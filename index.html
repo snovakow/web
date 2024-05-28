@@ -3,11 +3,42 @@
 
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width,initial-scale=1">
-
 	<title>snovakow</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<style>
+		a {
+			font-size: 48px;
+			display: block;
+		}
 
-	<script defer="defer" src="./main.js" type="module"></script>
+		body {
+			color: black;
+			background-color: white;
+		}
+	</style>
+	<script type="module">
+		const appInitialize = (title, version, css) => {
+			document.title = title;
+
+			if (css) {
+				const link = document.createElement('link');
+				link.rel = "stylesheet";
+				link.href = css + "?" + version;
+				document.head.appendChild(link);
+			}
+		}
+
+		const addLink = (title, link) => {
+			const a = document.createElement('a');
+			a.href = link;
+			a.appendChild(document.createTextNode(title));
+			document.body.appendChild(a);
+		};
+
+		addLink("Sudoku", "/sudoku/");
+		addLink("Three", "/three/");
+		addLink("About", "/about/");
+	</script>
 </head>
 
 <body>
