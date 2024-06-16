@@ -31,11 +31,12 @@ npx webpack
 cd ".."
 
 echo
-echo "copy index.html"
+echo "copy index.html favicon.ico"
 echo "****"
 echo
 
 cp "./snovakow/index.html" "../live/index.html"
+cp "./snovakow/favicon.ico" "../live/favicon.ico"
 
 # 	rm -rf "./dist"
 # 	mkdir "dist"
