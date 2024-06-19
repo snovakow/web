@@ -22,11 +22,20 @@ npx webpack
 cd ".."
 
 echo
-echo "three"
+echo "bounder"
+echo "*******"
+echo
+
+cd "bounder"
+npx webpack
+cd ".."
+
+echo
+echo "tuber"
 echo "*****"
 echo
 
-cd "three"
+cd "tuber"
 npx webpack
 cd ".."
 
