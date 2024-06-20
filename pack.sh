@@ -31,15 +31,6 @@ npx webpack
 cd ".."
 
 echo
-echo "tuber"
-echo "*****"
-echo
-
-cd "tuber"
-npx webpack
-cd ".."
-
-echo
 echo "copy index.html favicon.ico"
 echo "****"
 echo
