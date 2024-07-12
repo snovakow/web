@@ -1,6 +1,4 @@
 <?php
-    // Author: Scott Novakowski
-
 	if(!isset($_GET['id'])) die();
 
 	header("Access-Control-Allow-Origin: *");
