@@ -1,5 +1,5 @@
 <?php
-    class LWMySQL
+    class MySQL
     {
         public $db;
         
