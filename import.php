@@ -1,5 +1,4 @@
 <?php
-    // Author: Scott Novakowski
 	$version=1;
 	
 	if(!isset($_POST['version'])) die();
