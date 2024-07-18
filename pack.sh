@@ -22,6 +22,15 @@ npx webpack
 cd ".."
 
 echo
+echo "birthday"
+echo "******"
+echo
+
+cd "birthday"
+npx webpack
+cd ".."
+
+echo
 echo "bounder"
 echo "*******"
 echo
