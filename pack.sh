@@ -1,51 +1,60 @@
 player="echo '\n***\npack player\n***\n';npx webpack"
 presenter="echo '\n***\npack presenter\n***\n';npx webpack --config webpack.config.presenter.js"
 
+echo
+echo "Options: all | resume | sudoku | birthday| bounder | home"
+echo
+
 cd ".."
 
-echo
-echo "resume"
-echo "******"
-echo
+for build in "$@"
+do
+	if [ "$build" = "all" ] || [ "$build" = "resume" ] ; then
+		echo "resume"
+		echo "******"
 
-cd "resume"
-npx webpack
-cd ".."
+		cd "resume"
+		npx webpack
+		cd ".."
+		echo
+	fi
+	if [ "$build" = "all" ] || [ "$build" = "sudoku" ] ; then
+		echo "sudoku"
+		echo "******"
 
-echo
-echo "sudoku"
-echo "******"
-echo
+		cd "sudoku"
+		npx webpack
+		cd ".."
+		echo
+	fi
+	if [ "$build" = "all" ] || [ "$build" = "birthday" ] ; then
+		echo "birthday"
+		echo "******"
 
-cd "sudoku"
-npx webpack
-cd ".."
+		cd "birthday"
+		npx webpack
+		cd ".."
+		echo
+	fi
+	if [ "$build" = "all" ] || [ "$build" = "bounder" ] ; then
+		echo "bounder"
+		echo "*******"
 
-echo
-echo "birthday"
-echo "******"
-echo
+		cd "bounder"
+		npx webpack
+		cd ".."
+		echo
+	fi
+	if [ "$build" = "all" ] || [ "$build" = "home" ] ; then
+		echo "home: copy index.html favicon.ico"
+		echo "****"
 
-cd "birthday"
-npx webpack
-cd ".."
-
-echo
-echo "bounder"
-echo "*******"
-echo
-
-cd "bounder"
-npx webpack
-cd ".."
-
-echo
-echo "copy index.html favicon.ico"
-echo "****"
-echo
-
-cp "./snovakow/index.html" "../live/index.html"
-cp "./snovakow/favicon.ico" "../live/favicon.ico"
+		cp "./snovakow/index.html" "../live/index.html"
+		cp "./snovakow/favicon.ico" "../live/favicon.ico"
+		echo
+	fi
+	shift 1;
+done
 
 # 	rm -rf "./dist"
 # 	mkdir "dist"
