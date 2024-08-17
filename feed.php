@@ -1,52 +1,65 @@
-<?php
-	if(!isset($_GET['id'])) die();
+<!doctype html>
+<html>
 
-	header("Access-Control-Allow-Origin: *");
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
 
-	$filename = "cache/".$_GET['id'].".txt";
-	$filepath = realpath("./".$filename);
-    $time = time();
-	if(file_exists($filepath)) {
-		//$filetime=filemtime($filename);
-		//$filesize=filesize($filename);
-		//if(($time-$filetime)<60*60*24*3) {
-			header('Content-Length: ' . filesize($filename));            
-			readfile($filepath);
-            exit;
-		//}
+<body>
+
+	<script type="module">
+		document.body.style.fontFamily = "'Courier New', monospace";
+	</script>
+
+	<?php
+	// if(!isset($_GET['id'])) die();
+
+	// header("Access-Control-Allow-Origin: *");
+
+	$servername = "localhost";
+	$username = "snovakow";
+	$password = "kewbac-recge1-Fiwpux";
+	$dbname = "sudoku";
+
+	try {
+		$conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+		$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		$stmt = $conn->prepare("SELECT `clueCount`, count(*) as count FROM puzzles GROUP BY `clueCount`");
+		$stmt->execute();
+
+		$total = 0;
+		$counts = array();
+
+		$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+		foreach ($result as $clueCount => $row) {
+			$total += $row['count'];
+		}
+
+		$precision = 100000;
+
+		foreach ($result as $clueCount => $row) {
+			$clueCount = $row['clueCount'];
+			$count = $row['count'];
+
+			$number = $count / $total;
+			$formatted = ceil(100 * $number * $precision) / $precision;
+			echo  $clueCount;
+			echo  ": ";
+			echo rtrim(rtrim(sprintf('%f', $formatted), '0'), ".");
+			echo  "% ";
+			echo  number_format($count);
+			echo  "<br/>";
+		}
+
+		echo  "Total: " . number_format($total) . "<br/>";
+	} catch (PDOException $e) {
+		echo "Error: " . $e->getMessage();
 	}
+	$conn = null;
+	?>
 
-	include 'db.php';
+</body>
 
-	//ini_set('memory_limit', '2048M');
-    
-	$database = new LWMySQL();
-	$database->db->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
-
-	$sql = 'SELECT Time, HRot, VRot, platformID, VRMode, Count FROM data WHERE videoID=:id LIMIT 3000000'; // 45 meg
-    $stmt = $database->db->prepare($sql);
-    $stmt->bindParam(':id', $_GET['id'], PDO::PARAM_INT);
-    $stmt->execute();
-
-	$filetmp = "cache/_tmp_".$_GET['id']."_".$time.".txt";
-
-    function shutdown($path) {
-        if(file_exists($path)) unlink($path);
-    }
-    register_shutdown_function('shutdown', realpath("./".$filetmp));
-
-    $file = fopen($filetmp, "w");
-
-    while($row = $stmt->fetch()) {
-		$line=$row['Time']." ".$row['HRot']." ".$row['VRot']." ".$row['platformID']." ".$row['VRMode']." ".$row['Count']."/";
-		echo ($line);	
-		$row=null;
-		unset($row);
-		fwrite($file, $line);
-		$line=null;
-		unset($line);
-	}
-
-    fclose($file);
-    rename($filetmp, $filename);
-?>
+</html>
