@@ -49,24 +49,77 @@ $username = "snovakow";
 $password = "kewbac-recge1-Fiwpux";
 $dbname = "sudoku";
 
+$solveType = 1;
+if ($simple > 0) $solveType = 0;
+if ($bruteForce > 0) $solveType = 2;
+
+$has_naked2 = $naked2 > 0 ? 1 : 0;
+$has_naked3 = $naked3 > 0 ? 1 : 0;
+$has_naked4 = $naked4 > 0 ? 1 : 0;
+$has_hidden2 = $hidden2 > 0 ? 1 : 0;
+$has_hidden3 = $hidden3 > 0 ? 1 : 0;
+$has_hidden4 = $hidden4 > 0 ? 1 : 0;
+$has_yWing = $yWing > 0 ? 1 : 0;
+$has_xyzWing = $xyzWing > 0 ? 1 : 0;
+$has_xWing = $xWing > 0 ? 1 : 0;
+$has_swordfish = $swordfish > 0 ? 1 : 0;
+$has_jellyfish = $jellyfish > 0 ? 1 : 0;
+$has_uniqueRectangle = $uniqueRectangle > 0 ? 1 : 0;
+$has_phistomefel = $phistomefel > 0 ? 1 : 0;
+
 try {
-	$conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+	$pdo = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
 	// set the PDO error mode to exception
-	$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-	echo "Connected successfully";
+	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	// echo "Connected successfully";
 
 	$sql = "INSERT INTO puzzles (puzzleClues, puzzleFilled, clueCount, simple, naked2, naked3, naked4, hidden2, hidden3, hidden4, 
-			yWing, xyzWing, xWing, swordfish, jellyfish, uniqueRectangle, phistomefel, superpositions, bruteForce) 
-			VALUES ($puzzleClues, $puzzleFilled, $clueCount, $simple, $naked2, $naked3, $naked4, $hidden2, $hidden3, $hidden4, 
-			$yWing, $xyzWing, $xWing, $swordfish, $jellyfish, $uniqueRectangle, $phistomefel, $superpositions, $bruteForce)";
-	// use exec() because no results are returned
-	$conn->exec($sql);
-	echo "New record created successfully";
+			yWing, xyzWing, xWing, swordfish, jellyfish, uniqueRectangle, phistomefel, has_naked2, has_naked3, has_naked4, has_hidden2, has_hidden3, has_hidden4, 
+			has_yWing, has_xyzWing, has_xWing, has_swordfish, has_jellyfish, has_uniqueRectangle, has_phistomefel, superpositions, bruteForce, solveType) 
+			VALUES (:puzzleClues, :puzzleFilled, :clueCount, :simple, :naked2, :naked3, :naked4, :hidden2, :hidden3, :hidden4, 
+			:yWing, :xyzWing, :xWing, :swordfish, :jellyfish, :uniqueRectangle, :phistomefel, :has_naked2, :has_naked3, :has_naked4, :has_hidden2, :has_hidden3, :has_hidden4, 
+			:has_yWing, :has_xyzWing, :has_xWing, :has_swordfish, :has_jellyfish, :has_uniqueRectangle, :has_phistomefel, :superpositions, :bruteForce, :solveType)";
+
+	$statement = $pdo->prepare($sql);
+
+	$statement->execute([
+		'puzzleClues' => $puzzleClues,
+		'puzzleFilled' => $puzzleFilled,
+		'clueCount' => $clueCount,
+		'simple' => $simple,
+		'naked2' => $naked2,
+		'naked3' => $naked3,
+		'naked4' => $naked4,
+		'hidden2' => $hidden2,
+		'hidden3' => $hidden3,
+		'hidden4' => $hidden4,
+		'yWing' => $yWing,
+		'xyzWing' => $xyzWing,
+		'xWing' => $xWing,
+		'swordfish' => $swordfish,
+		'jellyfish' => $jellyfish,
+		'uniqueRectangle' => $uniqueRectangle,
+		'phistomefel' => $phistomefel,
+		'has_naked2' => $has_naked2,
+		'has_naked3' => $has_naked3,
+		'has_naked4' => $has_naked4,
+		'has_hidden2' => $has_hidden2,
+		'has_hidden3' => $has_hidden3,
+		'has_hidden4' => $has_hidden4,
+		'has_yWing' => $has_yWing,
+		'has_xyzWing' => $has_xyzWing,
+		'has_xWing' => $has_xWing,
+		'has_swordfish' => $has_swordfish,
+		'has_jellyfish' => $has_jellyfish,
+		'has_uniqueRectangle' => $has_uniqueRectangle,
+		'has_phistomefel' => $has_phistomefel,
+		'superpositions' => $superpositions,
+		'bruteForce' => $bruteForce,
+		'solveType' => $solveType
+	]);
+	// echo "New record created successfully";
 } catch (PDOException $e) {
-	echo "Connection failed: " . $e->getMessage();
+	// echo "Connection failed: " . $e->getMessage();
 }
 
-$conn = null;
-
-$processCount = 1;
-echo ("Done " . $processCount . " processed.<br>");
+$pdo = null;
