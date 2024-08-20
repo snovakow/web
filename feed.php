@@ -88,19 +88,34 @@
 		$uniqueRectangle = $solveTypes['uniqueRectangle'];
 		$phistomefel = $solveTypes['phistomefel'];
 
-		printStat("Naked 2", $naked2, $total);
-		printStat("Naked 3", $naked3, $total);
-		printStat("Naked 4", $naked4, $total);
-		printStat("Hidden 2", $hidden2, $total);
-		printStat("Hidden 3", $hidden3, $total);
-		printStat("Hidden 4", $hidden4, $total);
-		printStat("yWing", $yWing, $total);
-		printStat("xyzWing", $xyzWing, $total);
-		printStat("xWing", $xWing, $total);
-		printStat("swordfish", $swordfish, $total);
-		printStat("jellyfish", $jellyfish, $total);
-		printStat("uniqueRectangle", $uniqueRectangle, $total);
-		printStat("phistomefel", $phistomefel, $total);
+		$markers = 0;
+		$markers += $naked2;
+		$markers += $naked3;
+		$markers += $naked4;
+		$markers += $hidden2;
+		$markers += $hidden3;
+		$markers += $hidden4;
+		$markers += $yWing;
+		$markers += $xyzWing;
+		$markers += $xWing;
+		$markers += $swordfish;
+		$markers += $jellyfish;
+		$markers += $uniqueRectangle;
+		$markers += $phistomefel;
+
+		printStat("Naked 2", $naked2, $markers);
+		printStat("Naked 3", $naked3, $markers);
+		printStat("Naked 4", $naked4, $markers);
+		printStat("Hidden 2", $hidden2, $markers);
+		printStat("Hidden 3", $hidden3, $markers);
+		printStat("Hidden 4", $hidden4, $markers);
+		printStat("yWing", $yWing, $markers);
+		printStat("xyzWing", $xyzWing, $markers);
+		printStat("xWing", $xWing, $markers);
+		printStat("swordfish", $swordfish, $markers);
+		printStat("jellyfish", $jellyfish, $markers);
+		printStat("uniqueRectangle", $uniqueRectangle, $markers);
+		printStat("phistomefel", $phistomefel, $markers);
 		echo  "<br/>";
 
 		$stmt = $conn->prepare("SELECT `solveType`, COUNT(*) as count FROM puzzles GROUP BY `solveType`");
