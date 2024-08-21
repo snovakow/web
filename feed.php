@@ -1,61 +1,57 @@
-<!doctype html>
-<html>
+<?php
 
-<head>
-	<meta charset="utf-8">
-	<title></title>
-	<meta name="viewport" content="width=device-width,initial-scale=1">
-</head>
+function flushOut($message)
+{
+	echo $message . "<br/>";
+	// ob_flush();
+	// flush();
+}
 
-<body>
+function percentage($count, $total)
+{
+	$precision = 100000;
+	$number = $count / $total;
+	$formatted = ceil(100 * $number * $precision) / $precision;
+	return rtrim(rtrim(sprintf('%f', $formatted), '0'), ".") . "%";
+}
+function printStat($title, $count, $total)
+{
+	echo $title . ": " . percentage($count, $total) . " " . number_format($count) . "<br/>";
+}
 
-	<script type="module">
-		document.body.style.fontFamily = "'Courier New', monospace";
-	</script>
+// if(!isset($_GET['id'])) die();
 
-	<?php
-	function percentage($count, $total)
-	{
-		$precision = 100000;
-		$number = $count / $total;
-		$formatted = ceil(100 * $number * $precision) / $precision;
-		return rtrim(rtrim(sprintf('%f', $formatted), '0'), ".") . "%";
+// header("Access-Control-Allow-Origin: *");
+
+$servername = "localhost";
+$username = "snovakow";
+$password = "kewbac-recge1-Fiwpux";
+$dbname = "sudoku";
+
+try {
+	$conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+	$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION, PDO::ATTR_STRINGIFY_FETCHES);
+
+	$total = 0;
+	$counts = array();
+
+	flushOut("--- Clues");
+
+	$stmt = $conn->prepare("SELECT `clueCount`, COUNT(*) as count FROM puzzles GROUP BY `clueCount`");
+	$stmt->execute();
+	$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+	foreach ($result as $clueCount => $row) $total += $row['count'];
+	foreach ($result as $key => $row) {
+		$clueCount = $row['clueCount'];
+		$count = $row['count'];
+
+		printStat($clueCount, $count, $total);
 	}
-	function printStat($title, $count, $total)
-	{
-		echo $title . ": " . percentage($count, $total) . " " . number_format($count) . "<br/>";
-	}
+	echo  "<br/>";
 
-	// if(!isset($_GET['id'])) die();
+	flushOut("--- Strategies");
 
-	// header("Access-Control-Allow-Origin: *");
-
-	$servername = "localhost";
-	$username = "snovakow";
-	$password = "kewbac-recge1-Fiwpux";
-	$dbname = "sudoku";
-
-	try {
-		$conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-		$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION, PDO::ATTR_STRINGIFY_FETCHES);
-
-		$startTime = microtime(true);
-		$total = 0;
-		$counts = array();
-
-		$stmt = $conn->prepare("SELECT `clueCount`, COUNT(*) as count FROM puzzles GROUP BY `clueCount`");
-		$stmt->execute();
-		$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-		foreach ($result as $clueCount => $row) $total += $row['count'];
-		foreach ($result as $key => $row) {
-			$clueCount = $row['clueCount'];
-			$count = $row['count'];
-
-			printStat($clueCount . " Clues", $count, $total);
-		}
-		echo  "<br/>";
-
-		$stmt = $conn->prepare("
+	$stmt = $conn->prepare("
 		SELECT
 		SUM(`has_naked2`) AS naked2,
 		SUM(`has_naked3`) AS naked3,
@@ -71,79 +67,70 @@
 		SUM(`has_uniqueRectangle`) AS uniqueRectangle,
 		SUM(`has_phistomefel`) AS phistomefel
 		FROM puzzles WHERE `bruteForce` = 0");
-		$stmt->execute();
-		$solveTypes = $stmt->fetch();
+	$stmt->execute();
+	$solveTypes = $stmt->fetch();
 
-		$naked2 = $solveTypes['naked2'];
-		$naked3 = $solveTypes['naked3'];
-		$naked4 = $solveTypes['naked4'];
-		$hidden2 = $solveTypes['hidden2'];
-		$hidden3 = $solveTypes['hidden3'];
-		$hidden4 = $solveTypes['hidden4'];
-		$yWing = $solveTypes['yWing'];
-		$xyzWing = $solveTypes['xyzWing'];
-		$xWing = $solveTypes['xWing'];
-		$swordfish = $solveTypes['swordfish'];
-		$jellyfish = $solveTypes['jellyfish'];
-		$uniqueRectangle = $solveTypes['uniqueRectangle'];
-		$phistomefel = $solveTypes['phistomefel'];
+	$naked2 = $solveTypes['naked2'];
+	$naked3 = $solveTypes['naked3'];
+	$naked4 = $solveTypes['naked4'];
+	$hidden2 = $solveTypes['hidden2'];
+	$hidden3 = $solveTypes['hidden3'];
+	$hidden4 = $solveTypes['hidden4'];
+	$yWing = $solveTypes['yWing'];
+	$xyzWing = $solveTypes['xyzWing'];
+	$xWing = $solveTypes['xWing'];
+	$swordfish = $solveTypes['swordfish'];
+	$jellyfish = $solveTypes['jellyfish'];
+	$uniqueRectangle = $solveTypes['uniqueRectangle'];
+	$phistomefel = $solveTypes['phistomefel'];
 
-		$markers = 0;
-		$markers += $naked2;
-		$markers += $naked3;
-		$markers += $naked4;
-		$markers += $hidden2;
-		$markers += $hidden3;
-		$markers += $hidden4;
-		$markers += $yWing;
-		$markers += $xyzWing;
-		$markers += $xWing;
-		$markers += $swordfish;
-		$markers += $jellyfish;
-		$markers += $uniqueRectangle;
-		$markers += $phistomefel;
+	$markers = 0;
+	$markers += $naked2;
+	$markers += $naked3;
+	$markers += $naked4;
+	$markers += $hidden2;
+	$markers += $hidden3;
+	$markers += $hidden4;
+	$markers += $yWing;
+	$markers += $xyzWing;
+	$markers += $xWing;
+	$markers += $swordfish;
+	$markers += $jellyfish;
+	$markers += $uniqueRectangle;
+	$markers += $phistomefel;
 
-		printStat("Naked 2", $naked2, $markers);
-		printStat("Naked 3", $naked3, $markers);
-		printStat("Naked 4", $naked4, $markers);
-		printStat("Hidden 2", $hidden2, $markers);
-		printStat("Hidden 3", $hidden3, $markers);
-		printStat("Hidden 4", $hidden4, $markers);
-		printStat("yWing", $yWing, $markers);
-		printStat("xyzWing", $xyzWing, $markers);
-		printStat("xWing", $xWing, $markers);
-		printStat("swordfish", $swordfish, $markers);
-		printStat("jellyfish", $jellyfish, $markers);
-		printStat("uniqueRectangle", $uniqueRectangle, $markers);
-		printStat("phistomefel", $phistomefel, $markers);
-		echo  "<br/>";
+	printStat("Naked 2", $naked2, $markers);
+	printStat("Naked 3", $naked3, $markers);
+	printStat("Naked 4", $naked4, $markers);
+	printStat("Hidden 2", $hidden2, $markers);
+	printStat("Hidden 3", $hidden3, $markers);
+	printStat("Hidden 4", $hidden4, $markers);
+	printStat("yWing", $yWing, $markers);
+	printStat("xyzWing", $xyzWing, $markers);
+	printStat("xWing", $xWing, $markers);
+	printStat("swordfish", $swordfish, $markers);
+	printStat("jellyfish", $jellyfish, $markers);
+	printStat("uniqueRectangle", $uniqueRectangle, $markers);
+	printStat("phistomefel", $phistomefel, $markers);
+	echo  "<br/>";
 
-		$stmt = $conn->prepare("SELECT `solveType`, COUNT(*) as count FROM puzzles GROUP BY `solveType`");
-		$stmt->execute();
-		$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-		foreach ($result as $key => $row) {
-			$solveType = $row['solveType'];
-			$count = $row['count'];
+	flushOut("--- Stats");
 
-			$type = "Simples";
-			if ($solveType === "1") $type =  "Markers";
-			else if ($solveType === "2") $type = "Brute Force";
-			printStat($type, $count, $total);
-		}
-		echo  "<br/>";
+	$stmt = $conn->prepare("SELECT `solveType`, COUNT(*) as count FROM puzzles GROUP BY `solveType`");
+	$stmt->execute();
+	$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+	foreach ($result as $key => $row) {
+		$solveType = $row['solveType'];
+		$count = $row['count'];
 
-		echo  "Total Puzzles: " . number_format($total) . "<br/>";
-		echo  "<br/>";
-
-		$endtime = microtime(true);
-		$timediff = $endtime - $startTime;
-		echo $timediff . " seconds<br/>";
-	} catch (PDOException $e) {
-		echo "Error: " . $e->getMessage();
+		$type = "Simples";
+		if ($solveType === "1") $type =  "Markers";
+		else if ($solveType === "2") $type = "Brute Force";
+		printStat($type, $count, $total);
 	}
-	$conn = null;
-	?>
-
-</body>
-
-</html>
+	echo  "Total Puzzles: " . number_format($total) . "<br/>";
+	echo  "<br/>";
+} catch (PDOException $e) {
+	echo "Error: " . $e->getMessage();
+}
+$conn = null;
