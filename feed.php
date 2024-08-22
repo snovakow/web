@@ -37,7 +37,10 @@ try {
 
 	flushOut("--- Clues");
 
-	$stmt = $conn->prepare("SELECT `clueCount`, COUNT(*) as count FROM puzzles GROUP BY `clueCount`");
+	$table = "puzzles";
+	if (isset($_GET['dbphistomefel'])) $table = "phistomefel";
+
+	$stmt = $conn->prepare("SELECT `clueCount`, COUNT(*) as count FROM " . $table . " GROUP BY `clueCount`");
 	$stmt->execute();
 	$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 	foreach ($result as $clueCount => $row) $total += $row['count'];
@@ -66,7 +69,7 @@ try {
 		SUM(`has_jellyfish`) AS jellyfish,
 		SUM(`has_uniqueRectangle`) AS uniqueRectangle,
 		SUM(`has_phistomefel`) AS phistomefel
-		FROM puzzles WHERE `bruteForce` = 0");
+		FROM " . $table . " WHERE `bruteForce` = 0");
 	$stmt->execute();
 	$solveTypes = $stmt->fetch();
 
@@ -116,7 +119,7 @@ try {
 
 	flushOut("--- Stats");
 
-	$stmt = $conn->prepare("SELECT `solveType`, COUNT(*) as count FROM puzzles GROUP BY `solveType`");
+	$stmt = $conn->prepare("SELECT `solveType`, COUNT(*) as count FROM " . $table . " GROUP BY `solveType`");
 	$stmt->execute();
 	$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 	foreach ($result as $key => $row) {
