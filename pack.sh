@@ -2,7 +2,7 @@ player="echo '\n***\npack player\n***\n';npx webpack"
 presenter="echo '\n***\npack presenter\n***\n';npx webpack --config webpack.config.presenter.js"
 
 echo
-echo "Options: all | resume | sudoku | sudokudev | birthday| bounder | home"
+echo "Options: all | resume | sudoku | sudokudev | birthday| bounder | home | lib"
 echo
 
 cd ".."
@@ -60,6 +60,15 @@ do
 
 		cp "./snovakow/index.html" "../live/index.html"
 		cp "./snovakow/favicon.ico" "../live/favicon.ico"
+		echo
+	fi
+	if [ "$build" = "all" ] || [ "$build" = "lib" ] ; then
+		echo "lib: replace sudokulib/sudoku.php"
+		echo "****"
+
+		rm -r "../live/sudokulib/"
+		mkdir "../live/sudokulib/"
+		cp "./sudokulib/sudoku.php" "../live/sudokulib/sudoku.php"
 		echo
 	fi
 	shift 1;
