@@ -39,7 +39,17 @@
 			xhttp.onreadystatechange = () => {
 				// if (xhttp.readyState == 3) fillContent(xhttp.responseText, '... ' + diffTime());
 				if (xhttp.readyState == 4 && xhttp.status == 200) {
-					fillContent(xhttp.responseText, diffTime());
+					const options = {
+						weekday: "long",
+						year: "numeric",
+						month: "long",
+						day: "numeric",
+						hour: "numeric",
+						minute: "numeric",
+						second: "numeric",
+					};
+					const time = diffTime() + " " + new Date().toLocaleString(undefined, options);
+					fillContent(xhttp.responseText, time);
 
 					const minute = 1000 * 60;
 					window.setTimeout(() => {
@@ -47,7 +57,9 @@
 					}, minute * 60);
 				}
 			};
-			xhttp.open("GET", "https://snovakow.dev/snovakow/feed.php", true);
+			let url = "https://snovakow.dev/snovakow/feed.php";
+			if (window.location.search === "?dbphistomefel") url += "?dbphistomefel";
+			xhttp.open("GET", url, true);
 			xhttp.send();
 		};
 		refresh();
