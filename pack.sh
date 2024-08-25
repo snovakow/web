@@ -55,10 +55,11 @@ do
 		echo
 	fi
 	if [ "$build" = "all" ] || [ "$build" = "home" ] ; then
-		echo "home: copy index.html favicon.ico"
+		echo "home: copy index.html sudoku.html favicon.ico"
 		echo "****"
 
 		cp "./snovakow/index.html" "../live/index.html"
+		cp "./snovakow/sudoku.html" "../live/sudoku.html"
 		cp "./snovakow/favicon.ico" "../live/favicon.ico"
 		echo
 	fi
