@@ -1,76 +1,30 @@
-player="echo '\n***\npack player\n***\n';npx webpack"
-presenter="echo '\n***\npack presenter\n***\n';npx webpack --config webpack.config.presenter.js"
-
 echo
-echo "Options: all | resume | sudoku | sudokudev | birthday| bounder | home | lib"
+echo "Options: all | snovakow | resume | sudoku | sudokudev | birthday| bounder"
 echo
 
 cd ".."
 
+function_name () {
+	local name=$1
+	local param=$2
+	echo $name
+	echo $param
+	echo "******"
+
+	cd $name
+	npx webpack $param
+	cd ".."
+	echo
+}
+
 for build in "$@"
 do
-	if [ "$build" = "all" ] || [ "$build" = "resume" ] ; then
-		echo "resume"
-		echo "******"
-
-		cd "resume"
-		npx webpack
-		cd ".."
-		echo
-	fi
-	if [ "$build" = "all" ] || [ "$build" = "sudoku" ] ; then
-		echo "sudoku"
-		echo "******"
-
-		cd "sudoku"
-		npx webpack
-		cd ".."
-		echo
-	fi
-	if [ "$build" = "all" ] || [ "$build" = "sudokudev" ] ; then
-		echo "sudokudev"
-		echo "******"
-
-		cd "sudokudev"
-		npx webpack
-		cd ".."
-		echo
-	fi
-	if [ "$build" = "all" ] || [ "$build" = "birthday" ] ; then
-		echo "birthday"
-		echo "******"
-
-		cd "birthday"
-		npx webpack
-		cd ".."
-		echo
-	fi
-	if [ "$build" = "all" ] || [ "$build" = "bounder" ] ; then
-		echo "bounder"
-		echo "*******"
-
-		cd "bounder"
-		npx webpack
-		cd ".."
-		echo
-	fi
-	if [ "$build" = "all" ] || [ "$build" = "home" ] ; then
-		echo "home: copy index.html sudoku.html favicon.ico"
-		echo "****"
-
-		cp "./snovakow/index.html" "../live/index.html"
-		cp "./snovakow/sudoku.html" "../live/sudoku.html"
-		cp "./snovakow/favicon.ico" "../live/favicon.ico"
-		echo
-	fi
-	if [ "$build" = "all" ] || [ "$build" = "lib" ] ; then
-		echo "lib: replace sudokulib/sudoku.php"
-		echo "****"
-
-		rm -r "../live/sudokulib/"
-		mkdir "../live/sudokulib/"
-		cp "./sudokulib/sudoku.php" "../live/sudokulib/sudoku.php"
-		echo
-	fi
+	if [ "$build" = "snovakow" ] ; then function_name "snovakow" ; fi
+	if [ "$build" = "all" ] ; then function_name "snovakow" --env=clean ; fi
+	if [ "$build" = "all" ] || [ "$build" = "resume" ] ; then function_name "resume" ; fi
+	if [ "$build" = "all" ] || [ "$build" = "sudoku" ] ; then function_name "sudoku" ; fi
+	if [ "$build" = "all" ] || [ "$build" = "sudokudev" ] ; then function_name "sudokudev" ; fi
+	if [ "$build" = "all" ] || [ "$build" = "birthday" ] ; then function_name "birthday" ; fi
+	if [ "$build" = "all" ] || [ "$build" = "bounder" ] ; then function_name "bounder" ; fi
 	shift 1;
 done
