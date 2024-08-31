@@ -8,7 +8,6 @@ function_name () {
 	local name=$1
 	local param=$2
 	echo $name
-	echo $param
 	echo "******"
 
 	cd $name
