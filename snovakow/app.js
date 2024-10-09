@@ -16,7 +16,7 @@ iframe.style.border = 0;
 document.body.appendChild(iframe);
 
 addLink("Sudoku", "/sudoku?strategy=simple");
-addLink("Sudoku About", "/sudokudev/about.html");
+addLink("Sudoku About", "/sudoku/about.html");
 // addLink("Bounder", "/bounder/");
 
 addLink("Resume", "/resume/");
