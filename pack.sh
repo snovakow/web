@@ -1,5 +1,5 @@
 echo
-echo "Options: all | snovakow | resume | sudoku | sudokudev | birthday| bounder"
+echo "Options: all | snovakow | resume | sudoku | birthday| bounder"
 echo
 
 cd ".."
@@ -22,7 +22,6 @@ do
 	if [ "$build" = "all" ] ; then function_name "snovakow" --env=clean ; fi
 	if [ "$build" = "all" ] || [ "$build" = "resume" ] ; then function_name "resume" ; fi
 	if [ "$build" = "all" ] || [ "$build" = "sudoku" ] ; then function_name "sudoku" ; fi
-	if [ "$build" = "all" ] || [ "$build" = "sudokudev" ] ; then function_name "sudokudev" ; fi
 	if [ "$build" = "all" ] || [ "$build" = "birthday" ] ; then function_name "birthday" ; fi
 	if [ "$build" = "all" ] || [ "$build" = "bounder" ] ; then function_name "bounder" ; fi
 	shift 1;
