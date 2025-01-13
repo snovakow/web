@@ -7,7 +7,7 @@ module.exports = env => {
 		entry: './snovakow/main.js',
 		output: {
 			filename: './snovakow/main.js',
-			path: path.resolve(__dirname, '../../live'),
+			path: path.resolve(__dirname, '../live'),
 			chunkFilename: './snovakow/[chunkhash].js',
 			clean: env.clean ? true : false,
 			publicPath: ''
