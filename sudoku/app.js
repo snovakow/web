@@ -107,8 +107,8 @@ const draw = () => {
 }
 
 {
-	const urlComicSans = 'url(../snovakow/assets/fonts/comic-sans-ms/COMIC.TTF)';
-	const urlOpenSansRegular = 'url(../snovakow/assets/fonts/Open_Sans/static/OpenSans-Regular.ttf)';
+	const urlComicSans = 'url(../assets/fonts/comic-sans-ms/COMIC.TTF)';
+	const urlOpenSansRegular = 'url(../assets/fonts/Open_Sans/static/OpenSans-Regular.ttf)';
 
 	const fontOpenSansRegular = new FontFace("REGULAR", urlOpenSansRegular);
 	const fontComicSans = new FontFace("COMIC", urlComicSans);
