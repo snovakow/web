@@ -436,7 +436,7 @@ try {
 		$stmt->execute();
 		$result = $stmt->fetch();
 
-		echo "super_min\n";
+		echo "$tableName\n";
 
 		echo "Size: {$result['superSizeMin']} - {$result['superSizeMax']}\n";
 		$stmt = $db->prepare("SELECT `superDepth`, COUNT(*) AS count FROM `$tableName` GROUP BY `superDepth`");
@@ -447,7 +447,7 @@ try {
 			$count = $row['count'];
 
 			$percent = percentage($count, 1000000, 4);
-			$number = number_format($count);	
+			$number = number_format($count);
 			echo "Depth $superDepth: $percent $number\n";
 		}
 		// echo "Depth: {$result['superDepthMin']} - {$result['superDepthMax']}\n";
@@ -459,7 +459,7 @@ try {
 			$count = $row['count'];
 
 			$percent = percentage($count, 1000000, 4);
-			$number = number_format($count);	
+			$number = number_format($count);
 			echo "Count $superCount: $percent $number\n";
 		}
 		// echo "Count: {$result['superCountMin']} - {$result['superCountMax']}\n";
@@ -474,7 +474,7 @@ try {
 		$stmt->execute();
 		$result = $stmt->fetch();
 
-		echo "super_max\n";
+		echo "$tableName\n";
 
 		$stmt = $db->prepare("SELECT `superSize`, COUNT(*) AS count FROM `$tableName` GROUP BY `superSize`");
 		$stmt->execute();
@@ -484,7 +484,7 @@ try {
 			$count = $row['count'];
 
 			$percent = percentage($count, 1000000, 4);
-			$number = number_format($count);	
+			$number = number_format($count);
 			echo "Size $superSize: $percent $number\n";
 		}
 		// echo "Size: {$result['superSizeMin']} - {$result['superSizeMax']}\n";
