@@ -421,48 +421,50 @@ try {
 		$fields = ["superSize", "superDepth", "superCount", "superRank", "superType"];
 		$tableName = "super_min";
 		$sql = "SELECT ";
-		$sql .= "MIN(`superSize`) AS superSizeMin";
-		$sql .= ", ";
-		$sql .= "MIN(`superDepth`) AS superDepthMin";
-		$sql .= ", ";
-		$sql .= "MIN(`superCount`) AS superCountMin";
-		$sql .= ", ";
-		$sql .= "MIN(`superRank`) AS superRankMin";
-		$sql .= ", ";
-		$sql .= "MIN(`superType`) AS superTypeMin";
-		$sql .= ", ";
-		$sql .= "MAX(`superSize`) AS superSizeMax";
-		$sql .= ", ";
-		$sql .= "MAX(`superDepth`) AS superDepthMax";
-		$sql .= ", ";
-		$sql .= "MAX(`superCount`) AS superCountMax";
-		$sql .= ", ";
-		$sql .= "MAX(`superRank`) AS superRankMax";
-		$sql .= ", ";
+		$sql .= "MIN(`superSize`) AS superSizeMin, ";
+		$sql .= "MIN(`superDepth`) AS superDepthMin, ";
+		$sql .= "MIN(`superCount`) AS superCountMin, ";
+		$sql .= "MIN(`superRank`) AS superRankMin, ";
+		$sql .= "MIN(`superType`) AS superTypeMin, ";
+		$sql .= "MAX(`superSize`) AS superSizeMax, ";
+		$sql .= "MAX(`superDepth`) AS superDepthMax, ";
+		$sql .= "MAX(`superCount`) AS superCountMax, ";
+		$sql .= "MAX(`superRank`) AS superRankMax, ";
 		$sql .= "MAX(`superType`) AS superTypeMax";
 
 		$stmt = $db->prepare("$sql FROM `$tableName`");
 		$stmt->execute();
 		$result = $stmt->fetch();
 
-		$superSizeMin = $result['superSizeMin'];
-		$superDepthMin = $result['superDepthMin'];
-		$superCountMin = $result['superCountMin'];
-		$superRankMin = $result['superRankMin'];
-		$superTypeMin = $result['superTypeMin'];
-
-		$superSizeMax = $result['superSizeMax'];
-		$superDepthMax = $result['superDepthMax'];
-		$superCountMax = $result['superCountMax'];
-		$superRankMax = $result['superRankMax'];
-		$superTypeMax = $result['superTypeMax'];
-
 		echo "super_min\n";
-		echo "Size: $superSizeMin - $superSizeMax\n";
-		echo "Depth: $superDepthMin - $superDepthMax\n";
-		echo "Count: $superCountMin - $superCountMax\n";
-		echo "Rank: $superRankMin - $superRankMax\n";
-		echo "Type: $superTypeMin - $superTypeMax\n";
+
+		echo "Size: {$result['superSizeMin']} - {$result['superSizeMax']}\n";
+		$stmt = $db->prepare("SELECT `superDepth`, COUNT(*) AS count FROM `$tableName` GROUP BY `superDepth`");
+		$stmt->execute();
+		$group = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+		foreach ($group as $row) {
+			$superDepth = $row['superDepth'];
+			$count = $row['count'];
+
+			$percent = percentage($count, 1000000, 4);
+			$number = number_format($count);	
+			echo "Depth $superDepth: $percent $number\n";
+		}
+		// echo "Depth: {$result['superDepthMin']} - {$result['superDepthMax']}\n";
+		$stmt = $db->prepare("SELECT `superCount`, COUNT(*) AS count FROM `$tableName` GROUP BY `superCount`");
+		$stmt->execute();
+		$group = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+		foreach ($group as $row) {
+			$superCount = $row['superCount'];
+			$count = $row['count'];
+
+			$percent = percentage($count, 1000000, 4);
+			$number = number_format($count);	
+			echo "Count $superCount: $percent $number\n";
+		}
+		// echo "Count: {$result['superCountMin']} - {$result['superCountMax']}\n";
+		echo "Rank: {$result['superRankMin']} - {$result['superRankMax']}\n";
+		echo "Type: {$result['superTypeMin']} - {$result['superTypeMax']}\n";
 		echo "\n";
 
 		$fields = ["superSize", "superDepth", "superCount", "superRank", "superType"];
@@ -472,24 +474,24 @@ try {
 		$stmt->execute();
 		$result = $stmt->fetch();
 
-		$superSizeMin = $result['superSizeMin'];
-		$superDepthMin = $result['superDepthMin'];
-		$superCountMin = $result['superCountMin'];
-		$superRankMin = $result['superRankMin'];
-		$superTypeMin = $result['superTypeMin'];
-
-		$superSizeMax = $result['superSizeMax'];
-		$superDepthMax = $result['superDepthMax'];
-		$superCountMax = $result['superCountMax'];
-		$superRankMax = $result['superRankMax'];
-		$superTypeMax = $result['superTypeMax'];
-
 		echo "super_max\n";
-		echo "Size: $superSizeMin - $superSizeMax\n";
-		echo "Depth: $superDepthMin - $superDepthMax\n";
-		echo "Count: $superCountMin - $superCountMax\n";
-		echo "Rank: $superRankMin - $superRankMax\n";
-		echo "Type: $superTypeMin - $superTypeMax\n";
+
+		$stmt = $db->prepare("SELECT `superSize`, COUNT(*) AS count FROM `$tableName` GROUP BY `superSize`");
+		$stmt->execute();
+		$group = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+		foreach ($group as $row) {
+			$superSize = $row['superSize'];
+			$count = $row['count'];
+
+			$percent = percentage($count, 1000000, 4);
+			$number = number_format($count);	
+			echo "Size $superSize: $percent $number\n";
+		}
+		// echo "Size: {$result['superSizeMin']} - {$result['superSizeMax']}\n";
+		echo "Depth: {$result['superDepthMin']} - {$result['superDepthMax']}\n";
+		echo "Count: {$result['superCountMin']} - {$result['superCountMax']}\n";
+		echo "Rank: {$result['superRankMin']} - {$result['superRankMax']}\n";
+		echo "Type: {$result['superTypeMin']} - {$result['superTypeMax']}\n";
 		echo "\n";
 	}
 
