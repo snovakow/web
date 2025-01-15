@@ -329,13 +329,15 @@ try {
 		echo tableStrategyLogic($tableCount, 3, "swordfish", "candidate_swordfish");
 		echo tableStrategyLogic($tableCount, 3, "jellyfish", "candidate_jellyfish");
 
-		$fields = ["superSize", "superCount", "superDepth", "superRank", "superType"];
+		$fields = ["superSize", "superDepth", "superCount", "superRank", "superType"];
 		$select = implode(", ", $fields);
 		$logic = "`solveType`=4 AND `naked2`=0 AND `naked3`=0 AND `naked4`=0 AND `hidden1`=0 AND `hidden2`=0 AND `hidden3`=0 AND `hidden4`=0 AND ";
 		$logic .= "`omissions`=0 AND `uniqueRectangle`=0 AND `yWing`=0 AND `xyzWing`=0 AND `xWing`=0 AND `swordfish`=0 AND `jellyfish`=0";
 		$order = implode(", ", $fields);
 		echo tableGeneralStatement($tableCount, "super_min", $fields, $select, $logic, $order), "\n";
 
+		$fields = ["superSize", "superCount", "superDepth", "superRank", "superType"];
+		$select = implode(", ", $fields);
 		$logic = "`solveType`=4";
 		$order = implode(" DESC, ", $fields) . " DESC";
 		echo tableGeneralStatement($tableCount, "super_max", $fields, $select, $logic, $order), "\n";
@@ -343,6 +345,31 @@ try {
 
 	if ($mode === 2) {
 		echo "--- Populated Tables ", number_format($totalCount), "\n\n";
+
+		$len1 = 5;
+		$len2 = 9;
+		$len3 = 9;
+		echo "simple_hidden\n";
+		printf("%-{$len1}s %{$len2}s %{$len3}s\n", "Clues", "Percent", "Count");
+		printf("%'-{$len1}s %'-{$len2}s %'-{$len3}s\n", "", "", "");
+
+		$tableName = "simple_hidden";
+		$sql = "SELECT COUNT(*) AS groupCount, (81 - `count`) as hiddenSimple FROM `$tableName` GROUP BY `count`";
+
+		$stmt = $db->prepare($sql);
+		$stmt->execute();
+		$results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+		$total = 0;
+		foreach ($results as $result) $total += $result['groupCount'];
+		foreach ($results as $result) {
+			$groupCount = (int)$result['groupCount'];
+			$hiddenSimple = (int)$result['hiddenSimple'];
+
+			$percent = percentage($groupCount, $total, 4, 2);
+			$format = number_format($groupCount);
+			printf("%-{$len1}s %{$len2}s %{$len3}s\n", $hiddenSimple, $percent, $format);
+		}
+		echo "\n";
 
 		$tableNames = [
 			"simple_hidden",
@@ -366,13 +393,17 @@ try {
 			"super_max",
 		];
 
-		printf("%-26s%8s%4s%10s\n", "Table", "Percent", "Max", "Count");
-		printf("%'-26s%'-9s%'-4s%'-10s\n", " ", " ", " ", " ");
+		$len1 = 25;
+		$len2 = 8;
+		$len3 = 3;
+		$len4 = 9;
+		printf("%-{$len1}s %{$len2}s %{$len3}s %{$len4}s\n", "Table", "Percent", "Max", "Count");
+		printf("%'-{$len1}s %'-{$len2}s %'-{$len3}s %'-{$len4}s\n", "", "", "", "");
 		foreach ($tableNames as $tableName) {
-			if ($tableName == "simple_hidden") $sql = "SELECT COUNT(*) AS count, MAX(81 - `count`) as max FROM `$tableName`";
-			else if ($tableName == "super_min" || $tableName == "super_max") {
-				$sql = "SELECT COUNT(*) AS count, MAX(`superCount`) as max FROM `$tableName`";
-			} else $sql = "SELECT COUNT(*) AS count, MAX(`count`) as max FROM `$tableName`";
+			$property = "count";
+			if ($tableName == "super_min" || $tableName == "super_max") $property = "superCount";
+
+			$sql = "SELECT COUNT(*) AS count, MAX(`$property`) as max FROM `$tableName`";
 
 			$stmt = $db->prepare($sql);
 			$stmt->execute();
@@ -385,6 +416,80 @@ try {
 			$format = number_format($count);
 			printf("%-26s%8s%4s%10s\n", $tableName, $percent, $max, $format);
 		}
+		echo "\n";
+
+		$fields = ["superSize", "superDepth", "superCount", "superRank", "superType"];
+		$tableName = "super_min";
+		$sql = "SELECT ";
+		$sql .= "MIN(`superSize`) AS superSizeMin";
+		$sql .= ", ";
+		$sql .= "MIN(`superDepth`) AS superDepthMin";
+		$sql .= ", ";
+		$sql .= "MIN(`superCount`) AS superCountMin";
+		$sql .= ", ";
+		$sql .= "MIN(`superRank`) AS superRankMin";
+		$sql .= ", ";
+		$sql .= "MIN(`superType`) AS superTypeMin";
+		$sql .= ", ";
+		$sql .= "MAX(`superSize`) AS superSizeMax";
+		$sql .= ", ";
+		$sql .= "MAX(`superDepth`) AS superDepthMax";
+		$sql .= ", ";
+		$sql .= "MAX(`superCount`) AS superCountMax";
+		$sql .= ", ";
+		$sql .= "MAX(`superRank`) AS superRankMax";
+		$sql .= ", ";
+		$sql .= "MAX(`superType`) AS superTypeMax";
+
+		$stmt = $db->prepare("$sql FROM `$tableName`");
+		$stmt->execute();
+		$result = $stmt->fetch();
+
+		$superSizeMin = $result['superSizeMin'];
+		$superDepthMin = $result['superDepthMin'];
+		$superCountMin = $result['superCountMin'];
+		$superRankMin = $result['superRankMin'];
+		$superTypeMin = $result['superTypeMin'];
+
+		$superSizeMax = $result['superSizeMax'];
+		$superDepthMax = $result['superDepthMax'];
+		$superCountMax = $result['superCountMax'];
+		$superRankMax = $result['superRankMax'];
+		$superTypeMax = $result['superTypeMax'];
+
+		echo "super_min\n";
+		echo "Size: $superSizeMin - $superSizeMax\n";
+		echo "Depth: $superDepthMin - $superDepthMax\n";
+		echo "Count: $superCountMin - $superCountMax\n";
+		echo "Rank: $superRankMin - $superRankMax\n";
+		echo "Type: $superTypeMin - $superTypeMax\n";
+		echo "\n";
+
+		$fields = ["superSize", "superDepth", "superCount", "superRank", "superType"];
+		$tableName = "super_max";
+
+		$stmt = $db->prepare("$sql FROM `$tableName`");
+		$stmt->execute();
+		$result = $stmt->fetch();
+
+		$superSizeMin = $result['superSizeMin'];
+		$superDepthMin = $result['superDepthMin'];
+		$superCountMin = $result['superCountMin'];
+		$superRankMin = $result['superRankMin'];
+		$superTypeMin = $result['superTypeMin'];
+
+		$superSizeMax = $result['superSizeMax'];
+		$superDepthMax = $result['superDepthMax'];
+		$superCountMax = $result['superCountMax'];
+		$superRankMax = $result['superRankMax'];
+		$superTypeMax = $result['superTypeMax'];
+
+		echo "super_max\n";
+		echo "Size: $superSizeMin - $superSizeMax\n";
+		echo "Depth: $superDepthMin - $superDepthMax\n";
+		echo "Count: $superCountMin - $superCountMax\n";
+		echo "Rank: $superRankMin - $superRankMax\n";
+		echo "Type: $superTypeMin - $superTypeMax\n";
 		echo "\n";
 	}
 
