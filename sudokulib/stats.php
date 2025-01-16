@@ -299,17 +299,17 @@ try {
 	if ($mode === 1) {
 		$fields = ["count"];
 
-		$select = "`hiddenSimple` as count";
+		$select = "`hiddenSimple` AS count";
 		$logic = "`solveType`=0 AND `omissionSimple`=0 AND `naked2Simple`=0 AND `naked3Simple`=0 AND `nakedSimple`=0";
 		$order = "count";
 		echo tableGeneralStatement($tableCount, "simple_hidden", $fields, $select, $logic, $order), "\n";
 
-		$select = "`omissionSimple` as count";
+		$select = "`omissionSimple` AS count";
 		$logic = "`solveType`=0 AND `omissionSimple`>0 AND `naked2Simple`=0 AND `naked3Simple`=0 AND `nakedSimple`=0";
 		$order = "count DESC";
 		echo tableGeneralStatement($tableCount, "simple_omission", $fields, $select, $logic, $order), "\n";
 
-		$select = "`nakedVisible` as count";
+		$select = "`nakedVisible` AS count";
 		$logic = "`solveType`=1";
 		$order = "count DESC";
 		echo tableGeneralStatement($tableCount, "candidate_visible", $fields, $select, $logic, $order), "\n";
@@ -354,7 +354,7 @@ try {
 		printf("%'-{$len1}s %'-{$len2}s %'-{$len3}s\n", "", "", "");
 
 		$tableName = "simple_hidden";
-		$sql = "SELECT COUNT(*) AS groupCount, (81 - `count`) as hiddenSimple FROM `$tableName` GROUP BY `count`";
+		$sql = "SELECT COUNT(*) AS groupCount, (81 - `count`) AS hiddenSimple FROM `$tableName` GROUP BY `count`";
 
 		$stmt = $db->prepare($sql);
 		$stmt->execute();
@@ -396,25 +396,29 @@ try {
 		$len1 = 25;
 		$len2 = 8;
 		$len3 = 3;
-		$len4 = 9;
-		printf("%-{$len1}s %{$len2}s %{$len3}s %{$len4}s\n", "Table", "Percent", "Max", "Count");
-		printf("%'-{$len1}s %'-{$len2}s %'-{$len3}s %'-{$len4}s\n", "", "", "", "");
+		$len4 = 3;
+		$len5 = 9;
+		printf("%-{$len1}s %{$len2}s %{$len3}s %{$len4}s %{$len5}s\n", "Table", "Percent", "Min", "Max", "Count");
+		printf("%'-{$len1}s %'-{$len2}s %'-{$len3}s %'-{$len4}s %'-{$len5}s\n", "", "", "", "", "");
 		foreach ($tableNames as $tableName) {
 			$property = "count";
 			if ($tableName == "super_min" || $tableName == "super_max") $property = "superCount";
 
-			$sql = "SELECT COUNT(*) AS count, MAX(`$property`) as max FROM `$tableName`";
+			$sql = "SELECT COUNT(*) AS count, MIN(`$property`) AS min, MAX(`$property`) AS max FROM `$tableName`";
 
 			$stmt = $db->prepare($sql);
 			$stmt->execute();
 			$result = $stmt->fetch();
-			$count = (int)$result['count'];
-			$maxCount = (int)$result['max'];
+			$count = $result['count'];
 
-			$percent = percentage($count, 1000000, 3, 2);
-			$max = number_format($maxCount);
-			$format = number_format($count);
-			printf("%-26s%8s%4s%10s\n", $tableName, $percent, $max, $format);
+			printf(
+				"%-{$len1}s %{$len2}s %{$len3}s %{$len4}s %{$len5}s\n",
+				$tableName,
+				percentage($count, 1000000, 3, 2),
+				number_format($result['min']),
+				number_format($result['max']),
+				number_format($count)
+			);
 		}
 		echo "\n";
 
