@@ -211,7 +211,16 @@
 				addEstimate(formatTime(msTotal7) + " total");
 				statsEstimate.push(document.createElement('br'));
 
-				const remainingCount9 = 1e9 - totalCount;
+				const remainingCount8 = 1e8 - puzzleCount;
+				const ms8 = recordedTime / recordedCount * remainingCount8;
+				const date8 = new Date(now + ms8).toLocaleString(undefined, options);
+				addEstimate(date8, "100M ETA");
+				addEstimate(formatTime(ms8) + " remaining");
+				const msTotal8 = recordedTime * 1e8 / recordedCount;
+				addEstimate(formatTime(msTotal8) + " total");
+				statsEstimate.push(document.createElement('br'));
+
+				const remainingCount9 = 1e9 - puzzleCount;
 				const ms9 = recordedTime / recordedCount * remainingCount9;
 				const date9 = new Date(now + ms9).toLocaleString(undefined, options);
 				addEstimate(date9, "1 Billion ETA");
@@ -279,6 +288,16 @@
 		const search = new URLSearchParams(window.location.search);
 		const searchCores = parseInt(search.get("cores"));
 		if (!isNaN(searchCores) && searchCores <= 10 && searchCores > 0) coreCount = searchCores;
+
+		window.addEventListener("beforeunload", (event) => {
+			if (appStage === 0 || !animationLoop) return;
+
+			// Recommended
+			event.preventDefault();
+
+			// Included for legacy support, e.g. Chrome/Edge < 119
+			event.returnValue = true;
+		});
 
 		let strategyCounter = null;
 		let workers = null;
