@@ -878,7 +878,7 @@ try {
 			$title .=  str_pad("$min    ", $len3, " ", STR_PAD_LEFT);
 			$title .=  str_pad("$max    ", $len4, " ", STR_PAD_LEFT);
 
-			$percent = percentage($count, $total, 3);
+			$percent = percentage($count, $total, 5);
 			$format = number_format($count);
 
 			echo $title;
