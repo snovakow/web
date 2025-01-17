@@ -450,6 +450,7 @@ try {
 		foreach ($tableNames as $tableName) {
 			$property = "count";
 			if ($tableName == "super_min" || $tableName == "super_max") $property = "superCount";
+			elseif (substr($tableName, -4) === "_min") $property = "clueCount";
 
 			$sql = "SELECT COUNT(*) AS count, MIN(`$property`) AS min, MAX(`$property`) AS max FROM `$tableName`";
 
