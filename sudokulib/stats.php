@@ -130,6 +130,7 @@ function tableStatement($tableCount, $select, $tableName, $logic, $min = false)
 	$sql .= "CREATE TABLE `$tableName` (\n";
 	$sql .= "  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,\n";
 	$sql .= "  `count` tinyint(2) unsigned NOT NULL,\n";
+	$sql .= "  `clueCount` tinyint(2) unsigned NOT NULL,\n";
 	$sql .= "  `puzzle_id` int(10) unsigned NOT NULL,\n";
 	$sql .= "  `table_id` int(10) unsigned NOT NULL,\n";
 	$sql .= "  PRIMARY KEY (`id`)\n";
@@ -139,6 +140,7 @@ function tableStatement($tableCount, $select, $tableName, $logic, $min = false)
 		$sql .= "DROP TEMPORARY TABLE IF EXISTS `$tableName_tmp`;\n";
 		$sql .= "CREATE TEMPORARY TABLE `$tableName_tmp` (\n";
 		$sql .= "  `count` tinyint(2) unsigned NOT NULL,\n";
+		$sql .= "  `clueCount` tinyint(2) unsigned NOT NULL,\n";
 		$sql .= "  `puzzle_id` int(10) unsigned NOT NULL,\n";
 		$sql .= "  `table_id` int(10) unsigned NOT NULL\n";
 		$sql .= ") ENGINE=InnoDB DEFAULT CHARSET=ascii;\n";
@@ -159,19 +161,20 @@ function tableStatement($tableCount, $select, $tableName, $logic, $min = false)
 			}
 		}
 
-		$sql .= "INSERT INTO `$tableLead` (`count`, `puzzle_id`, `table_id`)\n";
+		$sql .= "INSERT INTO `$tableLead` (`count`, `clueCount`, `puzzle_id`, `table_id`)\n";
 
 		$table = tableName($table_id);
 
-		$selectLogic = "SELECT $select AS count, `id` AS puzzle_id, '$table_id' AS table_id FROM `$table` WHERE $logic";
+		$selectLogic = "SELECT $select AS count, `clueCount`, `id` AS puzzle_id, '$table_id' AS table_id FROM `$table` WHERE $logic";
 		if ($table_id > 1) {
 			$sql .= "($selectLogic) \n";
-			$sql .= "UNION ALL (SELECT `count`, `puzzle_id`, `table_id` FROM `$tableSwap`) \n";
+			$sql .= "UNION ALL (SELECT `count`, `clueCount`, `puzzle_id`, `table_id` FROM `$tableSwap`) \n";
 		} else {
 			$sql .= "$selectLogic \n";
 		}
-		$order = $min ? "" : "DESC ";
-		$sql .= "ORDER BY `count` {$order}LIMIT 1000000;\n";
+
+		$order = $min ? "count, clueCount DESC" : "count DESC";
+		$sql .= "ORDER BY {$order} LIMIT 1000000;\n";
 	}
 
 	if ($tableCount > 1) {
@@ -298,26 +301,25 @@ try {
 	}
 
 	if ($mode === 1) {
-		$fields = ["count"];
-
-		$select = "`hiddenSimple` AS count";
+		$fields = ["count", "clueCount"];
+		$select = "`hiddenSimple` AS count, `clueCount`";
 		$logic = "`solveType`=0 AND `omissionSimple`=0 AND `naked2Simple`=0 AND `naked3Simple`=0 AND `nakedSimple`=0";
 		echo tableGeneralStatement($tableCount, "simple_hidden_min", $fields, $select, $logic, "count"), "\n";
 		echo tableGeneralStatement($tableCount, "simple_hidden_max", $fields, $select, $logic, "count DESC"), "\n";
 
-		$select = "`omissionSimple` AS count";
+		$select = "`omissionSimple` AS count, `clueCount`";
 		$logic = "`solveType`=0 AND `omissionSimple`>0 AND `naked2Simple`=0 AND `naked3Simple`=0 AND `nakedSimple`=0";
-		echo tableGeneralStatement($tableCount, "simple_omission_min", $fields, $select, $logic, "count"), "\n";
+		echo tableGeneralStatement($tableCount, "simple_omission_min", $fields, $select, $logic, "count, clueCount DESC"), "\n";
 		echo tableGeneralStatement($tableCount, "simple_omission_max", $fields, $select, $logic, "count DESC"), "\n";
 
-		$select = "`nakedSimple` AS count";
+		$select = "`nakedSimple` AS count, `clueCount`";
 		$logic = "`solveType`=0 AND `nakedSimple`>0";
-		echo tableGeneralStatement($tableCount, "simple_naked_min", $fields, $select, $logic, "count"), "\n";
+		echo tableGeneralStatement($tableCount, "simple_naked_min", $fields, $select, $logic, "count, clueCount DESC"), "\n";
 		echo tableGeneralStatement($tableCount, "simple_naked_max", $fields, $select, $logic, "count DESC"), "\n";
 
-		$select = "`nakedVisible` AS count";
+		$select = "`nakedVisible` AS count, `clueCount`";
 		$logic = "`solveType`=1";
-		echo tableGeneralStatement($tableCount, "candidate_visible_min", $fields, $select, $logic, "count"), "\n";
+		echo tableGeneralStatement($tableCount, "candidate_visible_min", $fields, $select, $logic, "count, clueCount DESC"), "\n";
 		echo tableGeneralStatement($tableCount, "candidate_visible_max", $fields, $select, $logic, "count DESC"), "\n";
 
 		echo tableStrategyLogic($tableCount, 3, "naked2", "candidate_naked2_min", true);
@@ -366,7 +368,7 @@ try {
 		printf("%'-{$len1}s %'-{$len2}s %'-{$len3}s\n", "", "", "");
 
 		$tableName = "simple_hidden_min";
-		$sql = "SELECT COUNT(*) AS groupCount, (81 - `count`) AS hiddenSimple FROM `$tableName` GROUP BY `count`";
+		$sql = "SELECT COUNT(*) AS groupCount, `clueCount` AS hiddenSimple FROM `$tableName` GROUP BY `clueCount` ORDER BY 'clueCount'";
 		$stmt = $db->prepare($sql);
 		$stmt->execute();
 		$results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -386,7 +388,7 @@ try {
 		printf("%-{$len1}s %{$len2}s %{$len3}s\n", "Clues", "Percent", "Count");
 		printf("%'-{$len1}s %'-{$len2}s %'-{$len3}s\n", "", "", "");
 		$tableName = "simple_hidden_max";
-		$sql = "SELECT COUNT(*) AS groupCount, (81 - `count`) AS hiddenSimple FROM `$tableName` GROUP BY `count` ORDER BY 'hiddenSimple'";
+		$sql = "SELECT COUNT(*) AS groupCount, `clueCount` AS hiddenSimple FROM `$tableName` GROUP BY `clueCount` ORDER BY 'hiddenSimple'";
 		$stmt = $db->prepare($sql);
 		$stmt->execute();
 		$results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
