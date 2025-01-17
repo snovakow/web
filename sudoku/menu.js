@@ -118,11 +118,18 @@ const addMenuItem = (title, strategy) => {
 
 	menuMap.set(strategy, item);
 }
-addMenuItem("Hidden Single", 'simple_hidden');
-addMenuItem("Intersection Removal", 'simple_omission');
-addMenuItem("Basic Candidtates", 'candidate_visible');
-addMenuItem("Naked Pair", 'candidate_naked2');
-addMenuItem("Naked Triple", 'candidate_naked3');
+addMenuItem("Hidden Single", 'simple_hidden_min');
+addMenuItem("Hidden Single+", 'simple_hidden_max');
+addMenuItem("Intersection Removal", 'simple_omission_min');
+addMenuItem("Intersection Removal+", 'simple_omission_max');
+addMenuItem("Naked Single", 'simple_naked_min');
+addMenuItem("Naked Single+", 'simple_naked_max');
+addMenuItem("Basic Candidtates", 'candidate_visible_min');
+addMenuItem("Basic Candidtates+", 'candidate_visible_max');
+addMenuItem("Naked Pair", 'candidate_naked2_min');
+addMenuItem("Naked Pair+", 'candidate_naked2_max');
+addMenuItem("Naked Triple", 'candidate_naked3_min');
+addMenuItem("Naked Triple+", 'candidate_naked3_max');
 addMenuItem("Naked Quad", 'candidate_naked4');
 addMenuItem("Hidden Single", 'candidate_hidden1');
 addMenuItem("Hidden Pair", 'candidate_hidden2');
@@ -130,7 +137,8 @@ addMenuItem("Hidden Triple", 'candidate_hidden3');
 addMenuItem("Hidden Quad", 'candidate_hidden4');
 addMenuItem("Intersection Removal (Omissions)", 'candidate_omissions');
 addMenuItem("Deadly Pattern (Unique Rectangle)", 'candidate_uniqueRectangle');
-addMenuItem("Y Wing", 'candidate_yWing');
+addMenuItem("Y Wing", 'candidate_yWing_min');
+addMenuItem("Y Wing+", 'candidate_yWing_max');
 addMenuItem("XYZ Wing", 'candidate_xyzWing');
 addMenuItem("X Wing", 'candidate_xWing');
 addMenuItem("Swordfish", 'candidate_swordfish');
