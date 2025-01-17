@@ -7,7 +7,7 @@
 #
 # Host: localhost (MySQL 5.7.32)
 # Database: sudoku
-# Generation Time: 2025-01-17 16:33:02 +0000
+# Generation Time: 2025-01-17 19:32:14 +0000
 # ************************************************************
 
 
@@ -28,6 +28,7 @@ DROP TABLE IF EXISTS `candidate_hidden1`;
 CREATE TABLE `candidate_hidden1` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -43,6 +44,7 @@ DROP TABLE IF EXISTS `candidate_hidden2`;
 CREATE TABLE `candidate_hidden2` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -58,6 +60,7 @@ DROP TABLE IF EXISTS `candidate_hidden3`;
 CREATE TABLE `candidate_hidden3` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -73,6 +76,7 @@ DROP TABLE IF EXISTS `candidate_hidden4`;
 CREATE TABLE `candidate_hidden4` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -88,6 +92,7 @@ DROP TABLE IF EXISTS `candidate_jellyfish`;
 CREATE TABLE `candidate_jellyfish` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -103,6 +108,7 @@ DROP TABLE IF EXISTS `candidate_naked2_max`;
 CREATE TABLE `candidate_naked2_max` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -118,6 +124,7 @@ DROP TABLE IF EXISTS `candidate_naked2_min`;
 CREATE TABLE `candidate_naked2_min` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -133,6 +140,7 @@ DROP TABLE IF EXISTS `candidate_naked3_max`;
 CREATE TABLE `candidate_naked3_max` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -148,6 +156,7 @@ DROP TABLE IF EXISTS `candidate_naked3_min`;
 CREATE TABLE `candidate_naked3_min` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -163,6 +172,7 @@ DROP TABLE IF EXISTS `candidate_naked4`;
 CREATE TABLE `candidate_naked4` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -178,6 +188,7 @@ DROP TABLE IF EXISTS `candidate_omissions`;
 CREATE TABLE `candidate_omissions` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -193,6 +204,7 @@ DROP TABLE IF EXISTS `candidate_swordfish`;
 CREATE TABLE `candidate_swordfish` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -208,6 +220,7 @@ DROP TABLE IF EXISTS `candidate_uniqueRectangle`;
 CREATE TABLE `candidate_uniqueRectangle` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -223,6 +236,7 @@ DROP TABLE IF EXISTS `candidate_visible_max`;
 CREATE TABLE `candidate_visible_max` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -238,6 +252,7 @@ DROP TABLE IF EXISTS `candidate_visible_min`;
 CREATE TABLE `candidate_visible_min` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -253,6 +268,7 @@ DROP TABLE IF EXISTS `candidate_xWing`;
 CREATE TABLE `candidate_xWing` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -268,6 +284,7 @@ DROP TABLE IF EXISTS `candidate_xyzWing`;
 CREATE TABLE `candidate_xyzWing` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -283,6 +300,7 @@ DROP TABLE IF EXISTS `candidate_yWing_max`;
 CREATE TABLE `candidate_yWing_max` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -298,6 +316,7 @@ DROP TABLE IF EXISTS `candidate_yWing_min`;
 CREATE TABLE `candidate_yWing_min` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -313,6 +332,7 @@ DROP TABLE IF EXISTS `simple_hidden_max`;
 CREATE TABLE `simple_hidden_max` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -328,6 +348,7 @@ DROP TABLE IF EXISTS `simple_hidden_min`;
 CREATE TABLE `simple_hidden_min` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -343,6 +364,7 @@ DROP TABLE IF EXISTS `simple_naked_max`;
 CREATE TABLE `simple_naked_max` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -358,6 +380,7 @@ DROP TABLE IF EXISTS `simple_naked_min`;
 CREATE TABLE `simple_naked_min` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -373,6 +396,7 @@ DROP TABLE IF EXISTS `simple_omission_max`;
 CREATE TABLE `simple_omission_max` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -388,6 +412,7 @@ DROP TABLE IF EXISTS `simple_omission_min`;
 CREATE TABLE `simple_omission_min` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
+  `clueCount` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
