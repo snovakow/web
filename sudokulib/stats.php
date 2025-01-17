@@ -239,12 +239,18 @@ try {
 
 	$time = time();
 
-	$stmt = $db->prepare("SELECT `tableCount`, `puzzleCount` FROM `tables`");
-	$stmt->execute();
-	$result = $stmt->fetch();
-	$tableCount = (int)$result['tableCount'];
-	$puzzleCount = (int)$result['puzzleCount'];
-	$totalCount = totalCount($tableCount, $puzzleCount);
+	$tableCount = (int)$_GET['table'];
+	if (is_int($tableCount) && $tableCount >= 1 && $tableCount <= 1000) {
+		$puzzleCount = MAX_SIZE;
+		$totalCount = totalCount($tableCount, $puzzleCount);
+	} else {
+		$stmt = $db->prepare("SELECT `tableCount`, `puzzleCount` FROM `tables`");
+		$stmt->execute();
+		$result = $stmt->fetch();
+		$tableCount = (int)$result['tableCount'];
+		$puzzleCount = (int)$result['puzzleCount'];
+		$totalCount = totalCount($tableCount, $puzzleCount);
+	}
 
 	if ($mode === 0) {
 		$tableNames = [];
