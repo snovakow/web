@@ -321,21 +321,21 @@ try {
 		echo tableGeneralStatement($tableCount, "simple_naked", $fields, $select, $logic, "count DESC"), "\n";
 
 		$select = "`nakedVisible` AS count, `clueCount`";
-		$logic = "`solveType`=1 AND `nakedVisible`>=5";
+		$logic = "`solveType`=1 AND `nakedVisible`>=4";
 		echo tableGeneralStatement($tableCount, "candidate_visible", $fields, $select, $logic, "count DESC"), "\n";
 
 		echo tableStrategyLogic($tableCount, 3, "naked2", "candidate_naked2", 4);
-		echo tableStrategyLogic($tableCount, 3, "naked3", "candidate_naked3", 5);
-		echo tableStrategyLogic($tableCount, 3, "naked4", "candidate_naked4", 4);
+		echo tableStrategyLogic($tableCount, 3, "naked3", "candidate_naked3", 4);
+		echo tableStrategyLogic($tableCount, 3, "naked4", "candidate_naked4", 3);
 		echo tableStrategyLogic($tableCount, 3, "hidden1", "candidate_hidden1");
 		echo tableStrategyLogic($tableCount, 3, "hidden2", "candidate_hidden2");
 		echo tableStrategyLogic($tableCount, 3, "hidden3", "candidate_hidden3");
 		echo tableStrategyLogic($tableCount, 3, "hidden4", "candidate_hidden4");
 		echo tableStrategyLogic($tableCount, 3, "omissions", "candidate_omissions", 2);
 		echo tableStrategyLogic($tableCount, 3, "uniqueRectangle", "candidate_uniqueRectangle", 2);
-		echo tableStrategyLogic($tableCount, 3, "yWing", "candidate_yWing", 5);
+		echo tableStrategyLogic($tableCount, 3, "yWing", "candidate_yWing", 4);
 		echo tableStrategyLogic($tableCount, 3, "xyzWing", "candidate_xyzWing", 2);
-		echo tableStrategyLogic($tableCount, 3, "xWing", "candidate_xWing", 2);
+		echo tableStrategyLogic($tableCount, 3, "xWing", "candidate_xWing", 1);
 		echo tableStrategyLogic($tableCount, 3, "swordfish", "candidate_swordfish");
 		echo tableStrategyLogic($tableCount, 3, "jellyfish", "candidate_jellyfish");
 
@@ -434,8 +434,6 @@ try {
 		}
 		echo "\n";
 
-		$fields = ["superSize", "superDepth", "superCount", "superRank", "superType"];
-		$tableName = "super_min";
 		$sql = "SELECT ";
 		$sql .= "MIN(`superSize`) AS superSizeMin, ";
 		$sql .= "MIN(`superDepth`) AS superDepthMin, ";
@@ -448,49 +446,38 @@ try {
 		$sql .= "MAX(`superRank`) AS superRankMax, ";
 		$sql .= "MAX(`superType`) AS superTypeMax";
 
+		$fields = ["superSize", "superDepth", "superCount", "superRank", "superType"];
+		$tableName = "super_min";
+		echo "$tableName\n";
+
 		$stmt = $db->prepare("$sql FROM `$tableName`");
 		$stmt->execute();
 		$result = $stmt->fetch();
 
-		echo "$tableName\n";
-
 		echo "Size: {$result['superSizeMin']} - {$result['superSizeMax']}\n";
-		$stmt = $db->prepare("SELECT `superDepth`, COUNT(*) AS count FROM `$tableName` GROUP BY `superDepth`");
+		$stmt = $db->prepare("SELECT `superDepth`, `superCount`, COUNT(*) AS count FROM `$tableName` GROUP BY `superDepth`, `superCount`");
 		$stmt->execute();
 		$group = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 		foreach ($group as $row) {
 			$superDepth = $row['superDepth'];
-			$count = $row['count'];
-
-			$percent = percentage($count, 1000000, 4);
-			$number = number_format($count);
-			echo "Depth $superDepth: $percent $number\n";
-		}
-		// echo "Depth: {$result['superDepthMin']} - {$result['superDepthMax']}\n";
-		$stmt = $db->prepare("SELECT `superCount`, COUNT(*) AS count FROM `$tableName` GROUP BY `superCount`");
-		$stmt->execute();
-		$group = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-		foreach ($group as $row) {
 			$superCount = $row['superCount'];
 			$count = $row['count'];
 
 			$percent = percentage($count, 1000000, 4);
 			$number = number_format($count);
-			echo "Count $superCount: $percent $number\n";
+			echo "Depth $superDepth Count $superCount: $percent $number\n";
 		}
-		// echo "Count: {$result['superCountMin']} - {$result['superCountMax']}\n";
 		echo "Rank: {$result['superRankMin']} - {$result['superRankMax']}\n";
 		echo "Type: {$result['superTypeMin']} - {$result['superTypeMax']}\n";
 		echo "\n";
 
 		$fields = ["superSize", "superDepth", "superCount", "superRank", "superType"];
 		$tableName = "super_max";
+		echo "$tableName\n";
 
 		$stmt = $db->prepare("$sql FROM `$tableName`");
 		$stmt->execute();
 		$result = $stmt->fetch();
-
-		echo "$tableName\n";
 
 		$stmt = $db->prepare("SELECT `superSize`, COUNT(*) AS count FROM `$tableName` GROUP BY `superSize`");
 		$stmt->execute();
