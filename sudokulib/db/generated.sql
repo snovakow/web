@@ -7,7 +7,7 @@
 #
 # Host: localhost (MySQL 5.7.32)
 # Database: sudoku
-# Generation Time: 2025-01-17 19:32:14 +0000
+# Generation Time: 2025-01-18 03:38:38 +0000
 # ************************************************************
 
 
@@ -100,12 +100,12 @@ CREATE TABLE `candidate_jellyfish` (
 
 
 
-# Dump of table candidate_naked2_max
+# Dump of table candidate_naked2
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `candidate_naked2_max`;
+DROP TABLE IF EXISTS `candidate_naked2`;
 
-CREATE TABLE `candidate_naked2_max` (
+CREATE TABLE `candidate_naked2` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
   `clueCount` tinyint(2) unsigned NOT NULL,
@@ -116,44 +116,12 @@ CREATE TABLE `candidate_naked2_max` (
 
 
 
-# Dump of table candidate_naked2_min
+# Dump of table candidate_naked3
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `candidate_naked2_min`;
+DROP TABLE IF EXISTS `candidate_naked3`;
 
-CREATE TABLE `candidate_naked2_min` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `count` tinyint(2) unsigned NOT NULL,
-  `clueCount` tinyint(2) unsigned NOT NULL,
-  `puzzle_id` int(10) unsigned NOT NULL,
-  `table_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=ascii;
-
-
-
-# Dump of table candidate_naked3_max
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `candidate_naked3_max`;
-
-CREATE TABLE `candidate_naked3_max` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `count` tinyint(2) unsigned NOT NULL,
-  `clueCount` tinyint(2) unsigned NOT NULL,
-  `puzzle_id` int(10) unsigned NOT NULL,
-  `table_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=ascii;
-
-
-
-# Dump of table candidate_naked3_min
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `candidate_naked3_min`;
-
-CREATE TABLE `candidate_naked3_min` (
+CREATE TABLE `candidate_naked3` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
   `clueCount` tinyint(2) unsigned NOT NULL,
@@ -228,28 +196,12 @@ CREATE TABLE `candidate_uniqueRectangle` (
 
 
 
-# Dump of table candidate_visible_max
+# Dump of table candidate_visible
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `candidate_visible_max`;
+DROP TABLE IF EXISTS `candidate_visible`;
 
-CREATE TABLE `candidate_visible_max` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `count` tinyint(2) unsigned NOT NULL,
-  `clueCount` tinyint(2) unsigned NOT NULL,
-  `puzzle_id` int(10) unsigned NOT NULL,
-  `table_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=ascii;
-
-
-
-# Dump of table candidate_visible_min
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `candidate_visible_min`;
-
-CREATE TABLE `candidate_visible_min` (
+CREATE TABLE `candidate_visible` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
   `clueCount` tinyint(2) unsigned NOT NULL,
@@ -292,12 +244,12 @@ CREATE TABLE `candidate_xyzWing` (
 
 
 
-# Dump of table candidate_yWing_max
+# Dump of table candidate_yWing
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `candidate_yWing_max`;
+DROP TABLE IF EXISTS `candidate_yWing`;
 
-CREATE TABLE `candidate_yWing_max` (
+CREATE TABLE `candidate_yWing` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
   `clueCount` tinyint(2) unsigned NOT NULL,
@@ -308,12 +260,12 @@ CREATE TABLE `candidate_yWing_max` (
 
 
 
-# Dump of table candidate_yWing_min
+# Dump of table simple_hidden
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `candidate_yWing_min`;
+DROP TABLE IF EXISTS `simple_hidden`;
 
-CREATE TABLE `candidate_yWing_min` (
+CREATE TABLE `simple_hidden` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
   `clueCount` tinyint(2) unsigned NOT NULL,
@@ -324,12 +276,12 @@ CREATE TABLE `candidate_yWing_min` (
 
 
 
-# Dump of table simple_hidden_max
+# Dump of table simple_naked
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `simple_hidden_max`;
+DROP TABLE IF EXISTS `simple_naked`;
 
-CREATE TABLE `simple_hidden_max` (
+CREATE TABLE `simple_naked` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
   `clueCount` tinyint(2) unsigned NOT NULL,
@@ -340,76 +292,12 @@ CREATE TABLE `simple_hidden_max` (
 
 
 
-# Dump of table simple_hidden_min
+# Dump of table simple_omission
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `simple_hidden_min`;
+DROP TABLE IF EXISTS `simple_omission`;
 
-CREATE TABLE `simple_hidden_min` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `count` tinyint(2) unsigned NOT NULL,
-  `clueCount` tinyint(2) unsigned NOT NULL,
-  `puzzle_id` int(10) unsigned NOT NULL,
-  `table_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=ascii;
-
-
-
-# Dump of table simple_naked_max
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `simple_naked_max`;
-
-CREATE TABLE `simple_naked_max` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `count` tinyint(2) unsigned NOT NULL,
-  `clueCount` tinyint(2) unsigned NOT NULL,
-  `puzzle_id` int(10) unsigned NOT NULL,
-  `table_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=ascii;
-
-
-
-# Dump of table simple_naked_min
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `simple_naked_min`;
-
-CREATE TABLE `simple_naked_min` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `count` tinyint(2) unsigned NOT NULL,
-  `clueCount` tinyint(2) unsigned NOT NULL,
-  `puzzle_id` int(10) unsigned NOT NULL,
-  `table_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=ascii;
-
-
-
-# Dump of table simple_omission_max
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `simple_omission_max`;
-
-CREATE TABLE `simple_omission_max` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `count` tinyint(2) unsigned NOT NULL,
-  `clueCount` tinyint(2) unsigned NOT NULL,
-  `puzzle_id` int(10) unsigned NOT NULL,
-  `table_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=ascii;
-
-
-
-# Dump of table simple_omission_min
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `simple_omission_min`;
-
-CREATE TABLE `simple_omission_min` (
+CREATE TABLE `simple_omission` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
   `clueCount` tinyint(2) unsigned NOT NULL,
