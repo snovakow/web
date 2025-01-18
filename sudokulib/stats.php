@@ -184,36 +184,36 @@ function tableStatement($tableCount, $select, $tableName, $logic, $min = false)
 	$sql .= "ALTER TABLE `$tableName` AUTO_INCREMENT=1;\n";
 	return $sql;
 }
-function tableStrategyLogic($tableCount, $solveType, $strategy, $tableName, $min = false)
+function tableStrategyLogic($tableCount, $solveType, $strategy, $tableName, $frequency = 1, $min = false)
 {
 	$logic = "`solveType`=$solveType";
-	$logic .= tableLogic($strategy);
+	$logic .= tableLogic($strategy, $frequency);
 	$sql = tableStatement($tableCount, $strategy, $tableName, $logic, $min);
 	return "$sql\n";
 }
 
-function strategyLogic($strategy, $priority = "")
+function strategyLogic($strategy, $priority = "", $frequency = 1)
 {
-	if ($strategy == $priority) return " AND `$strategy`>0";
+	if ($strategy == $priority) return " AND `$strategy`>=$frequency";
 	return " AND `$strategy`=0";
 }
-function tableLogic($strategy = "")
+function tableLogic($strategy = "", $frequency = 1)
 {
 	$logic = "";
-	$logic .= strategyLogic("naked2", $strategy);
-	$logic .= strategyLogic("naked3", $strategy);
-	$logic .= strategyLogic("naked4", $strategy);
-	$logic .= strategyLogic("hidden1", $strategy);
-	$logic .= strategyLogic("hidden2", $strategy);
-	$logic .= strategyLogic("hidden3", $strategy);
-	$logic .= strategyLogic("hidden4", $strategy);
-	$logic .= strategyLogic("omissions", $strategy);
-	$logic .= strategyLogic("uniqueRectangle", $strategy);
-	$logic .= strategyLogic("yWing", $strategy);
-	$logic .= strategyLogic("xyzWing", $strategy);
-	$logic .= strategyLogic("xWing", $strategy);
-	$logic .= strategyLogic("swordfish", $strategy);
-	$logic .= strategyLogic("jellyfish", $strategy);
+	$logic .= strategyLogic("naked2", $strategy, $frequency);
+	$logic .= strategyLogic("naked3", $strategy, $frequency);
+	$logic .= strategyLogic("naked4", $strategy, $frequency);
+	$logic .= strategyLogic("hidden1", $strategy, $frequency);
+	$logic .= strategyLogic("hidden2", $strategy, $frequency);
+	$logic .= strategyLogic("hidden3", $strategy, $frequency);
+	$logic .= strategyLogic("hidden4", $strategy, $frequency);
+	$logic .= strategyLogic("omissions", $strategy, $frequency);
+	$logic .= strategyLogic("uniqueRectangle", $strategy, $frequency);
+	$logic .= strategyLogic("yWing", $strategy, $frequency);
+	$logic .= strategyLogic("xyzWing", $strategy, $frequency);
+	$logic .= strategyLogic("xWing", $strategy, $frequency);
+	$logic .= strategyLogic("swordfish", $strategy, $frequency);
+	$logic .= strategyLogic("jellyfish", $strategy, $frequency);
 	return $logic;
 }
 
@@ -309,56 +309,47 @@ try {
 	if ($mode === 1) {
 		$fields = ["count", "clueCount"];
 		$select = "`hiddenSimple` AS count, `clueCount`";
-		$logic = "`solveType`=0 AND `omissionSimple`=0 AND `naked2Simple`=0 AND `naked3Simple`=0 AND `nakedSimple`=0";
-		echo tableGeneralStatement($tableCount, "simple_hidden_min", $fields, $select, $logic, "count"), "\n";
-		echo tableGeneralStatement($tableCount, "simple_hidden_max", $fields, $select, $logic, "count DESC"), "\n";
+		$logic = "`solveType`=0 AND `clueCount`>=28 AND `omissionSimple`=0 AND `naked2Simple`=0 AND `naked3Simple`=0 AND `nakedSimple`=0";
+		echo tableGeneralStatement($tableCount, "simple_hidden", $fields, $select, $logic, "count DESC"), "\n";
 
 		$select = "`omissionSimple` AS count, `clueCount`";
-		$logic = "`solveType`=0 AND `omissionSimple`>0 AND `naked2Simple`=0 AND `naked3Simple`=0 AND `nakedSimple`=0";
-		echo tableGeneralStatement($tableCount, "simple_omission_min", $fields, $select, $logic, "count, clueCount DESC"), "\n";
-		echo tableGeneralStatement($tableCount, "simple_omission_max", $fields, $select, $logic, "count DESC"), "\n";
+		$logic = "`solveType`=0 AND `omissionSimple`>=4 AND `naked2Simple`=0 AND `naked3Simple`=0 AND `nakedSimple`=0";
+		echo tableGeneralStatement($tableCount, "simple_omission", $fields, $select, $logic, "count DESC"), "\n";
 
 		$select = "`nakedSimple` AS count, `clueCount`";
-		$logic = "`solveType`=0 AND `nakedSimple`>0";
-		echo tableGeneralStatement($tableCount, "simple_naked_min", $fields, $select, $logic, "count, clueCount DESC"), "\n";
-		echo tableGeneralStatement($tableCount, "simple_naked_max", $fields, $select, $logic, "count DESC"), "\n";
+		$logic = "`solveType`=0 AND `nakedSimple`>=8";
+		echo tableGeneralStatement($tableCount, "simple_naked", $fields, $select, $logic, "count DESC"), "\n";
 
 		$select = "`nakedVisible` AS count, `clueCount`";
-		$logic = "`solveType`=1";
-		echo tableGeneralStatement($tableCount, "candidate_visible_min", $fields, $select, $logic, "count, clueCount DESC"), "\n";
-		echo tableGeneralStatement($tableCount, "candidate_visible_max", $fields, $select, $logic, "count DESC"), "\n";
+		$logic = "`solveType`=1 AND `nakedVisible`>=5";
+		echo tableGeneralStatement($tableCount, "candidate_visible", $fields, $select, $logic, "count DESC"), "\n";
 
-		echo tableStrategyLogic($tableCount, 3, "naked2", "candidate_naked2_min", true);
-		echo tableStrategyLogic($tableCount, 3, "naked2", "candidate_naked2_max");
-		echo tableStrategyLogic($tableCount, 3, "naked3", "candidate_naked3_min", true);
-		echo tableStrategyLogic($tableCount, 3, "naked3", "candidate_naked3_max");
-
-		echo tableStrategyLogic($tableCount, 3, "naked4", "candidate_naked4");
+		echo tableStrategyLogic($tableCount, 3, "naked2", "candidate_naked2", 4);
+		echo tableStrategyLogic($tableCount, 3, "naked3", "candidate_naked3", 5);
+		echo tableStrategyLogic($tableCount, 3, "naked4", "candidate_naked4", 4);
 		echo tableStrategyLogic($tableCount, 3, "hidden1", "candidate_hidden1");
 		echo tableStrategyLogic($tableCount, 3, "hidden2", "candidate_hidden2");
 		echo tableStrategyLogic($tableCount, 3, "hidden3", "candidate_hidden3");
 		echo tableStrategyLogic($tableCount, 3, "hidden4", "candidate_hidden4");
-		echo tableStrategyLogic($tableCount, 3, "omissions", "candidate_omissions");
-		echo tableStrategyLogic($tableCount, 3, "uniqueRectangle", "candidate_uniqueRectangle");
-
-		echo tableStrategyLogic($tableCount, 3, "yWing", "candidate_yWing_min", true);
-		echo tableStrategyLogic($tableCount, 3, "yWing", "candidate_yWing_max");
-
-		echo tableStrategyLogic($tableCount, 3, "xyzWing", "candidate_xyzWing");
-		echo tableStrategyLogic($tableCount, 3, "xWing", "candidate_xWing");
+		echo tableStrategyLogic($tableCount, 3, "omissions", "candidate_omissions", 2);
+		echo tableStrategyLogic($tableCount, 3, "uniqueRectangle", "candidate_uniqueRectangle", 2);
+		echo tableStrategyLogic($tableCount, 3, "yWing", "candidate_yWing", 5);
+		echo tableStrategyLogic($tableCount, 3, "xyzWing", "candidate_xyzWing", 2);
+		echo tableStrategyLogic($tableCount, 3, "xWing", "candidate_xWing", 2);
 		echo tableStrategyLogic($tableCount, 3, "swordfish", "candidate_swordfish");
 		echo tableStrategyLogic($tableCount, 3, "jellyfish", "candidate_jellyfish");
 
 		$fields = ["superSize", "superDepth", "superCount", "superRank", "superType"];
 		$select = implode(", ", $fields);
-		$logic = "`solveType`=4 AND `naked2`=0 AND `naked3`=0 AND `naked4`=0 AND `hidden1`=0 AND `hidden2`=0 AND `hidden3`=0 AND `hidden4`=0 AND ";
+		$logic = "`solveType`=4 AND `superSize`=2 AND `superDepth`<=2 AND ";
+		$logic .= "`naked2`=0 AND `naked3`=0 AND `naked4`=0 AND `hidden1`=0 AND `hidden2`=0 AND `hidden3`=0 AND `hidden4`=0 AND ";
 		$logic .= "`omissions`=0 AND `uniqueRectangle`=0 AND `yWing`=0 AND `xyzWing`=0 AND `xWing`=0 AND `swordfish`=0 AND `jellyfish`=0";
 		$order = implode(", ", $fields);
 		echo tableGeneralStatement($tableCount, "super_min", $fields, $select, $logic, $order), "\n";
 
 		$fields = ["superSize", "superCount", "superDepth", "superRank", "superType"];
 		$select = implode(", ", $fields);
-		$logic = "`solveType`=4";
+		$logic = "`solveType`=4 AND `superSize`>=4";
 		$order = implode(" DESC, ", $fields) . " DESC";
 		echo tableGeneralStatement($tableCount, "super_max", $fields, $select, $logic, $order), "\n";
 	}
@@ -369,12 +360,12 @@ try {
 		$len1 = 5;
 		$len2 = 9;
 		$len3 = 9;
-		echo "simple_hidden_min\n";
+		$tableName = "simple_hidden";
+		echo "$tableName\n";
 		printf("%-{$len1}s %{$len2}s %{$len3}s\n", "Clues", "Percent", "Count");
 		printf("%'-{$len1}s %'-{$len2}s %'-{$len3}s\n", "", "", "");
 
-		$tableName = "simple_hidden_min";
-		$sql = "SELECT COUNT(*) AS groupCount, `clueCount` AS hiddenSimple FROM `$tableName` GROUP BY `clueCount` ORDER BY 'clueCount'";
+		$sql = "SELECT COUNT(*) AS groupCount, `clueCount` AS count FROM `$tableName` GROUP BY `clueCount` ORDER BY 'clueCount DESC'";
 		$stmt = $db->prepare($sql);
 		$stmt->execute();
 		$results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -382,47 +373,21 @@ try {
 		foreach ($results as $result) $total += $result['groupCount'];
 		foreach ($results as $result) {
 			$groupCount = (int)$result['groupCount'];
-			$hiddenSimple = (int)$result['hiddenSimple'];
+			$count = (int)$result['count'];
 
 			$percent = percentage($groupCount, $total, 4, 2);
 			$format = number_format($groupCount);
-			printf("%-{$len1}s %{$len2}s %{$len3}s\n", $hiddenSimple, $percent, $format);
-		}
-		echo "\n";
-
-		echo "simple_hidden_max\n";
-		printf("%-{$len1}s %{$len2}s %{$len3}s\n", "Clues", "Percent", "Count");
-		printf("%'-{$len1}s %'-{$len2}s %'-{$len3}s\n", "", "", "");
-		$tableName = "simple_hidden_max";
-		$sql = "SELECT COUNT(*) AS groupCount, `clueCount` AS hiddenSimple FROM `$tableName` GROUP BY `clueCount` ORDER BY 'hiddenSimple'";
-		$stmt = $db->prepare($sql);
-		$stmt->execute();
-		$results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-		$total = 0;
-		foreach ($results as $result) $total += $result['groupCount'];
-		foreach ($results as $result) {
-			$groupCount = (int)$result['groupCount'];
-			$hiddenSimple = (int)$result['hiddenSimple'];
-
-			$percent = percentage($groupCount, $total, 4, 2);
-			$format = number_format($groupCount);
-			printf("%-{$len1}s %{$len2}s %{$len3}s\n", $hiddenSimple, $percent, $format);
+			printf("%-{$len1}s %{$len2}s %{$len3}s\n", $count, $percent, $format);
 		}
 		echo "\n";
 
 		$tableNames = [
-			"simple_hidden_min",
-			"simple_hidden_max",
-			"simple_omission_min",
-			"simple_omission_max",
-			"simple_naked_min",
-			"simple_naked_max",
-			"candidate_visible_min",
-			"candidate_visible_max",
-			"candidate_naked2_min",
-			"candidate_naked2_max",
-			"candidate_naked3_min",
-			"candidate_naked3_max",
+			"simple_hidden",
+			"simple_omission",
+			"simple_naked",
+			"candidate_visible",
+			"candidate_naked2",
+			"candidate_naked3",
 			"candidate_naked4",
 			"candidate_hidden1",
 			"candidate_hidden2",
@@ -430,8 +395,7 @@ try {
 			"candidate_hidden4",
 			"candidate_omissions",
 			"candidate_uniqueRectangle",
-			"candidate_yWing_min",
-			"candidate_yWing_max",
+			"candidate_yWing",
 			"candidate_xyzWing",
 			"candidate_xWing",
 			"candidate_swordfish",

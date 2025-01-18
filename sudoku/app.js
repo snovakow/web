@@ -14,18 +14,12 @@ const pixAlign = PICKER.pixAlign;
 const searchParams = new URLSearchParams(window.location.search);
 const strategy = searchParams.get("strategy");
 const tableNames = [
-	"simple_hidden_min",
-	"simple_hidden_max",
-	"simple_omission_min",
-	"simple_omission_max",
-	"simple_naked_min",
-	"simple_naked_max",
-	"candidate_visible_min",
-	"candidate_visible_max",
-	"candidate_naked2_min",
-	"candidate_naked2_max",
-	"candidate_naked3_min",
-	"candidate_naked3_max",
+	"simple_hidden",
+	"simple_omission",
+	"simple_naked",
+	"candidate_visible",
+	"candidate_naked2",
+	"candidate_naked3",
 	"candidate_naked4",
 	"candidate_hidden1",
 	"candidate_hidden2",
@@ -33,8 +27,7 @@ const tableNames = [
 	"candidate_hidden4",
 	"candidate_omissions",
 	"candidate_uniqueRectangle",
-	"candidate_yWing_min",
-	"candidate_yWing_max",
+	"candidate_yWing",
 	"candidate_xyzWing",
 	"candidate_xWing",
 	"candidate_swordfish",
@@ -496,18 +489,12 @@ title.style.top = headerHeight / 2 + 'px';
 title.style.left = '50%';
 title.style.transform = 'translate(-50%, -50%)';
 let titleString = null;
-if (strategy === 'simple_hidden_min') titleString = "Hidden Single";
-if (strategy === 'simple_hidden_max') titleString = "Hidden Single+";
-if (strategy === 'simple_omission_min') titleString = "Intersection Removal";
-if (strategy === 'simple_omission_max') titleString = "Intersection Removal+";
-if (strategy === 'simple_naked_min') titleString = "Naked Single";
-if (strategy === 'simple_naked_max') titleString = "Naked Single+";
-if (strategy === 'candidate_visible_min') titleString = "Basic Candidtates";
-if (strategy === 'candidate_visible_max') titleString = "Basic Candidtates+";
-if (strategy === 'candidate_naked2_min') titleString = "Naked Pair";
-if (strategy === 'candidate_naked2_max') titleString = "Naked Pair+";
-if (strategy === 'candidate_naked3_min') titleString = "Naked Triple";
-if (strategy === 'candidate_naked3_max') titleString = "Naked Triple+";
+if (strategy === 'simple_hidden') titleString = "Hidden Single";
+if (strategy === 'simple_omission') titleString = "Intersection Removal";
+if (strategy === 'simple_naked') titleString = "Naked Single";
+if (strategy === 'candidate_visible') titleString = "Basic Candidtates";
+if (strategy === 'candidate_naked2') titleString = "Naked Pair";
+if (strategy === 'candidate_naked3') titleString = "Naked Triple";
 if (strategy === 'candidate_naked4') titleString = "Naked Quad";
 if (strategy === 'candidate_hidden1') titleString = "Hidden Single";
 if (strategy === 'candidate_hidden2') titleString = "Hidden Pair";
@@ -515,8 +502,7 @@ if (strategy === 'candidate_hidden3') titleString = "Hidden Triple";
 if (strategy === 'candidate_hidden4') titleString = "Hidden Quad";
 if (strategy === 'candidate_omissions') titleString = "Intersection Removal";
 if (strategy === 'candidate_uniqueRectangle') titleString = "Deadly Pattern";
-if (strategy === 'candidate_yWing_min') titleString = "Y Wing";
-if (strategy === 'candidate_yWing_max') titleString = "Y Wing+";
+if (strategy === 'candidate_yWing') titleString = "Y Wing";
 if (strategy === 'candidate_xyzWing') titleString = "XYZ Wing";
 if (strategy === 'candidate_xWing') titleString = "X Wing";
 if (strategy === 'candidate_swordfish') titleString = "Swordfish";
