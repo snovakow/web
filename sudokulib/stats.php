@@ -510,38 +510,50 @@ try {
 			$stmt->execute();
 			$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 			foreach ($result as $key => $row) {
-				$solveType = (int)$row['solveType'];
-				$count = (int)$row['count'];
+				$solveType = $row['solveType'];
+				$count = $row['count'];
 				if (!array_key_exists($solveType, $counts)) $counts[$solveType] = $count;
 				else $counts[$solveType] += $count;
 			}
+			break;
 		}
 
 		$simple = $counts[0];
-
 		$candidateVisual = $counts[1];
 		$candidate = $counts[2];
 		$candidateMinimal = $counts[3];
-		$candidate += $candidateMinimal;
 		$unsolvable = $counts[4];
 
+		$totalCount = 10000000;
+
+		$runningTotal = 0;
+
+		$runningTotal += $simple;
+		$runningPercent = percentage($runningTotal, $totalCount, 2);
 		$percent = percentage($simple, $totalCount, 2);
 		$number = number_format($simple);
-		echo "Simple: $percent $number\n";
+		echo "Simple: $runningPercent ($percent) $number\n";
 
+		$runningTotal += $candidateVisual;
+		$runningPercent = percentage($runningTotal, $totalCount, 2);
 		$percent = percentage($candidateVisual, $totalCount, 2);
-		$percentVisual = percentage($candidateVisual, $candidateVisual + $candidate, 2);
 		$number = number_format($candidateVisual);
-		echo "Visual: $percent ($percentVisual of candidates) $number\n";
+		echo "Visual: $runningPercent ($percent) $number\n";
 
-		$percent = percentage($candidate, $totalCount, 2);
-		$percentMinimal = percentage($candidateMinimal, $candidate, 2);
-		$number = number_format($candidate);
-		echo "Strategy: $percent ($percentMinimal minimal) $number\n";
+		$strategy = $candidate + $candidateMinimal;
+		$runningTotal += $strategy;
+		$runningPercent = percentage($runningTotal, $totalCount, 2);
+		$percentCandidate = percentage($strategy + $candidateVisual, $totalCount, 2);
+		$minPercent = percentage($candidateMinimal, $strategy, 2);
+		$percent = percentage($strategy, $totalCount, 2);
+		$number = number_format($strategy);
+		echo "Strategy: $runningPercent ($percent of $percentCandidate) ($minPercent minimal) $number\n";
 
+		$runningTotal += $unsolvable;
+		$runningPercent = percentage($runningTotal, $totalCount, 2);
 		$percent = percentage($unsolvable, $totalCount, 2);
 		$number = number_format($unsolvable);
-		echo "Unsolvable: $percent $number\n";
+		echo "Unsolvable: $runningPercent ($percent) $number\n";
 
 		echo "\n";
 	}
