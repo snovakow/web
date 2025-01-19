@@ -67,9 +67,19 @@ function queryStrategy($db, $table)
 
 function tableGeneralStatement($tableCount, $tableName, $fields, $select, $logic, $order)
 {
+	$tableName_offline = "{$tableName}_offline";
 	$tableName_tmp1 = "{$tableName}_tmp1";
 	$tableName_tmp2 = "{$tableName}_tmp2";
 	$sql = "";
+
+	$sql .= "DROP TABLE IF EXISTS `$tableName_offline`;\n";
+	$sql .= "CREATE TABLE `$tableName_offline` (\n";
+	$sql .= "  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,\n";
+	foreach ($fields as $field) $sql .= "  `$field` tinyint(2) unsigned NOT NULL,\n";
+	$sql .= "  `puzzle_id` int(10) unsigned NOT NULL,\n";
+	$sql .= "  `table_id` int(10) unsigned NOT NULL,\n";
+	$sql .= "  PRIMARY KEY (`id`)\n";
+	$sql .= ") ENGINE=InnoDB DEFAULT CHARSET=ascii;\n";
 
 	if ($tableCount > 1) {
 		$sql .= "DROP TEMPORARY TABLE IF EXISTS `$tableName_tmp1`;\n";
@@ -79,6 +89,7 @@ function tableGeneralStatement($tableCount, $tableName, $fields, $select, $logic
 		$sql .= "  `table_id` int(10) unsigned NOT NULL\n";
 		$sql .= ") ENGINE=InnoDB DEFAULT CHARSET=ascii;\n";
 	}
+
 	if ($tableCount > 2) {
 		$sql .= "DROP TEMPORARY TABLE IF EXISTS `$tableName_tmp2`;\n";
 		$sql .= "CREATE TEMPORARY TABLE `$tableName_tmp2` (\n";
@@ -88,22 +99,11 @@ function tableGeneralStatement($tableCount, $tableName, $fields, $select, $logic
 		$sql .= ") ENGINE=InnoDB DEFAULT CHARSET=ascii;\n";
 	}
 
-	$tableLead = $tableName;
+	$tableLead = $tableName_offline;
 	for ($table_id = 1; $table_id <= $tableCount; $table_id++) {
 		$tableSwap = $tableLead;
-		if ($table_id == $tableCount) {
-			$sql .= "DROP TABLE IF EXISTS `$tableName`;\n";
-			$sql .= "CREATE TABLE `$tableName` (\n";
-			$sql .= "  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,\n";
-			foreach ($fields as $field) $sql .= "  `$field` tinyint(2) unsigned NOT NULL,\n";
-			$sql .= "  `puzzle_id` int(10) unsigned NOT NULL,\n";
-			$sql .= "  `table_id` int(10) unsigned NOT NULL,\n";
-			$sql .= "  PRIMARY KEY (`id`)\n";
-			$sql .= ") ENGINE=InnoDB DEFAULT CHARSET=ascii;\n";
-			$tableLead = $tableName;
-		} else {
-			$tableLead = ($table_id % 2 == 1) ? $tableName_tmp1 : $tableName_tmp2;
-		}
+		if ($table_id == $tableCount) $tableLead = $tableName_offline;
+		else $tableLead = ($table_id % 2 == 1) ? $tableName_tmp1 : $tableName_tmp2;
 
 		if ($table_id > 2 && $table_id < $tableCount) $sql .= "TRUNCATE TABLE `$tableLead`;\n";
 
@@ -119,8 +119,11 @@ function tableGeneralStatement($tableCount, $tableName, $fields, $select, $logic
 		} else {
 			$sql .= "$selectLogic \n";
 		}
-		$sql .= "ORDER BY $order LIMIT 1000000;\n";
+		$sql .= "ORDER BY {$order} LIMIT 1000000;\n";
 	}
+
+	$sql .= "DROP TABLE IF EXISTS `$tableName`;\n";
+	$sql .= "RENAME TABLE $tableName_offline TO $tableName;\n";
 
 	if ($tableCount > 1) $sql .= "DROP TEMPORARY TABLE `$tableName_tmp1`;\n";
 	if ($tableCount > 2) $sql .= "DROP TEMPORARY TABLE `$tableName_tmp2`;\n";
@@ -129,66 +132,11 @@ function tableGeneralStatement($tableCount, $tableName, $fields, $select, $logic
 }
 function tableStatement($tableCount, $select, $tableName, $logic, $min = false)
 {
-	$tableName_tmp = "{$tableName}_tmp";
 
-	$sql = "";
-	$sql .= "DROP TABLE IF EXISTS `$tableName`;\n";
-	$sql .= "CREATE TABLE `$tableName` (\n";
-	$sql .= "  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,\n";
-	$sql .= "  `count` tinyint(2) unsigned NOT NULL,\n";
-	$sql .= "  `clueCount` tinyint(2) unsigned NOT NULL,\n";
-	$sql .= "  `puzzle_id` int(10) unsigned NOT NULL,\n";
-	$sql .= "  `table_id` int(10) unsigned NOT NULL,\n";
-	$sql .= "  PRIMARY KEY (`id`)\n";
-	$sql .= ") ENGINE=InnoDB DEFAULT CHARSET=ascii;\n";
-
-	if ($tableCount > 1) {
-		$sql .= "DROP TEMPORARY TABLE IF EXISTS `$tableName_tmp`;\n";
-		$sql .= "CREATE TEMPORARY TABLE `$tableName_tmp` (\n";
-		$sql .= "  `count` tinyint(2) unsigned NOT NULL,\n";
-		$sql .= "  `clueCount` tinyint(2) unsigned NOT NULL,\n";
-		$sql .= "  `puzzle_id` int(10) unsigned NOT NULL,\n";
-		$sql .= "  `table_id` int(10) unsigned NOT NULL\n";
-		$sql .= ") ENGINE=InnoDB DEFAULT CHARSET=ascii;\n";
-	}
-
-	for ($table_id = 1; $table_id <= $tableCount; $table_id++) {
-		$tableLead = $tableName;
-		$tableSwap = $tableName_tmp;
-		if ($tableCount % 2 !=  $table_id % 2) {
-			$tableLead = $tableName_tmp;
-			$tableSwap = $tableName;
-		}
-
-		if ($table_id > 2) {
-			$sql .= "TRUNCATE TABLE `$tableLead`;\n";
-			if ($table_id == $tableCount) {
-				$sql .= "ALTER TABLE `$tableLead` AUTO_INCREMENT=1;\n";
-			}
-		}
-
-		$sql .= "INSERT INTO `$tableLead` (`count`, `clueCount`, `puzzle_id`, `table_id`)\n";
-
-		$table = tableName($table_id);
-
-		$selectLogic = "SELECT $select AS count, `clueCount`, `id` AS puzzle_id, '$table_id' AS table_id FROM `$table` WHERE $logic";
-		if ($table_id > 1) {
-			$sql .= "($selectLogic) \n";
-			$sql .= "UNION ALL (SELECT `count`, `clueCount`, `puzzle_id`, `table_id` FROM `$tableSwap`) \n";
-		} else {
-			$sql .= "$selectLogic \n";
-		}
-
-		$order = $min ? "count, clueCount DESC" : "count DESC";
-		$sql .= "ORDER BY {$order} LIMIT 1000000;\n";
-	}
-
-	if ($tableCount > 1) {
-		$sql .= "DROP TEMPORARY TABLE `$tableName_tmp`;\n";
-	}
-
-	$sql .= "ALTER TABLE `$tableName` AUTO_INCREMENT=1;\n";
-	return $sql;
+	$fields = ["count", "clueCount"];
+	$select = "$select AS count, `clueCount`";
+	$order = $min ? "count, clueCount DESC" : "count DESC";
+	return tableGeneralStatement($tableCount, $tableName, $fields, $select, $logic, $order);
 }
 function tableStrategyLogic($tableCount, $solveType, $strategy, $tableName, $frequency = 1, $min = false)
 {
