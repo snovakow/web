@@ -1,4 +1,4 @@
-Various person projects.
+Various personal projects.
 
 They will run directly off the source, but are designed to run through the webpack system for a live release.
 
