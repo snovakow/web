@@ -19,6 +19,14 @@ nvm current # Should print "v22.13.0".
 # Verify npm version:
 npm -v # Should print "10.9.2".
 
-I run npm on the parent of the ropository root:
+Repo:
+```
+parent/web/
+```
+
+three.js dependency:
+parent/three.js/
+
+npm on the parent of the ropository root:
 npm init -y
 npm install webpack webpack-cli --save-dev
