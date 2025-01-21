@@ -1,3 +1,5 @@
+The web player will run directly off the source, but is designed to run through the webpack system for a live release
+
 https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
 
 To see if you already have Node.js and npm installed and check the installed version, run the following commands:
