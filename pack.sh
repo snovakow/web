@@ -18,7 +18,7 @@ webpack () {
 	echo "******"
 
 	cd $name
-	npx webpack $param
+	npx webpack
 	cd ".."
 	echo
 }
