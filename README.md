@@ -6,10 +6,12 @@ The web player will run directly off the source, but is designed to run through 
 Running webpack: [Downloading and installing Node.js and npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 
 webpack configs build to:
-/live
+> /live
 
 run npm:
 ```
 npm init -y
+```
+```
 npm install webpack webpack-cli --save-dev
 ```
