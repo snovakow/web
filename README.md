@@ -2,7 +2,7 @@ The web player will run directly off the source, but is designed to run through 
 
 Running webpack:
 
-(https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+[Downloading and installing Node.js and npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 
 To see if you already have Node.js and npm installed and check the installed version, run the following commands:
 
