@@ -18,4 +18,7 @@ npm init -y
 npm install webpack webpack-cli --save-dev
 ```
 
-pack.sh shell script will run the webpack config files
+Required webpack module:
+[copy-webpack-plugin](https://webpack.js.org/plugins/copy-webpack-plugin/)
+
+pack.sh shell script will run the webpack config files. It needs to be executed from the same directory because it uses relative paths.
