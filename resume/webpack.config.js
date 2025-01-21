@@ -6,7 +6,7 @@ module.exports = {
 	entry: './main.js',
 	output: {
 		filename: 'main.js',
-		path: path.resolve(__dirname, '../../live/resume'),
+		path: path.resolve(__dirname, '../../live_offline/resume'),
 		chunkFilename: '[chunkhash].js',
 		clean: true,
 		publicPath: ''

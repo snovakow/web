@@ -25,11 +25,18 @@ webpack () {
 
 for build in "$@"
 do
-	if [ "$build" = "snovakow" ] ; then base "snovakow" ; fi
-	if [ "$build" = "all" ] ; then base "snovakow" --env=clean ; fi
+	# if [ "$build" = "all" ] ; then base "snovakow" --env=clean ; fi
+	if [ "$build" = "all" ] || [ "$build" = "snovakow" ] ; then base "snovakow" ; fi
 	if [ "$build" = "all" ] || [ "$build" = "resume" ] ; then webpack "resume" ; fi
 	if [ "$build" = "all" ] || [ "$build" = "sudoku" ] ; then webpack "sudoku" ; fi
 	if [ "$build" = "all" ] || [ "$build" = "birthday" ] ; then webpack "birthday" ; fi
 	if [ "$build" = "all" ] || [ "$build" = "bounder" ] ; then webpack "bounder" ; fi
 	shift 1;
 done
+
+echo "rm -rf ../live"
+rm -rf ../live
+echo "mv ../live_offline ../live"
+mv ../live_offline ../live
+
+echo
