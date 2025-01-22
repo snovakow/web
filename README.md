@@ -8,7 +8,7 @@ External repo [three.js](https://github.com/mrdoob/three.js) dependency:
 Running webpack: [Downloading and installing Node.js and npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 
 webpack configs build to:
-> /live
+> /live_offline
 
 run npm:
 ```
