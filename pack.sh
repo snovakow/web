@@ -34,6 +34,8 @@ do
 	shift 1;
 done
 
+echo "Replace live with live_offline"
+echo "******"
 echo "rm -rf ../live"
 rm -rf ../live
 echo "mv ../live_offline ../live"
