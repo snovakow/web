@@ -334,9 +334,9 @@ if (window.name) {
 	draw();
 }
 
-Menu.setMenuReponse((responseStrategy, responseTitle) => {
+Menu.setMenuReponse((responseStrategy) => {
 	if (strategy === responseStrategy) return false;
-	if (!window.confirm("Do you want to start a new " + responseTitle + " puzzle?")) return false;
+	if (!window.confirm("Do you want to start a new " + Menu.menuTitle(strategy) + " puzzle?")) return false;
 	window.location.search = "?strategy=" + responseStrategy;
 	return true;
 });
@@ -629,14 +629,14 @@ if (strategy === 'custom') {
 	Menu.newPuzzle.style.display = 'none';
 } else {
 	Menu.newPuzzle.addEventListener('click', () => {
-		if (!window.confirm("Do you want to start a new puzzle?")) return;
+		if (!window.confirm("Do you want to start a new " + Menu.menuTitle(strategy) + " puzzle?")) return;
 		selected = false;
 		loadSudoku();
 	});
 }
 
 Menu.reset.addEventListener('click', () => {
-	if (!window.confirm("Do you want to restart the puzzle?")) return;
+	if (!window.confirm("Do you want to restart the " + Menu.menuTitle(strategy) + " puzzle?")) return;
 	selected = false;
 	board.resetGrid();
 	saveData();

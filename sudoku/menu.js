@@ -83,7 +83,17 @@ const menu = createIcon("./icons/menu.svg");
 const settings = createIcon("./icons/settings.svg");
 const reset = createIcon("./icons/replay.svg");
 const newPuzzle = createIcon("./icons/add_box.svg");
+menu.title = "Menu";
+settings.title = "Settings";
+reset.title = "Restart Puzzle";
+newPuzzle.title = "New Puzzle";
 
+class MenuItem {
+	constructor(title) {
+		this.title = title;
+		this.view = document.createElement('span');
+	}
+}
 const menuMap = new Map();
 let menuResponse = null;
 const setMenuReponse = (response) => {
@@ -94,27 +104,27 @@ const setMenuItem = (strategy) => {
 	if (!item) return;
 
 	for (const item of menuMap.values()) {
-		item.style.background = null;
+		item.view.style.background = null;
 	}
-	item.style.background = 'LightCyan';
+	item.view.style.background = 'LightCyan';
 }
 const addMenuItem = (title, strategy) => {
-	const item = document.createElement('span');
+	const item = new MenuItem(title);
 
-	if (backing.firstChild) item.style.borderTop = '1px solid lightgray';
-	item.style.padding = '4px';
+	if (backing.firstChild) item.view.style.borderTop = '1px solid lightgray';
+	item.view.style.padding = '4px';
 
-	item.style.whiteSpace = 'nowrap';
-	item.style.font = '18px sans-serif';
-	item.appendChild(document.createTextNode(title));
+	item.view.style.whiteSpace = 'nowrap';
+	item.view.style.font = '18px sans-serif';
+	item.view.appendChild(document.createTextNode(title));
 
-	item.addEventListener("click", () => {
+	item.view.addEventListener("click", () => {
 		if (!menuResponse) return;
 		if (!menuResponse(strategy, title)) return;
 		setMenuItem(strategy);
 	});
 
-	backing.appendChild(item);
+	backing.appendChild(item.view);
 
 	menuMap.set(strategy, item);
 }
@@ -139,6 +149,10 @@ addMenuItem("Jellyfish", 'candidate_jellyfish');
 addMenuItem("Other Strategies", 'super_min');
 addMenuItem("Difficult", 'super_max');
 
+const menuTitle = (strategy) => {
+	return menuMap.get(strategy)?.title ?? "";
+}
+
 mainBar.appendChild(menu);
 mainBar.appendChild(newPuzzle);
 mainBar.appendChild(reset);
@@ -148,10 +162,33 @@ const deleteButton = createIcon("./icons/backspace.svg", buttonSize);
 pickerBar.appendChild(markerButton);
 pickerBar.appendChild(deleteButton);
 
+const undoIcon = createIcon("./icons/undo.svg");
+const redoIcon = createIcon("./icons/redo.svg");
+const undoGrayIcon = createIcon("./icons/undo_gray.svg");
+const redoGrayIcon = createIcon("./icons/redo_gray.svg");
+undoIcon.title = "Undo";
+redoIcon.title = "Redo";
+undoGrayIcon.title = "Undo";
+redoGrayIcon.title = "Redo";
+
+// toolBar.appendChild(undoIcon);
+// toolBar.appendChild(undoGrayIcon);
+// toolBar.appendChild(redoIcon);
+// toolBar.appendChild(redoGrayIcon);
+
+redoGrayIcon.style.display = 'block';
+undoGrayIcon.style.display = 'block';
+
+undoIcon.style.display = 'none';
+redoIcon.style.display = 'none';
+
 toolBar.appendChild(settings);
+
 if (document.fullscreenEnabled) {
 	const fullscreen = createIcon("./icons/fullscreen.svg");
 	const fullscreenExit = createIcon("./icons/fullscreen_exit.svg");
+	fullscreen.title = "Full Screen";
+	fullscreenExit.title = "Exit Full Screen";
 
 	toolBar.appendChild(fullscreen);
 	toolBar.appendChild(fullscreenExit);
@@ -190,4 +227,4 @@ if (document.fullscreenEnabled) {
 
 export { backing, mainBar, toolBar, pickerBar, autoBar, headerHeight };
 export { newPuzzle, reset, settings, menu, markerButton, deleteButton };
-export { pickerBarLandscape, autoBarLandscape, setMenuItem, setMenuReponse };
+export { pickerBarLandscape, autoBarLandscape, setMenuItem, setMenuReponse, menuTitle };
