@@ -511,12 +511,18 @@ if (strategy === 'super_min') titleString = "Other Strategies";
 if (strategy === 'super_max') titleString = "Difficult";
 if (titleString) title.appendChild(document.createTextNode(titleString));
 
+const setMarkerButton = () => {
+	Menu.markerButton.title = pickerMarkerMode ? "Digits" : "Candidates";
+}
 Menu.markerButton.addEventListener('click', () => {
 	pickerMarkerMode = !pickerMarkerMode;
+	setMarkerButton();
 	setMarkerMode();
 	saveData();
 	draw();
 });
+setMarkerButton();
+
 Menu.deleteButton.addEventListener('click', () => {
 	if (!selected) return;
 

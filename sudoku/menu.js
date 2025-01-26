@@ -159,6 +159,7 @@ mainBar.appendChild(reset);
 
 const markerButton = createIcon("./icons/edit.svg", buttonSize);
 const deleteButton = createIcon("./icons/backspace.svg", buttonSize);
+deleteButton.title = "Clear";
 pickerBar.appendChild(markerButton);
 pickerBar.appendChild(deleteButton);
 
