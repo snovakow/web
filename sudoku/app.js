@@ -551,7 +551,7 @@ Menu.deleteButton.addEventListener('click', () => {
 
 	const selectedIndex = selectedRow * 9 + selectedCol;
 	const cell = board.cells[selectedIndex];
-	if (cell.symbol === 0) return;
+	if (cell.symbol === 0 && cell.mask === 0x0000) return;
 
 	cell.symbol = 0;
 	cell.mask = 0x0000;
@@ -561,10 +561,9 @@ Menu.deleteButton.addEventListener('click', () => {
 });
 
 const fillButton = document.createElement('button');
-fillButton.appendChild(document.createTextNode("Mark"));
-fillButton.style.width = '48px';
+fillButton.appendChild(document.createTextNode("Candidates"));
+// fillButton.style.width = '48px';
 fillButton.addEventListener('click', () => {
-	selected = false;
 	for (const cell of board.cells) if (cell.symbol === 0 && cell.mask === 0x0000) cell.fill();
 	candidates(board.cells);
 
@@ -573,10 +572,9 @@ fillButton.addEventListener('click', () => {
 	saveData();
 });
 const solveButton = document.createElement('button');
-solveButton.appendChild(document.createTextNode("Fill"));
-solveButton.style.width = '48px';
+solveButton.appendChild(document.createTextNode("Solve"));
+// solveButton.style.width = '48px';
 solveButton.addEventListener('click', () => {
-	selected = false;
 	for (const cell of board.cells) if (cell.symbol === 0 && cell.mask === 0x0000) cell.fill();
 	const now = performance.now();
 	const result = fillSolve(board.cells, null, null, []);

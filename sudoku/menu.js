@@ -21,6 +21,7 @@ toolBar.style.flexWrap = 'nowrap';
 
 pickerBar.style.position = 'absolute';
 pickerBar.style.display = 'flex';
+pickerBar.style.gap = '16px';
 pickerBar.style.flexWrap = 'nowrap';
 
 pickerBar.style.height = buttonSize + 'px';
@@ -158,7 +159,7 @@ mainBar.appendChild(newPuzzle);
 mainBar.appendChild(reset);
 
 const markerButton = createIcon("./icons/edit.svg", buttonSize);
-const deleteButton = createIcon("./icons/backspace.svg", buttonSize);
+const deleteButton = createIcon("./icons/eraser.svg", buttonSize);
 deleteButton.title = "Clear";
 pickerBar.appendChild(markerButton);
 pickerBar.appendChild(deleteButton);
