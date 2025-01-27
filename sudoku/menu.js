@@ -163,25 +163,16 @@ deleteButton.title = "Clear";
 pickerBar.appendChild(markerButton);
 pickerBar.appendChild(deleteButton);
 
-const undoIcon = createIcon("./icons/undo.svg");
-const redoIcon = createIcon("./icons/redo.svg");
-const undoGrayIcon = createIcon("./icons/undo_gray.svg");
-const redoGrayIcon = createIcon("./icons/redo_gray.svg");
-undoIcon.title = "Undo";
-redoIcon.title = "Redo";
-undoGrayIcon.title = "Undo";
-redoGrayIcon.title = "Redo";
-
-// toolBar.appendChild(undoIcon);
-// toolBar.appendChild(undoGrayIcon);
-// toolBar.appendChild(redoIcon);
-// toolBar.appendChild(redoGrayIcon);
-
-redoGrayIcon.style.display = 'block';
-undoGrayIcon.style.display = 'block';
-
-undoIcon.style.display = 'none';
-redoIcon.style.display = 'none';
+const undoIcons = {
+	undo_on: createIcon("./icons/undo.svg"),
+	redo_on: createIcon("./icons/redo.svg"),
+	undo_off: createIcon("./icons/undo_gray.svg"),
+	redo_off: createIcon("./icons/redo_gray.svg"),
+};
+toolBar.appendChild(undoIcons.undo_on);
+toolBar.appendChild(undoIcons.undo_off);
+toolBar.appendChild(undoIcons.redo_on);
+toolBar.appendChild(undoIcons.redo_off);
 
 toolBar.appendChild(settings);
 
@@ -228,4 +219,7 @@ if (document.fullscreenEnabled) {
 
 export { backing, mainBar, toolBar, pickerBar, autoBar, headerHeight };
 export { newPuzzle, reset, settings, menu, markerButton, deleteButton };
-export { pickerBarLandscape, autoBarLandscape, setMenuItem, setMenuReponse, menuTitle };
+export {
+	pickerBarLandscape, autoBarLandscape, setMenuItem, setMenuReponse,
+	menuTitle, undoIcons
+};

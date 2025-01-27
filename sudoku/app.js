@@ -4,6 +4,7 @@ import { CellCandidate, Grid } from "../sudokulib/Grid.js";
 import * as PICKER from "../sudokulib/picker.js";
 import { candidates } from "../sudokulib/solver.js";
 import * as Menu from "./menu.js";
+import * as Undo from "./undo.js";
 import * as SudokuProcess from "../sudokulib/process.js";
 
 const picker = PICKER.picker;
@@ -192,6 +193,7 @@ const pickerClick = (event) => {
 	// 	board.cells[selectedIndex].setSymbol(index);
 	// }
 
+	Undo.add(board.cells, selectedIndex);
 	saveData();
 	draw();
 
@@ -223,6 +225,8 @@ const pickerMarkerClick = (event) => {
 		cell.setSymbol(0);
 		cell.add(symbol);
 	}
+
+	Undo.add(board.cells, selectedIndex);
 
 	saveData();
 	draw();
@@ -330,6 +334,8 @@ if (window.name) {
 			saveData();
 		}
 		Menu.setMenuItem(strategy);
+
+		Undo.set(board.cells);
 	}
 	draw();
 }
@@ -424,6 +430,7 @@ if (strategy === 'custom' || strategy === 'hardcoded') {
 				}
 				puzzleData.transform = null;
 
+				Undo.set(board.cells);
 				saveData();
 				draw();
 			});
@@ -470,6 +477,7 @@ const loadSudoku = () => {
 			puzzleData.transform = transform;
 			puzzleData.grid = gridTransformed;
 
+			Undo.set(board.cells);
 			saveData();
 			draw();
 		});
@@ -511,6 +519,21 @@ if (strategy === 'super_min') titleString = "Other Strategies";
 if (strategy === 'super_max') titleString = "Difficult";
 if (titleString) title.appendChild(document.createTextNode(titleString));
 
+const applyUndo = (reverse) => {
+	const selectedIndex = reverse ? Undo.redo(board.cells) : Undo.undo(board.cells);
+	if (selectedIndex >= 0) {
+		selected = true;
+		selectedRow = Math.floor(selectedIndex / 9);
+		selectedCol = selectedIndex % 9;
+	} else {
+		selected = false;
+	}
+	saveData();
+	draw();
+};
+Menu.undoIcons.undo_on.addEventListener('click', () => { applyUndo(false) });
+Menu.undoIcons.redo_on.addEventListener('click', () => { applyUndo(true) });
+
 const setMarkerButton = () => {
 	Menu.markerButton.title = pickerMarkerMode ? "Digits" : "Candidates";
 }
@@ -526,9 +549,13 @@ setMarkerButton();
 Menu.deleteButton.addEventListener('click', () => {
 	if (!selected) return;
 
-	const cell = board.cells[selectedRow * 9 + selectedCol];
+	const selectedIndex = selectedRow * 9 + selectedCol;
+	const cell = board.cells[selectedIndex];
+	if (cell.symbol === 0) return;
+
 	cell.symbol = 0;
 	cell.mask = 0x0000;
+	Undo.add(board.cells, selectedIndex);
 	saveData();
 	draw();
 });
@@ -537,9 +564,11 @@ const fillButton = document.createElement('button');
 fillButton.appendChild(document.createTextNode("Mark"));
 fillButton.style.width = '48px';
 fillButton.addEventListener('click', () => {
+	selected = false;
 	for (const cell of board.cells) if (cell.symbol === 0 && cell.mask === 0x0000) cell.fill();
 	candidates(board.cells);
 
+	Undo.add(board.cells, -1);
 	draw();
 	saveData();
 });
@@ -547,12 +576,14 @@ const solveButton = document.createElement('button');
 solveButton.appendChild(document.createTextNode("Fill"));
 solveButton.style.width = '48px';
 solveButton.addEventListener('click', () => {
+	selected = false;
 	for (const cell of board.cells) if (cell.symbol === 0 && cell.mask === 0x0000) cell.fill();
 	const now = performance.now();
 	const result = fillSolve(board.cells, null, null, []);
 	console.log("----- " + (performance.now() - now) / 1000);
 	for (const line of consoleOut(result)) console.log(line);
 
+	Undo.add(board.cells, -1);
 	draw();
 	saveData();
 });
@@ -645,6 +676,7 @@ Menu.reset.addEventListener('click', () => {
 	if (!window.confirm("Do you want to restart the " + Menu.menuTitle(strategy) + " puzzle?")) return;
 	selected = false;
 	board.resetGrid();
+	Undo.set(board.cells);
 	saveData();
 	draw();
 });
