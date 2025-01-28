@@ -131,6 +131,15 @@ let timer = 0;
 let superpositionMode = 0;
 let superimposeCandidates = null;
 
+const correctCheck = () => {
+	for (const group of Grid.groupTypes) {
+		let set = 0x0000;
+		for (const i of group) set |= (0x0001 << board.cells[i].symbol);
+		if (set !== 0x03FE) return false;
+	}
+	return true;
+}
+
 const click = (event) => {
 	// event.preventDefault();
 
@@ -201,6 +210,12 @@ const pickerClick = (event) => {
 		fillSolve(board.cells, null, null, []);
 		saveData();
 		if (superimposeCandidates) superimposeCandidates();
+	}
+
+	if (correctCheck()) {
+		window.setTimeout(()=>{
+			alert("Puzzle Complete!!!");
+		}, 0);
 	}
 };
 picker.addEventListener('click', pickerClick);
@@ -572,7 +587,7 @@ fillButton.addEventListener('click', () => {
 	saveData();
 });
 const solveButton = document.createElement('button');
-solveButton.appendChild(document.createTextNode("Solve"));
+solveButton.appendChild(document.createTextNode("Fill"));
 // solveButton.style.width = '48px';
 solveButton.addEventListener('click', () => {
 	for (const cell of board.cells) if (cell.symbol === 0 && cell.mask === 0x0000) cell.fill();

@@ -44,13 +44,6 @@ const consoleOut = (result) => {
 	return lines;
 }
 
-const isFinished = (cells) => {
-	for (let i = 0; i < 81; i++) {
-		const cell = cells[i];
-		if (cell.symbol === 0) return false;
-	}
-	return true;
-}
 const emptyCount = (cells) => {
 	let count = 0;
 	for (let i = 0; i < 81; i++) {
