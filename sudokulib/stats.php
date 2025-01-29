@@ -482,8 +482,6 @@ try {
 		$candidateMinimal = $counts[3];
 		$unsolvable = $counts[4];
 
-		$totalCount = 10000000;
-
 		$runningTotal = 0;
 
 		$runningTotal += $simple;
