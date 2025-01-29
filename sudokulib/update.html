@@ -173,7 +173,8 @@
 			}
 		}
 
-		const url = './tables.php?version=1';
+		const searchTables = (searchParams.get("tablex") === null) ? "" : "&tablex";
+		const url = './tables.php?version=1' + searchTables;
 		fetch(url, { cache: "no-store" }).then(response => {
 			response.text().then((string) => {
 				const fields = string.split(":");
