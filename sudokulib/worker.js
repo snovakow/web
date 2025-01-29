@@ -173,7 +173,6 @@ const step = () => {
 	}
 	puzzleCount++;
 	if (tablex && (puzzleCount % PUZZLE_X_SIZE === 0)) data.tablex = true;
-	if (data.tablex) console.log("postMessage");
 
 	postMessage(data);
 
