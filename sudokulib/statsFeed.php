@@ -183,8 +183,6 @@ try {
 	$puzzleCount = 0;
 	$totalCount = 0;
 
-	$time = time();
-
 	$tables = "tables";
 	if (isset($_GET['tablex'])) $tables = "tablex";
 
@@ -251,7 +249,7 @@ try {
 			echo "$sql\n";
 
 			$sql = "INSERT INTO `$tableName` (`id`, `puzzleData`, `clueCount`) SELECT `id`, `puzzleData`, `clueCount` FROM `$rename`;";
-			echo "$sql\n\n";
+			echo "$sql\n";
 		}
 	}
 
@@ -444,11 +442,10 @@ try {
 		echo "Count: {$result['superCountMin']} - {$result['superCountMax']}\n";
 		echo "Rank: {$result['superRankMin']} - {$result['superRankMax']}\n";
 		echo "Type: {$result['superTypeMin']} - {$result['superTypeMax']}\n";
-		echo "\n";
 	}
 
 	if ($mode === 3) {
-		// SELECT RIGHT(HEX(`puzzleData`), 42) AS puzzle, COUNT(*) AS count FROM `puzzlex001` GROUP BY puzzle
+		// SELECT RIGHT(HEX(`puzzleData`), 42) AS puzzle, COUNT(*) AS count FROM `puzzlex001` GROUP BY puzzle ORDER BY count
 		$counts = [];
 		for ($i = 1; $i <= $tableCount; $i++) {
 			$table = tableName($i);
@@ -472,8 +469,8 @@ try {
 		$unsolvable = $counts[4];
 
 		$results = [
-			'simple' => $simple, 
-			'candidateVisual' => $candidateVisual, 
+			'simple' => $simple,
+			'candidateVisual' => $candidateVisual,
 			'candidate' => $candidate,
 			'candidateMinimal' => $candidateMinimal,
 			'unsolvable' => $unsolvable,
@@ -892,11 +889,6 @@ try {
 		printStat("Unsolvable", $countsUnsolvable, $totalCount, 2);
 		foreach ($counts as $clueCount => $count) printStat($clueCount, $countUnsolvable[$clueCount], $count, 2);
 		echo  "<br/>";
-	}
-
-	if ($mode > 1) {
-		$time = (time() - $time) . "s";
-		echo $time;
 	}
 } catch (PDOException $e) {
 	// echo "Error: " . $e->getMessage();
