@@ -44,7 +44,8 @@ if ($strategy == "") die();
 function tableName($number)
 {
 	$pad = str_pad($number, 3, "0", STR_PAD_LEFT);
-	return "puzzles$pad";
+	$puzzles = isset($_GET['tablex']) ? "puzzlex" : "puzzles";
+	return "$puzzles$pad";
 }
 
 try {
