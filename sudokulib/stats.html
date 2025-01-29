@@ -10,9 +10,9 @@
 		const body = document.createElement('pre');
 		body.style.textAlign = "left";
 		body.style.position = "absolute";
-		body.style.top = "5px";
-		body.style.left = "0px";
-		body.style.margin = "8px";
+		body.style.top = "16px";
+		body.style.left = "16px";
+		body.style.margin = "0px";
 		document.body.appendChild(body);
 
 		const search = new URLSearchParams(window.location.search);
@@ -81,6 +81,7 @@
 		fetch(url, { cache: "no-store" }).then(response => {
 			if (mode >= 0 && mode <= 2) response.text().then((text) => { modeText(text); });
 			if (mode === 3) response.json().then((json) => { mode3(json); });
+			if (mode >= 4 && mode <= 7) response.text().then((text) => { modeText(text); });
 		});
 	</script>
 
