@@ -39,7 +39,7 @@
 		const modeText = (data) => {
 			if (mode > 1) {
 				const time = Math.round((performance.now() - startTime) / 1000);
-				data += `\n${time}s`;
+				data += `\n${Math.floor(time / 60)}m ${time % 60}s\n\n`;
 			}
 			body.appendChild(document.createTextNode(data));
 		}
@@ -81,6 +81,11 @@
 			percent = percentage(unsolvable, totalCount, 2);
 			number = unsolvable.toLocaleString();
 			appendLine(`Unsolvable: ${runningPercent} (${percent}) ${number}`);
+
+			appendSpace();
+			const time = Math.round((performance.now() - startTime) / 1000);
+			appendLine(`${Math.floor(time / 60)}m ${time % 60}s`);
+			appendSpace();
 		}
 
 		const url = './statsFeed.php' + window.location.search;
