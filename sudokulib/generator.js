@@ -462,7 +462,7 @@ const sudokuGenerator = (cells, target = 0) => {
 	const rndi = makeArray(81);
 	randomize(rndi);
 
-	if (target === 0) {
+	if (target <= 0) {
 		for (let i = 0; i < 81; i++) {
 			const index = rndi[i];
 
