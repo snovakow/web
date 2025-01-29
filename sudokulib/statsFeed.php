@@ -458,7 +458,6 @@ try {
 				if (!array_key_exists($solveType, $counts)) $counts[$solveType] = $count;
 				else $counts[$solveType] += $count;
 			}
-			break;
 		}
 
 		$simple = $counts[0];
@@ -493,7 +492,6 @@ try {
 				if (!array_key_exists($solveType, $counts)) $counts[$solveType] = $count;
 				else $counts[$solveType] += $count;
 			}
-			break;
 		}
 
 		$simple = $counts[0];
