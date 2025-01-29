@@ -24,7 +24,7 @@ setIconState();
 class Undo {
     constructor(selectedIndex, cells) {
         this.grid = new Uint8Array(81);
-        this.candidate = new Uint8Array(81);
+        this.candidate = new Uint16Array(81);
         if (cells) {
             for (let i = 0; i < 81; i++) {
                 const cell = cells[i];
@@ -90,8 +90,8 @@ function saveData() {
     const dataStack = [];
     for (const undo of undoStack) {
         const data = {
-            grid: undo.grid.join(""),
-            candidate: undo.candidate.join(""),
+            grid: undo.grid,
+            candidate: undo.candidate,
             selectedIndex: undo.selectedIndex,
         };
         dataStack.push(data);
@@ -107,8 +107,8 @@ function loadData(data) {
     for (const undoData of data.undoStack) {
         const undo = new Undo(undoData.selectedIndex);
         for (let i = 0; i < 81; i++) {
-            undo.grid[i] = parseInt(undoData.grid[i]);
-            undo.candidate[i] = parseInt(undoData.candidate[i]);
+            undo.grid[i] = undoData.grid[i];
+            undo.candidate[i] = undoData.candidate[i];
         }
         dataStack.push(undo);
     }
