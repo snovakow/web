@@ -231,11 +231,13 @@ const cellsToStorage = (metadata) => {
 }
 
 const saveGrid = (metadata) => {
-	window.name = JSON.stringify(cellsToStorage(metadata));
+	const data = JSON.stringify(cellsToStorage(metadata));
+	sessionStorage.setItem("saveData", data);
 };
 const loadGrid = () => {
-	const data = window.name;
-	if (!data) return null;
+	const data = sessionStorage.getItem("saveData");
+
+	if (data === null) return null;
 	let metadata = null;
 	try {
 		metadata = storageToCells(JSON.parse(data));
