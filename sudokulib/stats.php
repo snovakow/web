@@ -34,7 +34,8 @@ function totalCount($tableCount, $puzzleCount)
 function tableName($number, $append = "")
 {
 	$pad = str_pad($number, 3, "0", STR_PAD_LEFT);
-	return "puzzles$append$pad";
+	$puzzles = isset($_GET['tablex']) ? "puzzlex" : "puzzles";
+	return "$puzzles$append$pad";
 }
 
 function percentage($count, $total, $precision, $pad = 3)
@@ -193,12 +194,15 @@ try {
 
 	$time = time();
 
+	$tables = "tables";
+	if (isset($_GET['tablex'])) $tables = "tablex";
+
 	$tableCount = (int)$_GET['table'];
 	if (is_int($tableCount) && $tableCount >= 1 && $tableCount <= 1000) {
 		$puzzleCount = MAX_SIZE;
 		$totalCount = totalCount($tableCount, $puzzleCount);
 	} else {
-		$stmt = $db->prepare("SELECT `tableCount`, `puzzleCount` FROM `tables`");
+		$stmt = $db->prepare("SELECT `tableCount`, `puzzleCount` FROM `$tables`");
 		$stmt->execute();
 		$result = $stmt->fetch();
 		$tableCount = (int)$result['tableCount'];
