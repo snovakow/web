@@ -46,7 +46,7 @@ function getStat($title, $count, $total, $precision)
 function printStat($title, $count, $total, $precision)
 {
 	$stat = getStat($title, $count, $total, $precision);
-	echo "$stat<br/>";
+	echo "$stat\n";
 }
 
 function queryStrategy($db, $table)
@@ -183,8 +183,8 @@ try {
 	$puzzleCount = 0;
 	$totalCount = 0;
 
-	$tables = "tables";
-	if (isset($_GET['tablex'])) $tables = "tablex";
+	$tablex = isset($_GET['tablex']);
+	$tables = $tablex ? "tablex" : "tables";
 
 	$tableCount = (int)$_GET['table'];
 	if (is_int($tableCount) && $tableCount >= 1 && $tableCount <= 1000) {
@@ -444,7 +444,41 @@ try {
 		echo "Type: {$result['superTypeMin']} - {$result['superTypeMax']}\n";
 	}
 
-	if ($mode === 3) {
+	if ($mode === 3 && !$tablex) {
+		$counts = [];
+		for ($i = 1; $i <= $tableCount; $i++) {
+			$table = tableName($i);
+			$sql = "SELECT `solveType`, COUNT(*) AS count FROM `$table` GROUP BY `solveType`";
+			$stmt = $db->prepare($sql);
+			$stmt->execute();
+			$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+			foreach ($result as $key => $row) {
+				$solveType = $row['solveType'];
+				$count = $row['count'];
+				if (!array_key_exists($solveType, $counts)) $counts[$solveType] = $count;
+				else $counts[$solveType] += $count;
+			}
+			break;
+		}
+
+		$simple = $counts[0];
+		$candidateVisual = $counts[1];
+		$candidate = $counts[2];
+		$candidateMinimal = $counts[3];
+		$unsolvable = $counts[4];
+
+		$results = [
+			'simple' => $simple,
+			'candidateVisual' => $candidateVisual,
+			'candidate' => $candidate,
+			'candidateMinimal' => $candidateMinimal,
+			'unsolvable' => $unsolvable,
+			'totalCount' => $totalCount
+		];
+		exit(json_encode($results));
+	}
+
+	if ($mode === 3 && $tablex) {
 		// SELECT RIGHT(HEX(`puzzleData`), 42) AS puzzle, COUNT(*) AS count FROM `puzzlex001` GROUP BY puzzle ORDER BY count
 		$counts = [];
 		for ($i = 1; $i <= $tableCount; $i++) {
@@ -600,8 +634,6 @@ try {
 			echo str_pad("$runningPercent", $len4, " ");
 			echo "\n";
 		}
-
-		echo "\n";
 	}
 
 	if ($mode === 5) {
@@ -718,8 +750,6 @@ try {
 			echo str_pad("$percentIso ($maxIso) $formatIso", 34, " ");
 			echo "\n";
 		}
-
-		echo  "\n";
 	}
 
 	if ($mode === 6) {
@@ -819,10 +849,8 @@ try {
 
 			echo $title;
 			echo str_pad("$percent $format", $len5, " ", STR_PAD_RIGHT);
-			echo  "\n";
+			echo "\n";
 		}
-
-		echo  "\n";
 	}
 
 	if ($mode === 7) {
@@ -863,7 +891,7 @@ try {
 		foreach ($counts as $clueCount => $count) {
 			printStat($clueCount, $count, $totalCount, 5);
 		}
-		echo  "<br/>";
+		echo "\n";
 
 		$countsSimple = 0;
 		$countsVisible = 0;
@@ -876,19 +904,19 @@ try {
 
 		printStat("Simple", $countsSimple, $totalCount, 2);
 		foreach ($counts as $clueCount => $count) printStat($clueCount, $countSimple[$clueCount], $count, 2);
-		echo  "<br/>";
+		echo "\n";
 
 		printStat("Visible", $countsVisible, $totalCount, 2);
 		foreach ($counts as $clueCount => $count) printStat($clueCount, $countVisible[$clueCount], $count, 2);
-		echo  "<br/>";
+		echo "\n";
 
 		printStat("Candidate", $countsCandidate, $totalCount, 2);
 		foreach ($counts as $clueCount => $count) printStat($clueCount, $countCandidate[$clueCount], $count, 2);
-		echo  "<br/>";
+		echo "\n";
 
 		printStat("Unsolvable", $countsUnsolvable, $totalCount, 2);
 		foreach ($counts as $clueCount => $count) printStat($clueCount, $countUnsolvable[$clueCount], $count, 2);
-		echo  "<br/>";
+		echo "\n";
 	}
 } catch (PDOException $e) {
 	// echo "Error: " . $e->getMessage();
