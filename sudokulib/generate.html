@@ -127,6 +127,13 @@
 
 		let coreCount = 0;
 
+		const search = new URLSearchParams(window.location.search);
+
+		const tablex = (search.get("tablex") === null) ? false : true;
+		let tablexStop = false;
+		let tablexStopComplete = 0;
+		let tablexStopCalled = 0;
+
 		const generateButton = document.createElement('button');
 		generateButton.style.top = '8px';
 		generateButton.style.right = '8px';
@@ -151,8 +158,17 @@
 			processTimer = seconds;
 
 			if (!sendDataSending && appStage === 2 && sendDataStack.length === 0 && generateButton.parentElement) {
-				animationLoop = false;
-				document.body.removeChild(generateButton);
+				if (tablex) {
+					if (tablexStop && (tablexStopCalled === tablexStopComplete)) {
+						for (const worker of workers) worker.terminate();
+						workers = null;
+						animationLoop = false;
+						document.body.removeChild(generateButton);
+					}
+				} else {
+					animationLoop = false;
+					document.body.removeChild(generateButton);
+				}
 			}
 
 			if (coreCount === 0 && pingRun && !pingRunBusy) pingSend();
@@ -237,11 +253,12 @@
 			displayStats();
 		};
 
+		const searchTables = tablex ? "&tablex" : "";
 		let prevPingTime = Date.now();
 		let prevPingCount = 0;
-		const pingSend = (responder) => {
+		function pingSend(responder) {
 			pingRunBusy = true;
-			const url = './tables.php?version=1';
+			const url = './tables.php?version=1' + searchTables;
 			fetch(url, { cache: "no-store" }).then(response => {
 				response.text().then((string) => {
 					pingRunBusy = false;
@@ -285,7 +302,6 @@
 		};
 		if (coreCount === 0) pingSend();
 
-		const search = new URLSearchParams(window.location.search);
 		const searchCores = parseInt(search.get("cores"));
 		if (!isNaN(searchCores) && searchCores <= 10 && searchCores > 0) coreCount = searchCores;
 
@@ -303,13 +319,16 @@
 		let workers = null;
 		const toggleWorker = () => {
 			pingRun = false;
-			while (generateButton.firstChild) generateButton.removeChild(generateButton.firstChild);
 			if (workers) {
-				generateButton.appendChild(document.createTextNode("Generate"));
+				if (tablex) {
+					tablexStop = true;
+					return;
+				}
 				for (const worker of workers) worker.terminate();
 				workers = null;
 				return;
 			}
+			while (generateButton.firstChild) generateButton.removeChild(generateButton.firstChild);
 			generateButton.appendChild(document.createTextNode("Stop"));
 			if (!strategyCounter) strategyCounter = new StrategyCounter();
 
@@ -365,7 +384,7 @@
 
 			sendDataSending = true;
 
-			const url = './generate.php?version=2';
+			const url = './generate.php?version=2' + searchTables;
 			const readyDataSend = [];
 			for (const ready of sendDataStack) {
 				const puzzleData = SudokuProcess.puzzleGridHex(ready.puzzleClues, ready.puzzleFilled);
@@ -444,12 +463,23 @@
 		const processGenerate = () => {
 			for (const worker of workers) {
 				const workerData = {};
+				if ("&tablex") workerData['tablex'] = true;
 				worker.onmessage = (e) => {
 					const data = e.data;
+
 					strategyCounter.addData();
 					populateGenerate();
 					sendData(data);
+
+					if (data.tablex) {
+						if (!tablexStop) {
+							tablexStopCalled++;
+							worker.postMessage(workerData);
+						}
+						tablexStopComplete++;
+					}
 				};
+				tablexStopCalled++;
 				worker.postMessage(workerData);
 			}
 		};
@@ -462,7 +492,7 @@
 
 				toggleWorker();
 
-				if (workers) {
+				if (workers && !tablexStop) {
 					generateMode = true;
 					processGenerate();
 				} else {
@@ -471,8 +501,9 @@
 			}
 			generateButton.addEventListener('click', () => {
 				if (appStage === 1) generateButton.disabled = true;
+				if (appStage === 0) pingSend(responder);
+				else responder();
 				appStage++;
-				pingSend(responder);
 			});
 			document.body.appendChild(generateButton);
 		}
