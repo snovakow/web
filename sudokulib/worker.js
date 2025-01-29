@@ -1,11 +1,17 @@
 import { CellCandidate, Grid } from "../sudokulib/Grid.js";
 import { sudokuGenerator, fillSolve, STRATEGY } from "../sudokulib/generator.js";
 
+const PUZZLE_X_SIZE = 100000;
+
 const cells = new Grid();
 for (let i = 0; i < 81; i++) cells[i] = new CellCandidate(i);
 
 let puzzleString = null;
 let puzzleStrings = null;
+
+let tablex = false;
+let tablexPuzzle = null;
+let puzzleCount = 0;
 
 let stepMode = 0; // 1=row 2=phist
 
@@ -75,7 +81,15 @@ const step = () => {
 		cells.fromString(puzzle);
 		mode = -1;
 	}
+	if (tablex && (puzzleCount % PUZZLE_X_SIZE > 0)) {
+		for (let i = 0; i < 81; i++) {
+			cells[i].symbol = tablexPuzzle[i];
+			cells[i].mask = 0x0000;
+		}
+		mode = -1;
+	}
 	const [clueCount, puzzleFilled] = sudokuGenerator(cells, mode);
+	if (tablex && (puzzleCount % PUZZLE_X_SIZE === 0)) tablexPuzzle = puzzleFilled;
 
 	const data = {
 		puzzle: cells.string(),
@@ -157,7 +171,13 @@ const step = () => {
 			orderedSolve();
 		}
 	}
+	puzzleCount++;
+	if (tablex && (puzzleCount % PUZZLE_X_SIZE === 0)) data.tablex = true;
+	if (data.tablex) console.log("postMessage");
+
 	postMessage(data);
+
+	if (data.tablex) return false;
 	if (puzzleStrings) return puzzleStrings.length > 0;
 	return true;
 };
@@ -171,5 +191,8 @@ onmessage = (event) => {
 			puzzleStrings.push(data);
 		}
 	}
+
+	if (event.data.tablex) tablex = true;
+
 	while (step());
 };
