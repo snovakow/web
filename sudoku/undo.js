@@ -22,13 +22,15 @@ const setIconState = () => {
 setIconState();
 
 class Undo {
-    constructor(cells, selectedIndex) {
+    constructor(selectedIndex, cells) {
         this.grid = new Uint8Array(81);
         this.candidate = new Uint8Array(81);
-        for (let i = 0; i < 81; i++) {
-            const cell = cells[i];
-            this.grid[i] = cell.symbol;
-            this.candidate[i] = cell.mask;
+        if (cells) {
+            for (let i = 0; i < 81; i++) {
+                const cell = cells[i];
+                this.grid[i] = cell.symbol;
+                this.candidate[i] = cell.mask;
+            }
         }
         this.selectedIndex = selectedIndex;
     }
@@ -53,7 +55,7 @@ class Undo {
 
 function set(cells) {
     leadIndex = 0;
-    undoStack.splice(0, Infinity, new Undo(cells, -1));
+    undoStack.splice(0, Infinity, new Undo(-1, cells));
     setIconState();
 }
 
@@ -65,7 +67,7 @@ function add(cells, selectedIndex) {
 
     if (leadIndex < undoStack.length - 1) undoStack.splice(leadIndex + 1);
     leadIndex = undoStack.length;
-    undoStack.push(new Undo(cells, selectedIndex));
+    undoStack.push(new Undo(selectedIndex, cells));
 
     setIconState();
 }
@@ -84,4 +86,36 @@ function redo(cells) {
     return undoStack[leadIndex].apply(cells);
 }
 
-export { set, add, undo, redo };
+function saveData() {
+    const dataStack = [];
+    for (const undo of undoStack) {
+        const data = {
+            grid: undo.grid.join(""),
+            candidate: undo.candidate.join(""),
+            selectedIndex: undo.selectedIndex,
+        };
+        dataStack.push(data);
+    }
+    return {
+        undoStack: dataStack,
+        leadIndex,
+    };
+}
+
+function loadData(data) {
+    const dataStack = [];
+    for (const undoData of data.undoStack) {
+        const undo = new Undo(undoData.selectedIndex);
+        for (let i = 0; i < 81; i++) {
+            undo.grid[i] = parseInt(undoData.grid[i]);
+            undo.candidate[i] = parseInt(undoData.candidate[i]);
+        }
+        dataStack.push(undo);
+    }
+
+    undoStack.splice(0, Infinity, ...dataStack);
+    leadIndex = data.leadIndex;
+    setIconState();
+}
+
+export { set, add, undo, redo, saveData, loadData };
