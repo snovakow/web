@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Stats</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+
+	<script type="module">
+		const body = document.createElement('pre');
+		body.style.textAlign = "left";
+		body.style.position = "absolute";
+		body.style.top = "13px";
+		body.style.left = "8px";
+		body.style.margin = "0px";
+		document.body.appendChild(body);
+
+		const search = new URLSearchParams(window.location.search);
+		const mode = parseInt(search.get("mode") ?? -1);
+		const tablex = (search.get("tablex") === null) ? false : true;
+
+		const percentage = (number, total, precision) => {
+			const percent = (number * 100 / total).toFixed(precision);
+			return percent.padStart(precision + 3, "0") + "%";
+		};
+
+		const appendSpace = () => {
+			const line = document.createElement('br');
+			body.appendChild(line);
+		};
+		const appendLine = (text) => {
+			const line = document.createElement('DIV');
+			line.appendChild(document.createTextNode(text));
+			body.appendChild(line);
+		};
+
+		const mode3 = (data) => {
+			const simple = data.simple;
+			const candidateVisual = data.candidateVisual;
+			const candidate = data.candidate;
+			const candidateMinimal = data.candidateMinimal;
+			const unsolvable = data.unsolvable;
+			const totalCount = data.totalCount;
+			let runningTotal = 0;
+
+			appendLine(`--- Total ${totalCount.toLocaleString()}`);
+			appendSpace();
+
+			runningTotal += simple;
+			let runningPercent = percentage(runningTotal, totalCount, 2);
+			let percent = percentage(simple, totalCount, 2);
+			let number = simple.toLocaleString();
+			appendLine(`Simple: ${runningPercent} (${percent}) ${number}`);
+
+			runningTotal += candidateVisual;
+			runningPercent = percentage(runningTotal, totalCount, 2);
+			percent = percentage(candidateVisual, totalCount, 2);
+			number = candidateVisual.toLocaleString();
+			appendLine(`Visual: ${runningPercent} (${percent}) ${number}`);
+
+			const strategy = candidate + candidateMinimal;
+			runningTotal += strategy;
+			runningPercent = percentage(runningTotal, totalCount, 2);
+			const percentCandidate = percentage(strategy + candidateVisual, totalCount, 2);
+			const minPercent = percentage(candidateMinimal, strategy, 2);
+			percent = percentage(strategy, totalCount, 2);
+			number = strategy.toLocaleString();
+			appendLine(`Strategy: ${runningPercent} (${percent} of ${percentCandidate}) (${minPercent} minimal) ${number}`);
+
+			runningTotal += unsolvable;
+			runningPercent = percentage(runningTotal, totalCount, 2);
+			percent = percentage(unsolvable, totalCount, 2);
+			number = unsolvable.toLocaleString();
+			appendLine(`Unsolvable: ${runningPercent} (${percent}) ${number}`);
+		}
+
+		const url = './statsFeed.php' + window.location.search;
+		fetch(url, { cache: "no-store" }).then(response => {
+			response.json().then((json) => {
+				if (mode === 3) mode3(json);
+			});
+		});
+	</script>
+
+</head>
+
+<body></body>
+
+</html>
