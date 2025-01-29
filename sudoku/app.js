@@ -77,7 +77,8 @@ const saveData = () => {
 		pickerMarkerMode,
 		selected,
 		selectedRow,
-		selectedCol
+		selectedCol,
+		undo: Undo.saveData()
 	});
 };
 
@@ -213,7 +214,7 @@ const pickerClick = (event) => {
 	}
 
 	if (correctCheck()) {
-		window.setTimeout(()=>{
+		window.setTimeout(() => {
 			alert("Puzzle Complete!!!");
 		}, 0);
 	}
@@ -323,35 +324,34 @@ fontLabel.for = "id";
 fontLabel.appendChild(fontCheckbox);
 
 let loaded = false;
-if (window.name) {
-	const metadata = loadGrid();
-	if (metadata) {
-		if (metadata.strategy === strategy) {
-			if (metadata.selected !== undefined) selected = metadata.selected;
-			if (metadata.selectedRow !== undefined) selectedRow = metadata.selectedRow;
-			if (metadata.selectedCol !== undefined) selectedCol = metadata.selectedCol;
+const loadGridMetadata = loadGrid();
+if (loadGridMetadata) {
+	const metadata = loadGridMetadata;
+	if (metadata.strategy === strategy) {
+		if (metadata.selected !== undefined) selected = metadata.selected;
+		if (metadata.selectedRow !== undefined) selectedRow = metadata.selectedRow;
+		if (metadata.selectedCol !== undefined) selectedCol = metadata.selectedCol;
 
-			if (metadata.id !== undefined) puzzleData.id = metadata.id;
-			if (metadata.transform !== undefined) puzzleData.transform = metadata.transform;
-			if (metadata.grid !== undefined) puzzleData.grid.set(metadata.grid);
+		if (metadata.id !== undefined) puzzleData.id = metadata.id;
+		if (metadata.transform !== undefined) puzzleData.transform = metadata.transform;
+		if (metadata.grid !== undefined) puzzleData.grid.set(metadata.grid);
 
-			loaded = true;
-		}
-
-		if (metadata.markerFont !== undefined) markerFont = metadata.markerFont;
-		setMarkerFont(markerFont);
-		fontCheckbox.checked = markerFont;
-
-		if (metadata.pickerMarkerMode !== undefined) pickerMarkerMode = metadata.pickerMarkerMode;
-
-		if (metadata.strategy !== strategy) {
-			metadata.strategy = strategy;
-			saveData();
-		}
-		Menu.setMenuItem(strategy);
-
-		Undo.set(board.cells);
+		loaded = true;
 	}
+
+	if (metadata.markerFont !== undefined) markerFont = metadata.markerFont;
+	setMarkerFont(markerFont);
+	fontCheckbox.checked = markerFont;
+
+	if (metadata.pickerMarkerMode !== undefined) pickerMarkerMode = metadata.pickerMarkerMode;
+
+	if (metadata.strategy !== strategy) {
+		metadata.strategy = strategy;
+		saveData();
+	}
+	Menu.setMenuItem(strategy);
+
+	Undo.loadData(metadata.undo);
 	draw();
 }
 
