@@ -455,8 +455,8 @@ try {
 			foreach ($result as $key => $row) {
 				$solveType = $row['solveType'];
 				$count = $row['count'];
-				if (!array_key_exists($solveType, $counts)) $counts[$solveType] = $count;
-				else $counts[$solveType] += $count;
+				if (array_key_exists($solveType, $counts)) $counts[$solveType] += $count;
+				else $counts[$solveType] = $count;
 			}
 		}
 
@@ -478,36 +478,54 @@ try {
 	}
 
 	if ($mode === 3 && $tablex) {
-		// SELECT RIGHT(HEX(`puzzleData`), 42) AS puzzle, COUNT(*) AS count FROM `puzzlex001` GROUP BY puzzle ORDER BY count
-		$counts = [];
+		$puzzles = [];
 		for ($i = 1; $i <= $tableCount; $i++) {
 			$table = tableName($i);
-			$sql = "SELECT `solveType`, COUNT(*) AS count FROM `$table` GROUP BY `solveType`";
+			$sql = "SELECT `solveType`, RIGHT(HEX(`puzzleData`), 42) AS puzzle, COUNT(*) AS count FROM `$table` GROUP BY puzzle, `solveType`";
 			$stmt = $db->prepare($sql);
 			$stmt->execute();
 			$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+			$counts = [];
 			foreach ($result as $key => $row) {
 				$solveType = $row['solveType'];
+				$puzzle = $row['puzzle'];
 				$count = $row['count'];
+
+				$counts = array_key_exists($puzzle, $puzzles) ? $puzzles[$puzzle] : [];
+
 				if (!array_key_exists($solveType, $counts)) $counts[$solveType] = $count;
 				else $counts[$solveType] += $count;
+
+				$puzzles[$puzzle] = $counts;
 			}
 		}
 
-		$simple = $counts[0];
-		$candidateVisual = $counts[1];
-		$candidate = $counts[2];
-		$candidateMinimal = $counts[3];
-		$unsolvable = $counts[4];
+		$results = [];
+		foreach ($puzzles as $puzzle => $counts) {
+			$simple = $counts[0];
+			$candidateVisual = $counts[1];
+			$candidate = $counts[2];
+			$candidateMinimal = $counts[3];
+			$unsolvable = $counts[4];
 
-		$results = [
-			'simple' => $simple,
-			'candidateVisual' => $candidateVisual,
-			'candidate' => $candidate,
-			'candidateMinimal' => $candidateMinimal,
-			'unsolvable' => $unsolvable,
-			'totalCount' => $totalCount
-		];
+			$totalCount = 0;
+			$totalCount += $simple;
+			$totalCount += $candidateVisual;
+			$totalCount += $candidate;
+			$totalCount += $candidateMinimal;
+			$totalCount += $unsolvable;
+
+			$result = [
+				'simple' => $simple,
+				'candidateVisual' => $candidateVisual,
+				'candidate' => $candidate,
+				'candidateMinimal' => $candidateMinimal,
+				'unsolvable' => $unsolvable,
+				'totalCount' => $totalCount
+			];
+			$results[] = $result;
+		}
 		exit(json_encode($results));
 	}
 
