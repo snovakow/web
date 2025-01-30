@@ -501,8 +501,7 @@
 			}
 			generateButton.addEventListener('click', () => {
 				if (appStage === 1) generateButton.disabled = true;
-				if (appStage === 0) pingSend(responder);
-				else responder();
+				responder();
 				appStage++;
 			});
 			document.body.appendChild(generateButton);
