@@ -44,7 +44,7 @@
 			body.appendChild(document.createTextNode(data));
 		}
 		const mode3 = (data) => {
-			console.log(data);
+			const fixed = 2;
 			if (tablex) {
 				let total = 0;
 				for (const puzzle of data) total += puzzle.totalCount;
@@ -52,6 +52,8 @@
 				appendLine(`--- Total ${total.toLocaleString()}`);
 				appendSpace();
 
+				let max = 0;
+				let min = 0;
 				for (const puzzle of data) {
 					const simple = puzzle.simple;
 					const candidateVisual = puzzle.candidateVisual;
@@ -59,37 +61,47 @@
 					const candidateMinimal = puzzle.candidateMinimal;
 					const unsolvable = puzzle.unsolvable;
 					const totalCount = puzzle.totalCount;
-					let runningTotal = 0;
+					// let runningTotal = 0;
 
-					runningTotal += simple;
-					let runningPercent = percentage(runningTotal, totalCount, 1);
-					let percent = percentage(simple, totalCount, 1);
-					let number = simple.toLocaleString();
-					appendLine(`Simple: ${runningPercent} (${percent}) ${number}`);
+					// runningTotal += simple;
+					// let runningPercent = percentage(runningTotal, totalCount, fixed);
+					// let percent = percentage(simple, totalCount, fixed);
+					// let number = simple.toLocaleString();
+					// appendLine(`Simple: ${runningPercent} (${percent}) ${number}`);
 
-					runningTotal += candidateVisual;
-					runningPercent = percentage(runningTotal, totalCount, 1);
-					percent = percentage(candidateVisual, totalCount, 1);
-					number = candidateVisual.toLocaleString();
-					appendLine(`Visual: ${runningPercent} (${percent}) ${number}`);
+					// runningTotal += candidateVisual;
+					// runningPercent = percentage(runningTotal, totalCount, fixed);
+					// percent = percentage(candidateVisual, totalCount, fixed);
+					// number = candidateVisual.toLocaleString();
+					// appendLine(`Visual: ${runningPercent} (${percent}) ${number}`);
 
-					const strategy = candidate + candidateMinimal;
-					runningTotal += strategy;
-					runningPercent = percentage(runningTotal, totalCount, 1);
-					const percentCandidate = percentage(strategy + candidateVisual, totalCount, 1);
-					const minPercent = percentage(candidateMinimal, strategy, 1);
-					percent = percentage(strategy, totalCount, 1);
-					number = strategy.toLocaleString();
-					appendLine(`Strategy: ${runningPercent} (${percent} of ${percentCandidate}) (${minPercent} minimal) ${number}`);
+					// const strategy = candidate + candidateMinimal;
+					// runningTotal += strategy;
+					// runningPercent = percentage(runningTotal, totalCount, fixed);
+					// const percentCandidate = percentage(strategy + candidateVisual, totalCount, fixed);
+					// const minPercent = percentage(candidateMinimal, strategy, fixed);
+					// percent = percentage(strategy, totalCount, fixed);
+					// number = strategy.toLocaleString();
+					// appendLine(`Strategy: ${runningPercent} (${percent} of ${percentCandidate}) (${minPercent} minimal) ${number}`);
 
-					runningTotal += unsolvable;
-					runningPercent = percentage(runningTotal, totalCount, 1);
-					percent = percentage(unsolvable, totalCount, 1);
-					number = unsolvable.toLocaleString();
-					appendLine(`Unsolvable: ${runningPercent} (${percent}) ${number}`);
+					// runningTotal += unsolvable;
+					// runningPercent = percentage(runningTotal, totalCount, fixed);
+					// percent = percentage(unsolvable, totalCount, fixed);
+					// number = unsolvable.toLocaleString();
+					// appendLine(`Unsolvable: ${runningPercent} (${percent}) ${number}`);
 
-					appendSpace();
+					if (min === 0) min = unsolvable;
+					else min = Math.min(min, unsolvable);
+					max = Math.max(max, unsolvable);
+					let percent = percentage(unsolvable, totalCount, fixed);
+					appendLine(`Unsolvable: ${percent}`);
 				}
+
+				let percent = percentage(min, 100000, fixed);
+				appendLine(`Min: ${percent}`);
+				percent = percentage(max, 100000, fixed);
+				appendLine(`Max: ${percent}`);
+
 				const time = Math.round((performance.now() - startTime) / 1000);
 				appendLine(`${Math.floor(time / 60)}m ${time % 60}s`);
 				appendSpace();
@@ -108,29 +120,29 @@
 			appendSpace();
 
 			runningTotal += simple;
-			let runningPercent = percentage(runningTotal, totalCount, 1);
-			let percent = percentage(simple, totalCount, 1);
+			let runningPercent = percentage(runningTotal, totalCount, fixed);
+			let percent = percentage(simple, totalCount, fixed);
 			let number = simple.toLocaleString();
 			appendLine(`Simple: ${runningPercent} (${percent}) ${number}`);
 
 			runningTotal += candidateVisual;
-			runningPercent = percentage(runningTotal, totalCount, 1);
-			percent = percentage(candidateVisual, totalCount, 1);
+			runningPercent = percentage(runningTotal, totalCount, fixed);
+			percent = percentage(candidateVisual, totalCount, fixed);
 			number = candidateVisual.toLocaleString();
 			appendLine(`Visual: ${runningPercent} (${percent}) ${number}`);
 
 			const strategy = candidate + candidateMinimal;
 			runningTotal += strategy;
-			runningPercent = percentage(runningTotal, totalCount, 1);
-			const percentCandidate = percentage(strategy + candidateVisual, totalCount, 1);
-			const minPercent = percentage(candidateMinimal, strategy, 1);
-			percent = percentage(strategy, totalCount, 1);
+			runningPercent = percentage(runningTotal, totalCount, fixed);
+			const percentCandidate = percentage(strategy + candidateVisual, totalCount, fixed);
+			const minPercent = percentage(candidateMinimal, strategy, fixed);
+			percent = percentage(strategy, totalCount, fixed);
 			number = strategy.toLocaleString();
 			appendLine(`Strategy: ${runningPercent} (${percent} of ${percentCandidate}) (${minPercent} minimal) ${number}`);
 
 			runningTotal += unsolvable;
-			runningPercent = percentage(runningTotal, totalCount, 1);
-			percent = percentage(unsolvable, totalCount, 1);
+			runningPercent = percentage(runningTotal, totalCount, fixed);
+			percent = percentage(unsolvable, totalCount, fixed);
 			number = unsolvable.toLocaleString();
 			appendLine(`Unsolvable: ${runningPercent} (${percent}) ${number}`);
 
