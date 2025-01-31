@@ -52,56 +52,69 @@
 				appendLine(`--- Total ${total.toLocaleString()}`);
 				appendSpace();
 
-				let max = 0;
-				let min = 0;
-				for (const puzzle of data) {
-					const simple = puzzle.simple;
-					const candidateVisual = puzzle.candidateVisual;
-					const candidate = puzzle.candidate;
-					const candidateMinimal = puzzle.candidateMinimal;
-					const unsolvable = puzzle.unsolvable;
-					const totalCount = puzzle.totalCount;
-					// let runningTotal = 0;
-
-					// runningTotal += simple;
-					// let runningPercent = percentage(runningTotal, totalCount, fixed);
-					// let percent = percentage(simple, totalCount, fixed);
-					// let number = simple.toLocaleString();
-					// appendLine(`Simple: ${runningPercent} (${percent}) ${number}`);
-
-					// runningTotal += candidateVisual;
-					// runningPercent = percentage(runningTotal, totalCount, fixed);
-					// percent = percentage(candidateVisual, totalCount, fixed);
-					// number = candidateVisual.toLocaleString();
-					// appendLine(`Visual: ${runningPercent} (${percent}) ${number}`);
-
-					// const strategy = candidate + candidateMinimal;
-					// runningTotal += strategy;
-					// runningPercent = percentage(runningTotal, totalCount, fixed);
-					// const percentCandidate = percentage(strategy + candidateVisual, totalCount, fixed);
-					// const minPercent = percentage(candidateMinimal, strategy, fixed);
-					// percent = percentage(strategy, totalCount, fixed);
-					// number = strategy.toLocaleString();
-					// appendLine(`Strategy: ${runningPercent} (${percent} of ${percentCandidate}) (${minPercent} minimal) ${number}`);
-
-					// runningTotal += unsolvable;
-					// runningPercent = percentage(runningTotal, totalCount, fixed);
-					// percent = percentage(unsolvable, totalCount, fixed);
-					// number = unsolvable.toLocaleString();
-					// appendLine(`Unsolvable: ${runningPercent} (${percent}) ${number}`);
-
-					if (min === 0) min = unsolvable;
-					else min = Math.min(min, unsolvable);
-					max = Math.max(max, unsolvable);
-					let percent = percentage(unsolvable, totalCount, fixed);
-					appendLine(`Unsolvable: ${percent}`);
+				class Counter {
+					constructor(title, property) {
+						this.property = property;
+						this.title = title;
+						this.count = 0;
+						this.total = 0;
+						this.min = 0;
+						this.max = 0;
+					}
 				}
+				const counters = [];
+				counters.push(new Counter("Simple", 'simple'));
+				counters.push(new Counter("Visual", 'candidateVisual'));
+				counters.push(new Counter("Strategy", 'candidate'));
+				counters.push(new Counter("Minimal", 'candidateMinimal'));
+				counters.push(new Counter("Incomplete", 'unsolvable'));
 
-				let percent = percentage(min, 100000, fixed);
-				appendLine(`Min: ${percent}`);
-				percent = percentage(max, 100000, fixed);
-				appendLine(`Max: ${percent}`);
+				for (const puzzle of data) {
+					for (const counter of counters) {
+						const count = puzzle[counter.property];
+						if (counter.count === 0) {
+							counter.max = count;
+							counter.min = count;
+						} else {
+							counter.max = Math.max(counter.max, count);
+							counter.min = Math.min(counter.min, count);
+						}
+						counter.total += count;
+						counter.count++;
+					}
+				}
+				let line = "";
+				line += "Type".padEnd(11);
+				line += "AVG".padEnd(7);
+				line += "Min".padEnd(7);
+				line += "Max".padEnd(7);
+				line += "Span".padEnd(7);
+				appendLine(line);
 
+				line = "";
+				line += " ".padStart(11, "-");
+				line += " ".padStart(7, "-");
+				line += " ".padStart(7, "-");
+				line += " ".padStart(7, "-");
+				line += " ".padStart(7, "-");
+				appendLine(line);
+
+				for (const counter of counters) {
+					const percentAvg = percentage(counter.total / counter.count, 100000, fixed);
+					const percentMin = percentage(counter.min, 100000, fixed);
+					const percentMax = percentage(counter.max, 100000, fixed);
+					const span = percentage((counter.max - counter.min) / (counter.total / counter.count), 100, fixed);
+
+					line = "";
+					line += counter.title.padEnd(11);
+					line += percentAvg.padEnd(7);
+					line += percentMin.padEnd(7);
+					line += percentMax.padEnd(7);
+					line += span.padEnd(7);
+					appendLine(line);
+
+				}
+				appendSpace();
 				const time = Math.round((performance.now() - startTime) / 1000);
 				appendLine(`${Math.floor(time / 60)}m ${time % 60}s`);
 				appendSpace();
