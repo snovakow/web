@@ -446,6 +446,7 @@ try {
 
 	if ($mode === 3 && !$tablex) {
 		$counts = [];
+		$total = 0;
 		for ($i = 1; $i <= $tableCount; $i++) {
 			$table = tableName($i);
 			$sql = "SELECT `solveType`, COUNT(*) AS count FROM `$table` GROUP BY `solveType`";
@@ -455,6 +456,7 @@ try {
 			foreach ($result as $key => $row) {
 				$solveType = $row['solveType'];
 				$count = $row['count'];
+				$total += $count;
 				if (array_key_exists($solveType, $counts)) $counts[$solveType] += $count;
 				else $counts[$solveType] = $count;
 			}
@@ -472,7 +474,7 @@ try {
 			'candidate' => $candidate,
 			'candidateMinimal' => $candidateMinimal,
 			'unsolvable' => $unsolvable,
-			'totalCount' => $totalCount
+			'totalCount' => $total
 		];
 		exit(json_encode($results));
 	}
