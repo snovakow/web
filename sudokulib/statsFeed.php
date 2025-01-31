@@ -543,16 +543,6 @@ try {
 			"nakedVisible",
 		];
 
-		$titles = [];
-		$titles['hiddenSimple'] = "Simple Hidden";
-		$titles['omissionSimple'] = "Simple Omission";
-		$titles['naked2Simple'] = "Simple Naked2";
-		$titles['naked3Simple'] = "Simple Naked3";
-		$titles['nakedSimple'] = "Simple Naked";
-		$titles['omissionVisible'] = "Visible Omission";
-		$titles['naked2Visible'] = "Visible Naked2";
-		$titles['nakedVisible'] = "Visible Naked";
-
 		$solveTypes = [];
 		$solveTypes['hiddenSimple'] = 0;
 		$solveTypes['omissionSimple'] = 0;
@@ -563,94 +553,59 @@ try {
 		$solveTypes['naked2Visible'] = 1;
 		$solveTypes['nakedVisible'] = 1;
 
-		$values = [];
-		foreach ($strategies as $strategy) $values[$strategy] = [0, 0, 0];
+		if (!$tablex) {
+			$values = [];
+			foreach ($strategies as $strategy) $values[$strategy] = ['strategy' => 0, 'iso' => 0, 'isomax' => 0];
 
-		for ($i = 1; $i <= $tableCount; $i++) {
-			$table = tableName($i);
+			for ($i = 1; $i <= $tableCount; $i++) {
+				$table = tableName($i);
 
-			$sqls = [];
+				$sqls = [];
 
-			$strategyLogic = $strategies;
-			foreach ($strategies as $strategy) {
-				$sqls[] = "SUM(`$strategy`>0) AS $strategy";
+				$strategyLogic = $strategies;
+				foreach ($strategies as $strategy) {
+					$sqls[] = "SUM(`$strategy`>0) AS $strategy";
 
-				$solveType = $solveTypes[$strategy];
-				$isoList = ["`solveType`=$solveType"];
-				$maxList = ["(`solveType`=$solveType)"];
+					$solveType = $solveTypes[$strategy];
+					$isoList = ["`solveType`=$solveType"];
+					$maxList = ["(`solveType`=$solveType)"];
 
-				$logic = array_shift($strategyLogic);
-				$isoList[] = "`$logic`>0";
-				$maxList[] = "`$logic`";
-				foreach ($strategyLogic as $iso) {
-					$isoList[] = "`$iso`=0";
-					$maxList[] = "(`$iso`=0)";
+					$logic = array_shift($strategyLogic);
+					$isoList[] = "`$logic`>0";
+					$maxList[] = "`$logic`";
+					foreach ($strategyLogic as $iso) {
+						$isoList[] = "`$iso`=0";
+						$maxList[] = "(`$iso`=0)";
+					}
+					$sql = implode(" AND ", $isoList);
+					$sqls[] = "SUM($sql) AS {$strategy}Iso";
+					$sql = implode(" * ", $maxList);
+					$sqls[] = "MAX($sql) AS {$strategy}IsoMax";
 				}
-				$sql = implode(" AND ", $isoList);
-				$sqls[] = "SUM($sql) AS {$strategy}Iso";
-				$sql = implode(" * ", $maxList);
-				$sqls[] = "MAX($sql) AS {$strategy}IsoMax";
+
+				$sql = implode(",", $sqls);
+
+				$sql = "SELECT $sql FROM `$table` WHERE `solveType`<=1";
+
+				$stmt = $db->prepare($sql);
+				$stmt->execute();
+				$result = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+				foreach ($strategies as $strategy) {
+					$value = &$values[$strategy];
+					$value['strategy'] += (int)$result[$strategy];
+					$value['iso'] += (int)$result["{$strategy}Iso"];
+					$value['isomax'] = max($value['isomax'], (int)$result["{$strategy}IsoMax"]);
+				}
 			}
 
-			$sql = implode(",", $sqls);
-
-			$sql = "SELECT $sql FROM `$table` WHERE `solveType`<=1";
-
-			$stmt = $db->prepare($sql);
-			$stmt->execute();
-			$result = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-			foreach ($strategies as $strategy) {
-				$value = &$values[$strategy];
-				$value[0] += (int)$result[$strategy];
-				$value[1] += (int)$result["{$strategy}Iso"];
-				$value[2] = max($value[2], (int)$result["{$strategy}IsoMax"]);
-			}
+			$results = [
+				'values' => $values,
+				'totalCount' => $totalCount
+			];
+			exit(json_encode($values));
 		}
-
-		$number = number_format($totalCount);
-		echo "Total: $number\n\n";
-
-		$len1 = 17;
-		$len2 = 19;
-		$len3 = 24;
-		$len4 = 8;
-		echo str_pad("Strategy", $len1, " ", STR_PAD_BOTH);
-		echo str_pad("Total", $len2, " ", STR_PAD_BOTH);
-		echo str_pad("Isolated", $len3, " ", STR_PAD_BOTH);
-		echo str_pad("Percent", $len4, " ", STR_PAD_BOTH);
-		echo "\n";
-		echo str_pad(str_pad("", $len1 - 1, "-", STR_PAD_BOTH), $len1, " ");
-		echo str_pad(str_pad("", $len2 - 1, "-", STR_PAD_BOTH), $len2, " ");
-		echo str_pad(str_pad("", $len3 - 1, "-", STR_PAD_BOTH), $len3, " ");
-		echo str_pad(str_pad("", $len4 - 1, "-", STR_PAD_BOTH), $len4, " ");
-		echo "\n";
-
-		$runningTotoal = 0;
-
-		foreach ($strategies as $strategy) {
-			$value = &$values[$strategy];
-			$strategyValue = $value[0];
-			$strategyIso = $value[1];
-			$strategyIsoMax = $value[2];
-
-			$title = $titles[$strategy];
-
-			$percent = percentage($strategyValue, $totalCount, 2);
-			$format = number_format($strategyValue);
-
-			$runningTotoal += $strategyIso;
-			$runningPercent = percentage($runningTotoal, $totalCount, 2);
-
-			$percentIso = percentage($strategyIso, $totalCount, 2);
-			$max = number_format($strategyIsoMax);
-			$formatIso = number_format($strategyIso);
-
-			echo str_pad("{$title}", $len1, " ");
-			echo str_pad("$percent $format", $len2, " ");
-			echo str_pad("$percentIso ($max) $formatIso", $len3, " ");
-			echo str_pad("$runningPercent", $len4, " ");
-			echo "\n";
+		if ($tablex) {
 		}
 	}
 
