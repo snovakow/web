@@ -446,17 +446,15 @@ try {
 
 	if ($mode === 3 && !$tablex) {
 		$counts = [];
-		$total = 0;
 		for ($i = 1; $i <= $tableCount; $i++) {
 			$table = tableName($i);
 			$sql = "SELECT `solveType`, COUNT(*) AS count FROM `$table` GROUP BY `solveType`";
 			$stmt = $db->prepare($sql);
 			$stmt->execute();
 			$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-			foreach ($result as $key => $row) {
+			foreach ($result as $row) {
 				$solveType = $row['solveType'];
 				$count = $row['count'];
-				$total += $count;
 				if (array_key_exists($solveType, $counts)) $counts[$solveType] += $count;
 				else $counts[$solveType] = $count;
 			}
@@ -474,7 +472,7 @@ try {
 			'candidate' => $candidate,
 			'candidateMinimal' => $candidateMinimal,
 			'unsolvable' => $unsolvable,
-			'totalCount' => $total
+			'totalCount' => $totalCount
 		];
 		exit(json_encode($results));
 	}
@@ -488,8 +486,11 @@ try {
 			$stmt->execute();
 			$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
+			$puzzles = [];
+			$sql = "SELECT `solveType`, RIGHT(HEX(`puzzleData`), 42) AS puzzle, COUNT(*) AS count FROM `$table` GROUP BY puzzle, `solveType`";
+
 			$counts = [];
-			foreach ($result as $key => $row) {
+			foreach ($result as $row) {
 				$solveType = $row['solveType'];
 				$puzzle = $row['puzzle'];
 				$count = $row['count'];
@@ -511,12 +512,12 @@ try {
 			$candidateMinimal = $counts[3];
 			$unsolvable = $counts[4];
 
-			$totalCount = 0;
-			$totalCount += $simple;
-			$totalCount += $candidateVisual;
-			$totalCount += $candidate;
-			$totalCount += $candidateMinimal;
-			$totalCount += $unsolvable;
+			$count = 0;
+			$count += $simple;
+			$count += $candidateVisual;
+			$count += $candidate;
+			$count += $candidateMinimal;
+			$count += $unsolvable;
 
 			$result = [
 				'simple' => $simple,
@@ -524,7 +525,7 @@ try {
 				'candidate' => $candidate,
 				'candidateMinimal' => $candidateMinimal,
 				'unsolvable' => $unsolvable,
-				'totalCount' => $totalCount
+				'totalCount' => $count
 			];
 			$results[] = $result;
 		}
@@ -553,60 +554,56 @@ try {
 		$solveTypes['naked2Visible'] = 1;
 		$solveTypes['nakedVisible'] = 1;
 
-		if (!$tablex) {
-			$values = [];
-			foreach ($strategies as $strategy) $values[$strategy] = ['strategy' => 0, 'iso' => 0, 'isomax' => 0];
+		$values = [];
+		foreach ($strategies as $strategy) $values[$strategy] = ['strategy' => 0, 'iso' => 0, 'isomax' => 0];
 
-			for ($i = 1; $i <= $tableCount; $i++) {
-				$table = tableName($i);
+		for ($i = 1; $i <= $tableCount; $i++) {
+			$table = tableName($i);
 
-				$sqls = [];
+			$sqls = [];
 
-				$strategyLogic = $strategies;
-				foreach ($strategies as $strategy) {
-					$sqls[] = "SUM(`$strategy`>0) AS $strategy";
+			$strategyLogic = $strategies;
+			foreach ($strategies as $strategy) {
+				$sqls[] = "SUM(`$strategy`>0) AS $strategy";
 
-					$solveType = $solveTypes[$strategy];
-					$isoList = ["`solveType`=$solveType"];
-					$maxList = ["(`solveType`=$solveType)"];
+				$solveType = $solveTypes[$strategy];
+				$isoList = ["`solveType`=$solveType"];
+				$maxList = ["(`solveType`=$solveType)"];
 
-					$logic = array_shift($strategyLogic);
-					$isoList[] = "`$logic`>0";
-					$maxList[] = "`$logic`";
-					foreach ($strategyLogic as $iso) {
-						$isoList[] = "`$iso`=0";
-						$maxList[] = "(`$iso`=0)";
-					}
-					$sql = implode(" AND ", $isoList);
-					$sqls[] = "SUM($sql) AS {$strategy}Iso";
-					$sql = implode(" * ", $maxList);
-					$sqls[] = "MAX($sql) AS {$strategy}IsoMax";
+				$logic = array_shift($strategyLogic);
+				$isoList[] = "`$logic`>0";
+				$maxList[] = "`$logic`";
+				foreach ($strategyLogic as $iso) {
+					$isoList[] = "`$iso`=0";
+					$maxList[] = "(`$iso`=0)";
 				}
-
-				$sql = implode(",", $sqls);
-
-				$sql = "SELECT $sql FROM `$table` WHERE `solveType`<=1";
-
-				$stmt = $db->prepare($sql);
-				$stmt->execute();
-				$result = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-				foreach ($strategies as $strategy) {
-					$value = &$values[$strategy];
-					$value['strategy'] += (int)$result[$strategy];
-					$value['iso'] += (int)$result["{$strategy}Iso"];
-					$value['isomax'] = max($value['isomax'], (int)$result["{$strategy}IsoMax"]);
-				}
+				$sql = implode(" AND ", $isoList);
+				$sqls[] = "SUM($sql) AS {$strategy}Iso";
+				$sql = implode(" * ", $maxList);
+				$sqls[] = "MAX($sql) AS {$strategy}IsoMax";
 			}
 
-			$results = [
-				'values' => $values,
-				'totalCount' => $totalCount
-			];
-			exit(json_encode($values));
+			$sql = implode(",", $sqls);
+
+			$sql = "SELECT $sql FROM `$table` WHERE `solveType`<=1";
+
+			$stmt = $db->prepare($sql);
+			$stmt->execute();
+			$result = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+			foreach ($strategies as $strategy) {
+				$value = &$values[$strategy];
+				$value['strategy'] += (int)$result[$strategy];
+				$value['iso'] += (int)$result["{$strategy}Iso"];
+				$value['isomax'] = max($value['isomax'], (int)$result["{$strategy}IsoMax"]);
+			}
 		}
-		if ($tablex) {
-		}
+
+		$results = [
+			'values' => $values,
+			'totalCount' => $totalCount
+		];
+		exit(json_encode($results));
 	}
 
 	if ($mode === 5) {
@@ -826,9 +823,7 @@ try {
 		}
 	}
 
-	if ($mode === 7) {
-		$number = number_format($totalCount);
-		echo "--- Clues $number\n\n";
+	if ($mode === 7 && !$tablex) {
 		$counts = [];
 		$countSimple = [];
 		$countVisible = [];
@@ -841,7 +836,7 @@ try {
 			$stmt = $db->prepare($sql);
 			$stmt->execute();
 			$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-			foreach ($result as $key => $row) {
+			foreach ($result as $row) {
 				$clueCount = $row['clueCount'];
 				$solveType = (int)$row['solveType'];
 				$count = (int)$row['count'];
@@ -860,36 +855,66 @@ try {
 				if ($solveType == 4) $countUnsolvable[$clueCount] += $count;
 			}
 		}
+		$results = [];
+		$results['counts'] = $counts;
+		$results['countSimple'] = $countSimple;
+		$results['countVisible'] = $countVisible;
+		$results['countCandidate'] = $countCandidate;
+		$results['countUnsolvable'] = $countUnsolvable;
+		$results['totalCount'] = $totalCount;
 
-		foreach ($counts as $clueCount => $count) {
-			printStat($clueCount, $count, $totalCount, 5);
+		exit(json_encode($results));
+	}
+
+	if ($mode === 7 && $tablex) {
+		$puzzles = [];
+
+		for ($i = 1; $i <= $tableCount; $i++) {
+			$table = tableName($i);
+			$sql = "SELECT `clueCount`, `solveType`, RIGHT(HEX(`puzzleData`), 42) AS puzzle, COUNT(*) AS count FROM `$table` GROUP BY `clueCount`, `solveType`, puzzle";
+			$stmt = $db->prepare($sql);
+			$stmt->execute();
+			$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+			foreach ($result as $row) {
+				$clueCount = $row['clueCount'];
+				$puzzle = $row['puzzle'];
+				$solveType = (int)$row['solveType'];
+				$count = (int)$row['count'];
+
+				$values = array_key_exists($puzzle, $puzzles) ? $puzzles[$puzzle] : [
+					'counts' => [],
+					'countSimple' => [],
+					'countVisible' => [],
+					'countCandidate' => [],
+					'countUnsolvable' => []
+				];
+
+				if (!$values['counts'][$clueCount]) $values['counts'][$clueCount] = 0;
+				if (!$values['countSimple'][$clueCount]) $values['countSimple'][$clueCount] = 0;
+				if (!$values['countVisible'][$clueCount]) $values['countVisible'][$clueCount] = 0;
+				if (!$values['countCandidate'][$clueCount]) $values['countCandidate'][$clueCount] = 0;
+				if (!$values['countUnsolvable'][$clueCount]) $values['countUnsolvable'][$clueCount] = 0;
+
+				$values['counts'][$clueCount] += $count;
+				if ($solveType == 0) $values['countSimple'][$clueCount] += $count;
+				if ($solveType == 1) $values['countVisible'][$clueCount] += $count;
+				if ($solveType == 2) $values['countCandidate'][$clueCount] += $count;
+				if ($solveType == 3) $values['countCandidate'][$clueCount] += $count;
+				if ($solveType == 4) $values['countUnsolvable'][$clueCount] += $count;
+
+				$puzzles[$puzzle] = $values;
+			}
 		}
-		echo "\n";
 
-		$countsSimple = 0;
-		$countsVisible = 0;
-		$countsCandidate = 0;
-		$countsUnsolvable = 0;
-		foreach ($countSimple as $clueCount => $count) $countsSimple += $count;
-		foreach ($countVisible as $clueCount => $count) $countsVisible += $count;
-		foreach ($countCandidate as $clueCount => $count) $countsCandidate += $count;
-		foreach ($countUnsolvable as $clueCount => $count) $countsUnsolvable += $count;
+		$results = [];
+		foreach ($puzzles as $puzzle => $result) $results[] = $result;
 
-		printStat("Simple", $countsSimple, $totalCount, 2);
-		foreach ($counts as $clueCount => $count) printStat($clueCount, $countSimple[$clueCount], $count, 2);
-		echo "\n";
+		$result = [
+			'values' => $results,
+			'totalCount' => $totalCount
+		];
 
-		printStat("Visible", $countsVisible, $totalCount, 2);
-		foreach ($counts as $clueCount => $count) printStat($clueCount, $countVisible[$clueCount], $count, 2);
-		echo "\n";
-
-		printStat("Candidate", $countsCandidate, $totalCount, 2);
-		foreach ($counts as $clueCount => $count) printStat($clueCount, $countCandidate[$clueCount], $count, 2);
-		echo "\n";
-
-		printStat("Unsolvable", $countsUnsolvable, $totalCount, 2);
-		foreach ($counts as $clueCount => $count) printStat($clueCount, $countUnsolvable[$clueCount], $count, 2);
-		echo "\n";
+		exit(json_encode($result));
 	}
 } catch (PDOException $e) {
 	// echo "Error: " . $e->getMessage();
