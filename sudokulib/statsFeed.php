@@ -486,9 +486,6 @@ try {
 			$stmt->execute();
 			$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-			$puzzles = [];
-			$sql = "SELECT `solveType`, RIGHT(HEX(`puzzleData`), 42) AS puzzle, COUNT(*) AS count FROM `$table` GROUP BY puzzle, `solveType`";
-
 			$counts = [];
 			foreach ($result as $row) {
 				$solveType = $row['solveType'];
