@@ -232,14 +232,21 @@
 
 		const mode7 = (data) => {
 			if (!tablex) {
+				const printTitle = (title, avg, count, total, precision) => {
+					const percent = percentage(count, total, precision);
+					const number = count.toLocaleString();
+					appendLine(`${title}: (${avg.toFixed(2)}) ${percent} ${number}`);
+				}
 				const printStat = (title, count, total, precision) => {
 					const percent = percentage(count, total, precision);
 					const number = count.toLocaleString();
 					appendLine(`${title}: ${percent} ${number}`);
 				}
 
-				appendLine(`--- Total ${data.totalCount.toLocaleString()}`);
-				appendSpace();
+				let avg = 0;
+				for (const [clueCount, count] of Object.entries(data.counts)) avg += parseInt(clueCount) * count;
+				avg /= data.totalCount;
+				appendLine(`Clues: (${avg.toFixed(2)}) ${data.totalCount.toLocaleString()}`);
 
 				for (const clueCount in data.counts) {
 					const count = data.counts[clueCount];
@@ -256,19 +263,31 @@
 				for (const [clueCount, count] of Object.entries(data.countCandidate)) countsCandidate += count;
 				for (const [clueCount, count] of Object.entries(data.countUnsolvable)) countsUnsolvable += count;
 
-				printStat("Simple", countsSimple, data.totalCount, 2);
+				avg = 0;
+				for (const [clueCount, count] of Object.entries(data.countSimple)) avg += parseInt(clueCount) * count;
+				avg /= countsSimple;
+				printTitle("Simple", avg, countsSimple, data.totalCount, 2);
 				for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, data.countSimple[clueCount], count, 2);
 				appendSpace();
 
-				printStat("Visible", countsVisible, data.totalCount, 2);
+				avg = 0;
+				for (const [clueCount, count] of Object.entries(data.countVisible)) avg += parseInt(clueCount) * count;
+				avg /= countsVisible;
+				printTitle("Visible", avg, countsVisible, data.totalCount, 2);
 				for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, data.countVisible[clueCount], count, 2);
 				appendSpace();
 
-				printStat("Candidate", countsCandidate, data.totalCount, 2);
+				avg = 0;
+				for (const [clueCount, count] of Object.entries(data.countCandidate)) avg += parseInt(clueCount) * count;
+				avg /= countsCandidate;
+				printTitle("Candidate", avg, countsCandidate, data.totalCount, 2);
 				for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, data.countCandidate[clueCount], count, 2);
 				appendSpace();
 
-				printStat("Unsolvable", countsUnsolvable, data.totalCount, 2);
+				avg = 0;
+				for (const [clueCount, count] of Object.entries(data.countUnsolvable)) avg += parseInt(clueCount) * count;
+				avg /= countsUnsolvable;
+				printTitle("Unsolvable", avg, countsUnsolvable, data.totalCount, 2);
 				for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, data.countUnsolvable[clueCount], count, 2);
 				appendSpace();
 
