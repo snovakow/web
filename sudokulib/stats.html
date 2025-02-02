@@ -305,6 +305,36 @@
 						this.max = count;
 					}
 				}
+
+				let min = 0;
+				let max = 0;
+				let avgAll = 0;
+				let totalAll = 0;
+				for (const values of data.values) {
+					let avg = 0;
+					let total = 0;
+					for (const [clueCount, count] of Object.entries(values)) {
+						avg += clueCount * count;
+						total += count;
+					}
+
+					avgAll += avg;
+					totalAll += total;
+
+					avg /= total;
+
+					if (min === 0) {
+						min = avg;
+						max = avg;
+					} else {
+						min = Math.min(min, avg);
+						max = Math.max(max, avg);
+					}
+				}
+				avgAll /= totalAll;
+
+				appendLine(`Clues: (${min.toFixed(2)} - ${max.toFixed(2)}) ${avgAll.toFixed(2)} ${data.totalCount.toLocaleString()}`);
+
 				const clues = new Map();
 				for (const values of data.values) {
 					for (const [clueCount, count] of Object.entries(values)) {
