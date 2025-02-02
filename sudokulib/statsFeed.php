@@ -868,36 +868,19 @@ try {
 
 		for ($i = 1; $i <= $tableCount; $i++) {
 			$table = tableName($i);
-			$sql = "SELECT `clueCount`, `solveType`, RIGHT(HEX(`puzzleData`), 42) AS puzzle, COUNT(*) AS count FROM `$table` GROUP BY `clueCount`, `solveType`, puzzle";
+			$sql = "SELECT `clueCount`, RIGHT(HEX(`puzzleData`), 42) AS puzzle, COUNT(*) AS count FROM `$table` GROUP BY `clueCount`, puzzle";
 			$stmt = $db->prepare($sql);
 			$stmt->execute();
 			$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 			foreach ($result as $row) {
 				$clueCount = $row['clueCount'];
 				$puzzle = $row['puzzle'];
-				$solveType = (int)$row['solveType'];
 				$count = (int)$row['count'];
 
-				$values = array_key_exists($puzzle, $puzzles) ? $puzzles[$puzzle] : [
-					'counts' => [],
-					'countSimple' => [],
-					'countVisible' => [],
-					'countCandidate' => [],
-					'countUnsolvable' => []
-				];
+				$values = array_key_exists($puzzle, $puzzles) ? $puzzles[$puzzle] : [];
 
-				if (!$values['counts'][$clueCount]) $values['counts'][$clueCount] = 0;
-				if (!$values['countSimple'][$clueCount]) $values['countSimple'][$clueCount] = 0;
-				if (!$values['countVisible'][$clueCount]) $values['countVisible'][$clueCount] = 0;
-				if (!$values['countCandidate'][$clueCount]) $values['countCandidate'][$clueCount] = 0;
-				if (!$values['countUnsolvable'][$clueCount]) $values['countUnsolvable'][$clueCount] = 0;
-
-				$values['counts'][$clueCount] += $count;
-				if ($solveType == 0) $values['countSimple'][$clueCount] += $count;
-				if ($solveType == 1) $values['countVisible'][$clueCount] += $count;
-				if ($solveType == 2) $values['countCandidate'][$clueCount] += $count;
-				if ($solveType == 3) $values['countCandidate'][$clueCount] += $count;
-				if ($solveType == 4) $values['countUnsolvable'][$clueCount] += $count;
+				if (!$values[$clueCount]) $values[$clueCount] = 0;
+				$values[$clueCount] += $count;
 
 				$puzzles[$puzzle] = $values;
 			}
