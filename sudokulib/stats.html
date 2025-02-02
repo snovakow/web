@@ -169,9 +169,9 @@
 			appendSpace();
 
 			const len1 = 17;
-			const len2 = 19;
-			const len3 = 24;
-			const len4 = 8;
+			const len2 = 10;
+			const len3 = 15;
+			const len4 = 10;
 
 			let line = "";
 			line += "Strategy".padEnd(len1);
@@ -206,20 +206,19 @@
 
 				const title = titles[strategy];
 
-				const percent = percentage(strategyValue, totalCount, 2);
-				const format = strategyValue.toLocaleString();
+				const fixed = 5;
+				const percent = percentage(strategyValue, totalCount, fixed);
 
 				runningTotoal += strategyIso;
-				const runningPercent = percentage(runningTotoal, totalCount, 2);
+				const runningPercent = percentage(runningTotoal, totalCount, fixed);
 
-				const percentIso = percentage(strategyIso, totalCount, 2);
+				const percentIso = percentage(strategyIso, totalCount, fixed);
 				const max = strategyIsoMax.toLocaleString();
-				const formatIso = strategyIso.toLocaleString();
 
 				line = "";
 				line += title.padEnd(len1);
-				line += `${percent} ${format}`.padEnd(len2);
-				line += `${percentIso} (${max}) ${formatIso}`.padEnd(len3);
+				line += `${percent}`.padEnd(len2);
+				line += `${percentIso} (${max})`.padEnd(len3);
 				line += `${runningPercent}`.padEnd(len4);
 				appendLine(line);
 			}
