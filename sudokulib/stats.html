@@ -296,16 +296,6 @@
 				appendSpace();
 			}
 			if (tablex) {
-				class Counter {
-					constructor(clue, count) {
-						this.clue = clue;
-						this.count = 1;
-						this.total = count;
-						this.min = count;
-						this.max = count;
-					}
-				}
-
 				let min = 0;
 				let max = 0;
 				let avgAll = 0;
@@ -334,6 +324,16 @@
 				avgAll /= totalAll;
 
 				appendLine(`Clues: (${min.toFixed(2)} - ${max.toFixed(2)}) ${avgAll.toFixed(2)} ${data.totalCount.toLocaleString()}`);
+
+				class Counter {
+					constructor(clue, count) {
+						this.clue = clue;
+						this.count = 1;
+						this.total = count;
+						this.min = count;
+						this.max = count;
+					}
+				}
 
 				const clues = new Map();
 				for (const values of data.values) {
