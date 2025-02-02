@@ -21,7 +21,7 @@ toolBar.style.flexWrap = 'nowrap';
 
 pickerBar.style.position = 'absolute';
 pickerBar.style.display = 'flex';
-pickerBar.style.gap = '16px';
+pickerBar.style.gap = '8px';
 pickerBar.style.flexWrap = 'nowrap';
 
 pickerBar.style.height = buttonSize + 'px';
