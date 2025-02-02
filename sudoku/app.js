@@ -194,14 +194,14 @@ const pickerClick = (event) => {
 	const selectedIndex = selectedRow * 9 + selectedCol;
 	const symbol = board.cells[selectedIndex].symbol;
 
-	if (index === symbol) return;
-	board.cells[selectedIndex].setSymbol(index);
-	// if (symbol === index) {
-	// 	const cell = board.cells[selectedIndex];
-	// 	cell.setSymbol(0);
-	// } else {
-	// 	board.cells[selectedIndex].setSymbol(index);
-	// }
+	// if (index === symbol) return;
+	// board.cells[selectedIndex].setSymbol(index);
+	if (symbol === index) {
+		const cell = board.cells[selectedIndex];
+		cell.setSymbol(0);
+	} else {
+		board.cells[selectedIndex].setSymbol(index);
+	}
 
 	Undo.add(board.cells, selectedIndex);
 	saveData();
