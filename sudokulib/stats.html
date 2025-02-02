@@ -296,64 +296,40 @@
 				appendSpace();
 			}
 			if (tablex) {
-
-				const printStat = (title, count, total, precision) => {
-					const percent = percentage(count, total, precision);
-					const number = count.toLocaleString();
-					appendLine(`${title}: ${percent} ${number}`);
-				}
-
-				appendLine(`--- Total ${data.totalCount.toLocaleString()}`);
-				appendSpace();
-
 				class Counter {
-					constructor(title, property) {
-						this.property = property;
-						this.title = title;
-						this.count = 0;
-						this.total = 0;
-						this.min = 0;
-						this.max = 0;
+					constructor(clue, count) {
+						this.clue = clue;
+						this.count = 1;
+						this.total = count;
+						this.min = count;
+						this.max = count;
+					}
+				}
+				const clues = new Map();
+				for (const values of data.values) {
+					for (const [clueCount, count] of Object.entries(values)) {
+						let clue = clues.get(clueCount);
+						if (clue) {
+							clue.count++;
+							clue.total += count;
+							clue.min = Math.min(clue.min, count);
+							clue.max = Math.max(clue.max, count);
+						} else {
+							clues.set(clueCount, new Counter(clueCount, count));
+						}
 					}
 				}
 
-				const clues = new Counter("Clues", 'countSimple');
-				const countSimple = new Counter("Simple", 'countSimple');
-				const countVisible = new Counter("Visible", 'countVisible');
-				const countCandidate = new Counter("Candidate", 'countCandidate');
-				const countUnsolvable = new Counter("Unsolvable", 'countUnsolvable');
-
-				data = data.values[0];
-				data.totalCount = 10000000;
-				for (const clueCount in data.counts) {
-					const count = data.counts[clueCount];
-					printStat(clueCount, count, data.totalCount, 5);
+				const list = [...clues.values()];
+				list.sort((a, b) => {
+					return a.clue - b.clue;
+				});
+				for (const clue of list) {
+					const avg = percentage(clue.total, data.totalCount, 5);
+					const min = percentage(clue.min * clue.count, data.totalCount, 5);
+					const max = percentage(clue.max * clue.count, data.totalCount, 5);
+					appendLine(`${clue.clue}: (${min} - ${max}) ${avg} ${clue.total.toLocaleString()}`);
 				}
-				appendSpace();
-
-				let countsSimple = 0;
-				let countsVisible = 0;
-				let countsCandidate = 0;
-				let countsUnsolvable = 0;
-				for (const [clueCount, count] of Object.entries(data.countSimple)) countsSimple += count;
-				for (const [clueCount, count] of Object.entries(data.countVisible)) countsVisible += count;
-				for (const [clueCount, count] of Object.entries(data.countCandidate)) countsCandidate += count;
-				for (const [clueCount, count] of Object.entries(data.countUnsolvable)) countsUnsolvable += count;
-
-				printStat("Simple", countsSimple, data.totalCount, 2);
-				for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, data.countSimple[clueCount], count, 2);
-				appendSpace();
-
-				printStat("Visible", countsVisible, data.totalCount, 2);
-				for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, data.countVisible[clueCount], count, 2);
-				appendSpace();
-
-				printStat("Candidate", countsCandidate, data.totalCount, 2);
-				for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, data.countCandidate[clueCount], count, 2);
-				appendSpace();
-
-				printStat("Unsolvable", countsUnsolvable, data.totalCount, 2);
-				for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, data.countUnsolvable[clueCount], count, 2);
 				appendSpace();
 
 				const time = Math.round((performance.now() - startTime) / 1000);
