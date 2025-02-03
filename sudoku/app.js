@@ -132,11 +132,17 @@ let timer = 0;
 let superpositionMode = 0;
 let superimposeCandidates = null;
 
-const correctCheck = () => {
-	for (const group of Grid.groupTypes) {
-		let set = 0x0000;
-		for (const i of group) set |= (0x0001 << board.cells[i].symbol);
-		if (set !== 0x03FE) return false;
+const puzzleFinished = () => {
+	if (board.puzzleSolved) {
+		for (let i = 0; i < 81; i++) {
+			if (board.cells[i].symbol !== board.puzzleSolved[i]) return false;
+		}
+	} else {
+		for (const group of Grid.groupTypes) {
+			let set = 0x0000;
+			for (const i of group) set |= (0x0001 << board.cells[i].symbol);
+			if (set !== 0x03FE) return false;
+		}
 	}
 	return true;
 }
@@ -213,7 +219,7 @@ const pickerClick = (event) => {
 		if (superimposeCandidates) superimposeCandidates();
 	}
 
-	if (correctCheck()) {
+	if (puzzleFinished()) {
 		window.setTimeout(() => {
 			alert("Puzzle Complete!!!");
 		}, 0);
@@ -444,6 +450,7 @@ if (strategy === 'custom' || strategy === 'hardcoded') {
 					puzzleData.markers = markers;
 				}
 				puzzleData.transform = null;
+				board.puzzleSolved.fill(0);
 
 				Undo.set(board.cells);
 				saveData();
@@ -483,6 +490,7 @@ const loadSudoku = () => {
 
 			const puzzleString = puzzleTransformed.join("");
 			board.cells.fromString(puzzleString);
+			board.puzzleSolved.set(gridTransformed);
 			for (const cell of board.cells) {
 				const startCell = board.startCells[cell.index];
 				startCell.symbol = cell.symbol;
