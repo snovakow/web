@@ -36,6 +36,8 @@ class Board {
 
 		this.startCells = new Grid();
 		for (let i = 0; i < 81; i++) this.startCells[i] = new Cell(i);
+
+		this.puzzleSolved = new Uint8Array(81);
 	}
 	setGrid(cells) {
 		for (let i = 0; i < 81; i++) {
@@ -190,7 +192,7 @@ class Board {
 const board = new Board();
 
 const storageToCells = (data) => {
-	const dataCells = data.grid;
+	const dataCells = data.board;
 	if (!dataCells) return null;
 	for (let i = 0; i < 81; i++) {
 		const dataCell = dataCells[i];
@@ -204,6 +206,7 @@ const storageToCells = (data) => {
 			cell.setSymbol(dataCell.symbol);
 			if (dataCell.symbol === 0) cell.mask = dataCell.mask;
 		}
+		board.puzzleSolved[i] = dataCell.fill;
 	}
 	return data.metadata;
 }
@@ -222,10 +225,11 @@ const cellsToStorage = (metadata) => {
 			data.symbol = startCell.symbol;
 			data.mask = 0x0000;
 		}
+		data.fill = board.puzzleSolved[i];
 		dataCells.push(data);
 	}
 	return {
-		grid: dataCells,
+		board: dataCells,
 		metadata
 	}
 }
@@ -238,13 +242,7 @@ const loadGrid = () => {
 	const data = sessionStorage.getItem("saveData");
 
 	if (data === null) return null;
-	let metadata = null;
-	try {
-		metadata = storageToCells(JSON.parse(data));
-	} catch (err) {
-		console.log("Window name data error", err);
-	}
-	return metadata;
+	return storageToCells(JSON.parse(data));
 };
 
 export { board, FONT, loadGrid, saveGrid, setMarkerFont };
