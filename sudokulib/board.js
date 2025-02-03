@@ -9,20 +9,7 @@ const LINE_THICK = 8;
 const LINE_THICK_HALF = LINE_THICK * 0.5;
 const LINE_THIN = 2;
 
-const FONT = {};
-FONT.REGULAR = "REGULAR, Hauss, sans-serif";
-FONT.COMIC = "COMIC, 'Comic Sans MS', 'Comic Sans', cursive";
-FONT.marker = FONT.REGULAR;
-FONT.default = FONT.REGULAR;
-FONT.initialized = false;
-Object.freeze(FONT.REGULAR);
-Object.freeze(FONT.COMIC);
-Object.freeze(FONT.default);
-
-const setMarkerFont = (markerFont) => {
-	if (markerFont) FONT.marker = FONT.COMIC;
-	else FONT.marker = FONT.REGULAR;
-};
+const FONT = "sans-serif";
 
 const BOX_SIDE = 3;
 const GRID_SIDE = BOX_SIDE * BOX_SIDE;
@@ -133,8 +120,6 @@ class Board {
 		}
 		ctx.stroke();
 
-		if (!FONT.initialized) return;
-
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'bottom';
 		ctx.fillStyle = 'Black'; // DimGray Black
@@ -151,7 +136,7 @@ class Board {
 				const index = r * 9 + c;
 				const cell = this.cells[index];
 				if (cell.symbol === 0) {
-					ctx.font = pixAlign(unitSize * 0.7 * 1 / 3) + "px " + FONT.marker;
+					ctx.font = pixAlign(unitSize * 0.7 * 1 / 3) + "px " + FONT;
 
 					if (!measureCandidate) measureCandidate = ctx.measureText("0");
 
@@ -168,9 +153,8 @@ class Board {
 					}
 				} else {
 					const startCell = board.startCells[index];
-					const font = startCell.symbol > 0 ? FONT.default : FONT.marker;
 					const fontSize = pixAlign(unitSize * 0.7);
-					ctx.font = fontSize + "px " + font;
+					ctx.font = fontSize + "px " + FONT;
 
 					let measured = measure;
 					if (startCell.symbol === 0) {
@@ -181,6 +165,8 @@ class Board {
 						measured = measureClue;
 					}
 
+					if (cell.error) ctx.fillStyle = 'HSL(9 100% 50%)';
+					else ctx.fillStyle = 'Black';
 					const x = pixAlign(coff);
 					const y = pixAlign(roff + (measured.actualBoundingBoxAscent * 0.5 - measured.actualBoundingBoxDescent * 0.5));
 					ctx.fillText(cell.symbol, x, y);
@@ -245,4 +231,4 @@ const loadGrid = () => {
 	return storageToCells(JSON.parse(data));
 };
 
-export { board, FONT, loadGrid, saveGrid, setMarkerFont };
+export { board, FONT, loadGrid, saveGrid };

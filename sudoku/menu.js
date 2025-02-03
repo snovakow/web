@@ -81,11 +81,9 @@ backing.style.overflowY = 'auto';
 backing.style.boxSizing = "border-box";
 
 const menu = createIcon("./icons/menu.svg");
-const settings = createIcon("./icons/settings.svg");
 const reset = createIcon("./icons/replay.svg");
 const newPuzzle = createIcon("./icons/add.svg");
 menu.title = "Menu";
-settings.title = "Settings";
 reset.title = "Restart Puzzle";
 newPuzzle.title = "New Puzzle";
 
@@ -174,8 +172,6 @@ toolBar.appendChild(undoIcons.undo_on);
 toolBar.appendChild(undoIcons.undo_off);
 toolBar.appendChild(undoIcons.redo_on);
 toolBar.appendChild(undoIcons.redo_off);
-
-toolBar.appendChild(settings);
 
 if (document.fullscreenEnabled) {
 	const fullscreen = createIcon("./icons/fullscreen.svg");

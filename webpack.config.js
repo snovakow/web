@@ -17,7 +17,6 @@ module.exports = env => {
 			new CopyPlugin({
 				patterns: [
 					{ from: 'snovakow/sudoku.html', to: 'snovakow/sudoku.html' },
-					{ from: 'assets', to: 'assets' },
 					{ from: 'favicon.ico', to: 'favicon.ico' },
 					{ from: 'index.html', to: 'index.html' }
 				]

@@ -1,4 +1,4 @@
-import { FONT, board, loadGrid, saveGrid, setMarkerFont } from "../sudokulib/board.js";
+import { FONT, board, loadGrid, saveGrid } from "../sudokulib/board.js";
 import { generateFromSeed, generateTransform, fillSolve, consoleOut } from "../sudokulib/generator.js";
 import { CellCandidate, Grid } from "../sudokulib/Grid.js";
 import * as PICKER from "../sudokulib/picker.js";
@@ -56,7 +56,6 @@ const puzzleData = {
 }
 Object.seal(puzzleData);
 
-let markerFont = false;
 let pickerMarkerMode = false;
 
 const headerHeight = Menu.headerHeight;
@@ -73,7 +72,6 @@ const saveData = () => {
 		transform: puzzleData.transform,
 		grid: puzzleData.grid.join(""),
 		markers: puzzleData.markers.join(""),
-		markerFont,
 		pickerMarkerMode,
 		selected,
 		selectedRow,
@@ -100,32 +98,9 @@ const draw = () => {
 		}
 	}
 
-	if (FONT.initialized) {
-		const font = pixAlign(PICKER.cellSize * window.devicePixelRatio) + "px " + FONT.marker;
-		const fontMarker = pixAlign(PICKER.cellSize * 3 / 8 * window.devicePixelRatio) + "px " + FONT.marker;
-		pickerDraw(selectedSet, font, fontMarker);
-	} else {
-		pickerDraw(selectedSet);
-	}
-}
-
-{
-	const urlComicSans = 'url(../assets/fonts/comic-sans-ms/COMIC.TTF)';
-	const urlOpenSansRegular = 'url(../assets/fonts/Open_Sans/static/OpenSans-Regular.ttf)';
-
-	const fontOpenSansRegular = new FontFace("REGULAR", urlOpenSansRegular);
-	const fontComicSans = new FontFace("COMIC", urlComicSans);
-
-	document.fonts.add(fontOpenSansRegular);
-	document.fonts.add(fontComicSans);
-
-	fontOpenSansRegular.load();
-	fontComicSans.load();
-
-	document.fonts.ready.then(() => {
-		FONT.initialized = true;
-		draw();
-	});
+	const font = pixAlign(PICKER.cellSize * window.devicePixelRatio) + "px " + FONT;
+	const fontMarker = pixAlign(PICKER.cellSize * 3 / 8 * window.devicePixelRatio) + "px " + FONT;
+	pickerDraw(selectedSet, font, fontMarker);
 }
 
 let timer = 0;
@@ -299,36 +274,6 @@ pickerMarker.style.touchAction = "manipulation";
 const header = document.createElement('DIV');
 const mainBody = document.createElement('DIV');
 
-const fontCheckbox = document.createElement('input');
-fontCheckbox.type = "checkbox";
-fontCheckbox.name = "name";
-fontCheckbox.value = "value";
-fontCheckbox.id = "id";
-fontCheckbox.style.position = 'absolute';
-fontCheckbox.style.bottom = 0 + 'px';
-fontCheckbox.style.left = 0 + 'px';
-// fontCheckbox.style.transform = 'translate(0%, 100%)';
-// fontCheckbox.style.margin = '0px';
-// fontCheckbox.style.padding = '8px';
-fontCheckbox.addEventListener('change', () => {
-	markerFont = fontCheckbox.checked;
-	setMarkerFont(markerFont);
-	saveData();
-	draw();
-});
-
-const fontLabel = document.createElement('label')
-fontLabel.appendChild(document.createTextNode('Marker Font'));
-fontLabel.style.position = 'absolute';
-fontLabel.style.top = 0 + 'px';
-fontLabel.style.right = 0 + 'px';
-fontLabel.style.paddingLeft = 24 + 'px';
-fontLabel.style.paddingTop = 8 + 'px';
-fontLabel.style.paddingRight = 8 + 'px';
-fontLabel.style.whiteSpace = 'nowrap';
-fontLabel.for = "id";
-fontLabel.appendChild(fontCheckbox);
-
 let loaded = false;
 const loadGridMetadata = loadGrid();
 if (loadGridMetadata) {
@@ -344,10 +289,6 @@ if (loadGridMetadata) {
 
 		loaded = true;
 	}
-
-	if (metadata.markerFont !== undefined) markerFont = metadata.markerFont;
-	setMarkerFont(markerFont);
-	fontCheckbox.checked = markerFont;
 
 	if (metadata.pickerMarkerMode !== undefined) pickerMarkerMode = metadata.pickerMarkerMode;
 
@@ -583,6 +524,38 @@ Menu.deleteButton.addEventListener('click', () => {
 	draw();
 });
 
+Menu.checkButton.addEventListener('click', () => {
+	let errorCount = 0;
+	let solved = true;
+	for (let i = 0; i < 81; i++) {
+		const cell = board.cells[i];
+		cell.error = false;
+		if (cell.symbol === 0) {
+			solved = false;
+			continue;
+		}
+		if (cell.symbol !== board.puzzleSolved[i]) {
+			cell.error = true;
+			errorCount++;
+			solved = false;
+		}
+	}
+	draw();
+	window.setTimeout(() => {
+		if (solved) {
+			alert("Puzzle Complete!!!");
+		} else if (errorCount > 0) {
+			if (errorCount === 1) alert(errorCount + " Error!");
+			else alert(errorCount + " Errors!");
+		} else {
+			alert("No Errors!");
+		}
+	}, 0);
+});
+
+Menu.infoButton.addEventListener('click', () => {
+});
+
 const fillButton = document.createElement('button');
 fillButton.appendChild(document.createTextNode("Candidates"));
 // fillButton.style.width = '48px';
@@ -700,11 +673,6 @@ Menu.reset.addEventListener('click', () => {
 	Undo.set(board.cells);
 	saveData();
 	draw();
-});
-
-Menu.settings.addEventListener('click', () => {
-	if (fontLabel.parentElement) fontLabel.parentElement.removeChild(fontLabel);
-	else mainBody.appendChild(fontLabel);
 });
 
 const resize = () => {
