@@ -14,7 +14,7 @@ function totalCount($tableCount, $puzzleCount)
 function tableName($number)
 {
 	$pad = str_pad($number, 3, "0", STR_PAD_LEFT);
-	$puzzles = isset($_GET['tablex']) ? "puzzlex" : "puzzles";
+	$puzzles = "puzzles";
 	return "$puzzles$pad";
 }
 
@@ -79,7 +79,7 @@ try {
 	$array = json_decode(file_get_contents("php://input"));
 	$addCount = count($array);
 
-	$tables = isset($_GET['tablex']) ? "tablex" : "tables";
+	$tables = "tables";
 
 	$db->exec("START TRANSACTION");
 	$stmt = $db->prepare("SELECT `tableCount`, `puzzleCount` FROM `$tables` FOR UPDATE");

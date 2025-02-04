@@ -17,7 +17,6 @@
 
 		const search = new URLSearchParams(window.location.search);
 		const mode = parseInt(search.get("mode") ?? -1);
-		const tablex = (search.get("tablex") === null) ? false : true;
 
 		const percentage = (number, total, precision) => {
 			const percent = (number * 100 / total).toFixed(precision);
@@ -45,120 +44,50 @@
 		}
 
 		const mode3 = (data) => {
+			const simple = data.simple;
+			const candidateVisual = data.candidateVisual;
+			const candidate = data.candidate;
+			const candidateMinimal = data.candidateMinimal;
+			const unsolvable = data.unsolvable;
+			const totalCount = data.totalCount;
+			let runningTotal = 0;
+
+			appendLine(`--- Total ${totalCount.toLocaleString()}`);
+			appendSpace();
+
 			const fixed = 2;
-			if (!tablex) {
-				const simple = data.simple;
-				const candidateVisual = data.candidateVisual;
-				const candidate = data.candidate;
-				const candidateMinimal = data.candidateMinimal;
-				const unsolvable = data.unsolvable;
-				const totalCount = data.totalCount;
-				let runningTotal = 0;
 
-				appendLine(`--- Total ${totalCount.toLocaleString()}`);
-				appendSpace();
+			runningTotal += simple;
+			let runningPercent = percentage(runningTotal, totalCount, fixed);
+			let percent = percentage(simple, totalCount, fixed);
+			let number = simple.toLocaleString();
+			appendLine(`Simple: ${runningPercent} (${percent}) ${number}`);
 
-				runningTotal += simple;
-				let runningPercent = percentage(runningTotal, totalCount, fixed);
-				let percent = percentage(simple, totalCount, fixed);
-				let number = simple.toLocaleString();
-				appendLine(`Simple: ${runningPercent} (${percent}) ${number}`);
+			runningTotal += candidateVisual;
+			runningPercent = percentage(runningTotal, totalCount, fixed);
+			percent = percentage(candidateVisual, totalCount, fixed);
+			number = candidateVisual.toLocaleString();
+			appendLine(`Visual: ${runningPercent} (${percent}) ${number}`);
 
-				runningTotal += candidateVisual;
-				runningPercent = percentage(runningTotal, totalCount, fixed);
-				percent = percentage(candidateVisual, totalCount, fixed);
-				number = candidateVisual.toLocaleString();
-				appendLine(`Visual: ${runningPercent} (${percent}) ${number}`);
+			const strategy = candidate + candidateMinimal;
+			runningTotal += strategy;
+			runningPercent = percentage(runningTotal, totalCount, fixed);
+			const percentCandidate = percentage(strategy + candidateVisual, totalCount, fixed);
+			const minPercent = percentage(candidateMinimal, strategy, fixed);
+			percent = percentage(strategy, totalCount, fixed);
+			number = strategy.toLocaleString();
+			appendLine(`Strategy: ${runningPercent} (${percent} of ${percentCandidate}) (${minPercent} minimal) ${number}`);
 
-				const strategy = candidate + candidateMinimal;
-				runningTotal += strategy;
-				runningPercent = percentage(runningTotal, totalCount, fixed);
-				const percentCandidate = percentage(strategy + candidateVisual, totalCount, fixed);
-				const minPercent = percentage(candidateMinimal, strategy, fixed);
-				percent = percentage(strategy, totalCount, fixed);
-				number = strategy.toLocaleString();
-				appendLine(`Strategy: ${runningPercent} (${percent} of ${percentCandidate}) (${minPercent} minimal) ${number}`);
+			runningTotal += unsolvable;
+			runningPercent = percentage(runningTotal, totalCount, fixed);
+			percent = percentage(unsolvable, totalCount, fixed);
+			number = unsolvable.toLocaleString();
+			appendLine(`Unsolvable: ${runningPercent} (${percent}) ${number}`);
 
-				runningTotal += unsolvable;
-				runningPercent = percentage(runningTotal, totalCount, fixed);
-				percent = percentage(unsolvable, totalCount, fixed);
-				number = unsolvable.toLocaleString();
-				appendLine(`Unsolvable: ${runningPercent} (${percent}) ${number}`);
-
-				appendSpace();
-				const time = Math.round((performance.now() - startTime) / 1000);
-				appendLine(`${Math.floor(time / 60)}m ${time % 60}s`);
-				appendSpace();
-			}
-			if (tablex) {
-				let total = 0;
-				for (const puzzle of data) total += puzzle.totalCount;
-
-				appendLine(`--- Total ${total.toLocaleString()}`);
-				appendSpace();
-
-				class Counter {
-					constructor(title, property) {
-						this.property = property;
-						this.title = title;
-						this.count = 0;
-						this.total = 0;
-						this.min = 0;
-						this.max = 0;
-					}
-				}
-				const counters = [];
-				counters.push(new Counter("Simple", 'simple'));
-				counters.push(new Counter("Visual", 'candidateVisual'));
-				counters.push(new Counter("Strategy", 'candidate'));
-				counters.push(new Counter("Minimal", 'candidateMinimal'));
-				counters.push(new Counter("Incomplete", 'unsolvable'));
-
-				for (const puzzle of data) {
-					for (const counter of counters) {
-						const count = puzzle[counter.property];
-						if (counter.count === 0) {
-							counter.max = count;
-							counter.min = count;
-						} else {
-							counter.max = Math.max(counter.max, count);
-							counter.min = Math.min(counter.min, count);
-						}
-						counter.total += count;
-						counter.count++;
-					}
-				}
-				let line = "";
-				line += "Type".padEnd(11);
-				line += "AVG".padEnd(7);
-				line += "Min".padEnd(7);
-				line += "Max".padEnd(7);
-				appendLine(line);
-
-				line = "";
-				line += " ".padStart(11, "-");
-				line += " ".padStart(7, "-");
-				line += " ".padStart(7, "-");
-				line += " ".padStart(7, "-");
-				appendLine(line);
-
-				for (const counter of counters) {
-					const percentAvg = percentage(counter.total / counter.count, 100000, fixed);
-					const percentMin = percentage(counter.min, 100000, fixed);
-					const percentMax = percentage(counter.max, 100000, fixed);
-					line = "";
-					line += counter.title.padEnd(11);
-					line += percentAvg.padEnd(7);
-					line += percentMin.padEnd(7);
-					line += percentMax.padEnd(7);
-					appendLine(line);
-
-				}
-				appendSpace();
-				const time = Math.round((performance.now() - startTime) / 1000);
-				appendLine(`${Math.floor(time / 60)}m ${time % 60}s`);
-				appendSpace();
-			}
+			appendSpace();
+			const time = Math.round((performance.now() - startTime) / 1000);
+			appendLine(`${Math.floor(time / 60)}m ${time % 60}s`);
+			appendSpace();
 		}
 
 		const mode4 = (data) => {
@@ -212,7 +141,8 @@
 				runningTotoal += strategyIso;
 				const runningPercent = percentage(runningTotoal, totalCount, fixed);
 
-				const percentIso = percentage(strategyIso, totalCount, fixed);
+				// const percentIso = percentage(strategyIso, totalCount, fixed);
+				const percentIso = (strategyIso * 100 / totalCount) + "%";
 				const max = strategyIsoMax.toLocaleString();
 
 				line = "";
@@ -230,141 +160,68 @@
 		}
 
 		const mode7 = (data) => {
-			if (!tablex) {
-				const printTitle = (title, avg, count, total, precision) => {
-					const percent = percentage(count, total, precision);
-					const number = count.toLocaleString();
-					appendLine(`${title}: (${avg.toFixed(2)}) ${percent} ${number}`);
-				}
-				const printStat = (title, count, total, precision) => {
-					const percent = percentage(count, total, precision);
-					const number = count.toLocaleString();
-					appendLine(`${title}: ${percent} ${number}`);
-				}
-
-				let avg = 0;
-				for (const [clueCount, count] of Object.entries(data.counts)) avg += parseInt(clueCount) * count;
-				avg /= data.totalCount;
-				appendLine(`Clues: (${avg.toFixed(2)}) ${data.totalCount.toLocaleString()}`);
-
-				for (const clueCount in data.counts) {
-					const count = data.counts[clueCount];
-					printStat(clueCount, count, data.totalCount, 5);
-				}
-				appendSpace();
-
-				let countsSimple = 0;
-				let countsVisible = 0;
-				let countsCandidate = 0;
-				let countsUnsolvable = 0;
-				for (const [clueCount, count] of Object.entries(data.countSimple)) countsSimple += count;
-				for (const [clueCount, count] of Object.entries(data.countVisible)) countsVisible += count;
-				for (const [clueCount, count] of Object.entries(data.countCandidate)) countsCandidate += count;
-				for (const [clueCount, count] of Object.entries(data.countUnsolvable)) countsUnsolvable += count;
-
-				avg = 0;
-				for (const [clueCount, count] of Object.entries(data.countSimple)) avg += parseInt(clueCount) * count;
-				avg /= countsSimple;
-				printTitle("Simple", avg, countsSimple, data.totalCount, 2);
-				for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, data.countSimple[clueCount], count, 2);
-				appendSpace();
-
-				avg = 0;
-				for (const [clueCount, count] of Object.entries(data.countVisible)) avg += parseInt(clueCount) * count;
-				avg /= countsVisible;
-				printTitle("Visible", avg, countsVisible, data.totalCount, 2);
-				for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, data.countVisible[clueCount], count, 2);
-				appendSpace();
-
-				avg = 0;
-				for (const [clueCount, count] of Object.entries(data.countCandidate)) avg += parseInt(clueCount) * count;
-				avg /= countsCandidate;
-				printTitle("Candidate", avg, countsCandidate, data.totalCount, 2);
-				for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, data.countCandidate[clueCount], count, 2);
-				appendSpace();
-
-				avg = 0;
-				for (const [clueCount, count] of Object.entries(data.countUnsolvable)) avg += parseInt(clueCount) * count;
-				avg /= countsUnsolvable;
-				printTitle("Unsolvable", avg, countsUnsolvable, data.totalCount, 2);
-				for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, data.countUnsolvable[clueCount], count, 2);
-				appendSpace();
-
-				const time = Math.round((performance.now() - startTime) / 1000);
-				appendLine(`${Math.floor(time / 60)}m ${time % 60}s`);
-				appendSpace();
+			const printTitle = (title, avg, count, total, precision) => {
+				const percent = percentage(count, total, precision);
+				const number = count.toLocaleString();
+				appendLine(`${title}: (${avg.toFixed(2)}) ${percent} ${number}`);
 			}
-			if (tablex) {
-				let min = 0;
-				let max = 0;
-				let avgAll = 0;
-				let totalAll = 0;
-				for (const values of data.values) {
-					let avg = 0;
-					let total = 0;
-					for (const [clueCount, count] of Object.entries(values)) {
-						avg += clueCount * count;
-						total += count;
-					}
-
-					avgAll += avg;
-					totalAll += total;
-
-					avg /= total;
-
-					if (min === 0) {
-						min = avg;
-						max = avg;
-					} else {
-						min = Math.min(min, avg);
-						max = Math.max(max, avg);
-					}
-				}
-				avgAll /= totalAll;
-
-				appendLine(`Clues: (${min.toFixed(2)} - ${max.toFixed(2)}) ${avgAll.toFixed(2)} ${data.totalCount.toLocaleString()}`);
-
-				class Counter {
-					constructor(clue, count) {
-						this.clue = clue;
-						this.count = 1;
-						this.total = count;
-						this.min = count;
-						this.max = count;
-					}
-				}
-
-				const clues = new Map();
-				for (const values of data.values) {
-					for (const [clueCount, count] of Object.entries(values)) {
-						let clue = clues.get(clueCount);
-						if (clue) {
-							clue.count++;
-							clue.total += count;
-							clue.min = Math.min(clue.min, count);
-							clue.max = Math.max(clue.max, count);
-						} else {
-							clues.set(clueCount, new Counter(clueCount, count));
-						}
-					}
-				}
-
-				const list = [...clues.values()];
-				list.sort((a, b) => {
-					return a.clue - b.clue;
-				});
-				for (const clue of list) {
-					const avg = percentage(clue.total, data.totalCount, 5);
-					const min = percentage(clue.min * clue.count, data.totalCount, 5);
-					const max = percentage(clue.max * clue.count, data.totalCount, 5);
-					appendLine(`${clue.clue}: (${min} - ${max}) ${avg} ${clue.total.toLocaleString()}`);
-				}
-				appendSpace();
-
-				const time = Math.round((performance.now() - startTime) / 1000);
-				appendLine(`${Math.floor(time / 60)}m ${time % 60}s`);
-				appendSpace();
+			const printStat = (title, count, total, precision) => {
+				const percent = percentage(count, total, precision);
+				const number = count.toLocaleString();
+				appendLine(`${title}: ${percent} ${number}`);
 			}
+
+			let avg = 0;
+			for (const [clueCount, count] of Object.entries(data.counts)) avg += parseInt(clueCount) * count;
+			avg /= data.totalCount;
+			appendLine(`Clues: (${avg.toFixed(2)}) ${data.totalCount.toLocaleString()}`);
+
+			for (const clueCount in data.counts) {
+				const count = data.counts[clueCount];
+				printStat(clueCount, count, data.totalCount, 5);
+			}
+			appendSpace();
+
+			let countsSimple = 0;
+			let countsVisible = 0;
+			let countsCandidate = 0;
+			let countsUnsolvable = 0;
+			for (const [clueCount, count] of Object.entries(data.countSimple)) countsSimple += count;
+			for (const [clueCount, count] of Object.entries(data.countVisible)) countsVisible += count;
+			for (const [clueCount, count] of Object.entries(data.countCandidate)) countsCandidate += count;
+			for (const [clueCount, count] of Object.entries(data.countUnsolvable)) countsUnsolvable += count;
+
+			avg = 0;
+			for (const [clueCount, count] of Object.entries(data.countSimple)) avg += parseInt(clueCount) * count;
+			avg /= countsSimple;
+			printTitle("Simple", avg, countsSimple, data.totalCount, 2);
+			for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, data.countSimple[clueCount], count, 2);
+			appendSpace();
+
+			avg = 0;
+			for (const [clueCount, count] of Object.entries(data.countVisible)) avg += parseInt(clueCount) * count;
+			avg /= countsVisible;
+			printTitle("Visible", avg, countsVisible, data.totalCount, 2);
+			for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, data.countVisible[clueCount], count, 2);
+			appendSpace();
+
+			avg = 0;
+			for (const [clueCount, count] of Object.entries(data.countCandidate)) avg += parseInt(clueCount) * count;
+			avg /= countsCandidate;
+			printTitle("Candidate", avg, countsCandidate, data.totalCount, 2);
+			for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, data.countCandidate[clueCount], count, 2);
+			appendSpace();
+
+			avg = 0;
+			for (const [clueCount, count] of Object.entries(data.countUnsolvable)) avg += parseInt(clueCount) * count;
+			avg /= countsUnsolvable;
+			printTitle("Unsolvable", avg, countsUnsolvable, data.totalCount, 2);
+			for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, data.countUnsolvable[clueCount], count, 2);
+			appendSpace();
+
+			const time = Math.round((performance.now() - startTime) / 1000);
+			appendLine(`${Math.floor(time / 60)}m ${time % 60}s`);
+			appendSpace();
 		}
 
 		const url = './statsFeed.php' + window.location.search;

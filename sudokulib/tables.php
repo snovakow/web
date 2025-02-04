@@ -10,7 +10,7 @@ try {
 	$dbname = "sudoku";
 	$db = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
 
-	$tables = isset($_GET['tablex']) ? "tablex" : "tables";
+	$tables = "tables";
 	$stmt = $db->prepare("SELECT `tableCount`, `puzzleCount` FROM `$tables`");
 	$stmt->execute();
 	$result = $stmt->fetch();

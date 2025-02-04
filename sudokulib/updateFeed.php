@@ -7,7 +7,7 @@ $count = (int)$_GET['count'];
 function tableName($number)
 {
 	$pad = str_pad($number, 3, "0", STR_PAD_LEFT);
-	$puzzles = isset($_GET['tablex']) ? "puzzlex" : "puzzles";
+	$puzzles = "puzzles";
 	return "$puzzles$pad";
 }
 
