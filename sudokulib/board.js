@@ -25,6 +25,10 @@ class Board {
 		for (let i = 0; i < 81; i++) this.startCells[i] = new Cell(i);
 
 		this.puzzleSolved = new Uint8Array(81);
+
+		this.errorCells = new Set();
+
+		Object.seal(this);
 	}
 	setGrid(cells) {
 		for (let i = 0; i < 81; i++) {
@@ -43,6 +47,7 @@ class Board {
 		for (const cell of this.cells) {
 			cell.setSymbol(this.startCells[cell.index].symbol);
 		}
+		this.errorCells.clear();
 	}
 	hitDetect(x, y, sizeTotal) {
 		const size = sizeTotal - LINE_THICK;
@@ -165,7 +170,7 @@ class Board {
 						measured = measureClue;
 					}
 
-					if (cell.error) ctx.fillStyle = 'HSL(9 100% 50%)';
+					if (board.errorCells.has(index)) ctx.fillStyle = 'HSL(9 100% 50%)';
 					else ctx.fillStyle = 'Black';
 					const x = pixAlign(coff);
 					const y = pixAlign(roff + (measured.actualBoundingBoxAscent * 0.5 - measured.actualBoundingBoxDescent * 0.5));
@@ -178,12 +183,13 @@ class Board {
 const board = new Board();
 
 const storageToCells = (data) => {
-	const dataCells = data.board;
+	const dataCells = data.boardCells;
 	if (!dataCells) return null;
 	for (let i = 0; i < 81; i++) {
 		const dataCell = dataCells[i];
 		const startCell = board.startCells[i];
 		const cell = board.cells[i];
+		cell.mask = 0x0000;
 		if (dataCell.clue) {
 			startCell.symbol = dataCell.symbol;
 			cell.symbol = dataCell.symbol;
@@ -194,6 +200,8 @@ const storageToCells = (data) => {
 		}
 		board.puzzleSolved[i] = dataCell.fill;
 	}
+	board.errorCells.clear();
+	for (const error of data.errorCells) board.errorCells.add(error);
 	return data.metadata;
 }
 const cellsToStorage = (metadata) => {
@@ -215,7 +223,8 @@ const cellsToStorage = (metadata) => {
 		dataCells.push(data);
 	}
 	return {
-		board: dataCells,
+		boardCells: dataCells,
+		errorCells: [...board.errorCells],
 		metadata
 	}
 }

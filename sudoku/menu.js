@@ -156,11 +156,19 @@ mainBar.appendChild(menu);
 mainBar.appendChild(newPuzzle);
 mainBar.appendChild(reset);
 
+const infoButton = createIcon("./icons/question_mark.svg");
+infoButton.title = "Info";
+mainBar.appendChild(infoButton);
+
 const markerButton = createIcon("./icons/edit.svg", buttonSize);
 const deleteButton = createIcon("./icons/eraser.svg", buttonSize);
 deleteButton.title = "Clear";
 pickerBar.appendChild(markerButton);
 pickerBar.appendChild(deleteButton);
+
+const checkButton = createIcon("./icons/check_box.svg");
+checkButton.title = "Check Puzzle";
+toolBar.appendChild(checkButton);
 
 const undoIcons = {
 	undo_on: createIcon("./icons/undo.svg"),
@@ -168,6 +176,11 @@ const undoIcons = {
 	undo_off: createIcon("./icons/undo_gray.svg"),
 	redo_off: createIcon("./icons/redo_gray.svg"),
 };
+undoIcons.undo_on.title = "Undo";
+undoIcons.undo_off.title = "Undo";
+undoIcons.redo_on.title = "Redo";
+undoIcons.redo_off.title = "Redo";
+
 toolBar.appendChild(undoIcons.undo_on);
 toolBar.appendChild(undoIcons.undo_off);
 toolBar.appendChild(undoIcons.redo_on);
@@ -215,7 +228,7 @@ if (document.fullscreenEnabled) {
 }
 
 export { backing, mainBar, toolBar, pickerBar, autoBar, headerHeight };
-export { newPuzzle, reset, settings, menu, markerButton, deleteButton };
+export { newPuzzle, reset, menu, markerButton, deleteButton, infoButton, checkButton };
 export {
 	pickerBarLandscape, autoBarLandscape, setMenuItem, setMenuReponse,
 	menuTitle, undoIcons

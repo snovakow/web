@@ -177,14 +177,12 @@ const pickerClick = (event) => {
 
 	// if (index === symbol) return;
 	// board.cells[selectedIndex].setSymbol(index);
-	if (symbol === index) {
-		const cell = board.cells[selectedIndex];
-		cell.setSymbol(0);
-	} else {
-		board.cells[selectedIndex].setSymbol(index);
-	}
+	const cell = board.cells[selectedIndex];
+	if (symbol === index) cell.setSymbol(0);
+	else cell.setSymbol(index);
+	board.errorCells.delete(selectedIndex);
 
-	Undo.add(board.cells, selectedIndex);
+	Undo.add(board, selectedIndex);
 	saveData();
 	draw();
 
@@ -222,8 +220,9 @@ const pickerMarkerClick = (event) => {
 		cell.setSymbol(0);
 		cell.add(symbol);
 	}
+	board.errorCells.delete(selectedIndex);
 
-	Undo.add(board.cells, selectedIndex);
+	Undo.add(board, selectedIndex);
 
 	saveData();
 	draw();
@@ -392,8 +391,9 @@ if (strategy === 'custom' || strategy === 'hardcoded') {
 				}
 				puzzleData.transform = null;
 				board.puzzleSolved.fill(0);
+				board.errorCells.clear();
 
-				Undo.set(board.cells);
+				Undo.set(board);
 				saveData();
 				draw();
 			});
@@ -436,12 +436,13 @@ const loadSudoku = () => {
 				const startCell = board.startCells[cell.index];
 				startCell.symbol = cell.symbol;
 			}
+			board.errorCells.clear();
 
 			puzzleData.id = puzzleId;
 			puzzleData.transform = transform;
 			puzzleData.grid = gridTransformed;
 
-			Undo.set(board.cells);
+			Undo.set(board);
 			saveData();
 			draw();
 		});
@@ -484,7 +485,7 @@ if (strategy === 'super_max') titleString = "Difficult";
 if (titleString) title.appendChild(document.createTextNode(titleString));
 
 const applyUndo = (reverse) => {
-	const selectedIndex = reverse ? Undo.redo(board.cells) : Undo.undo(board.cells);
+	const selectedIndex = reverse ? Undo.redo(board) : Undo.undo(board);
 	if (selectedIndex >= 0) {
 		selected = true;
 		selectedRow = Math.floor(selectedIndex / 9);
@@ -492,6 +493,7 @@ const applyUndo = (reverse) => {
 	} else {
 		selected = false;
 	}
+	board.errorCells.clear();
 	saveData();
 	draw();
 };
@@ -519,7 +521,8 @@ Menu.deleteButton.addEventListener('click', () => {
 
 	cell.symbol = 0;
 	cell.mask = 0x0000;
-	Undo.add(board.cells, selectedIndex);
+	board.errorCells.delete(selectedIndex);
+	Undo.add(board, selectedIndex);
 	saveData();
 	draw();
 });
@@ -527,15 +530,15 @@ Menu.deleteButton.addEventListener('click', () => {
 Menu.checkButton.addEventListener('click', () => {
 	let errorCount = 0;
 	let solved = true;
+	board.errorCells.clear();
 	for (let i = 0; i < 81; i++) {
 		const cell = board.cells[i];
-		cell.error = false;
 		if (cell.symbol === 0) {
 			solved = false;
 			continue;
 		}
 		if (cell.symbol !== board.puzzleSolved[i]) {
-			cell.error = true;
+			board.errorCells.add(i);
 			errorCount++;
 			solved = false;
 		}
@@ -563,7 +566,7 @@ fillButton.addEventListener('click', () => {
 	for (const cell of board.cells) if (cell.symbol === 0 && cell.mask === 0x0000) cell.fill();
 	candidates(board.cells);
 
-	Undo.add(board.cells, -1);
+	Undo.add(board, -1);
 	draw();
 	saveData();
 });
@@ -577,7 +580,7 @@ solveButton.addEventListener('click', () => {
 	console.log("----- " + (performance.now() - now) / 1000);
 	for (const line of consoleOut(result)) console.log(line);
 
-	Undo.add(board.cells, -1);
+	Undo.add(board, -1);
 	draw();
 	saveData();
 });
@@ -670,7 +673,7 @@ Menu.reset.addEventListener('click', () => {
 	if (!window.confirm("Do you want to restart the " + Menu.menuTitle(strategy) + " puzzle?")) return;
 	selected = false;
 	board.resetGrid();
-	Undo.set(board.cells);
+	Undo.set(board);
 	saveData();
 	draw();
 });

@@ -21,78 +21,96 @@ const setIconState = () => {
 };
 setIconState();
 
-class Undo {
-    constructor(selectedIndex, cells) {
-        this.grid = new Uint8Array(81);
-        this.candidate = new Uint16Array(81);
-        if (cells) {
-            for (let i = 0; i < 81; i++) {
-                const cell = cells[i];
-                this.grid[i] = cell.symbol;
-                this.candidate[i] = cell.mask;
-            }
+class UndoCell {
+    constructor(cell) {
+        if (cell) {
+            this.symbol = cell.symbol;
+            this.mask = cell.mask;
+        } else {
+            this.symbol = 0;
+            this.mask = 0x0000;
         }
+    }
+    assignTo(cell) {
+        cell.symbol = this.symbol;
+        cell.mask = this.mask;
+    }
+    assign(data) {
+        this.symbol = data.symbol;
+        this.mask = data.mask;
+    }
+    equals(cell) {
+        if (cell.symbol !== this.symbol) return false;
+        if (cell.mask !== this.mask) return false;
+        return true;
+    }
+}
+class Undo {
+    constructor(selectedIndex, board) {
+        this.cells = [];
+        for (let i = 0; i < 81; i++) this.cells[i] = new UndoCell(board?.cells?.[i]);
         this.selectedIndex = selectedIndex;
     }
-    apply(cells) {
+    apply(board) {
         for (let i = 0; i < 81; i++) {
-            const cell = cells[i];
-            cell.symbol = this.grid[i];
-            cell.mask = this.candidate[i];
+            this.cells[i].assignTo(board.cells[i]);
         }
         return this.selectedIndex;
     }
     equals(cells, selectedIndex) {
         if (selectedIndex !== this.selectedIndex) return false;
         for (let i = 0; i < 81; i++) {
-            const cell = cells[i];
-            if (cell.symbol !== this.grid[i]) return false;
-            if (cell.mask !== this.candidate[i]) return false;
+            if (!this.cells[i].equals(cells[i])) return false;
         }
         return true;
     }
 }
 
-function set(cells) {
+function set(board) {
     leadIndex = 0;
-    undoStack.splice(0, Infinity, new Undo(-1, cells));
+    undoStack.splice(0, Infinity, new Undo(-1, board));
     setIconState();
 }
 
-function add(cells, selectedIndex) {
+function add(board, selectedIndex) {
     if (leadIndex >= 0) {
         const lead = undoStack[leadIndex];
-        if (lead.equals(cells, selectedIndex)) return;
+        if (lead.equals(board.cells, selectedIndex)) return;
     }
 
     if (leadIndex < undoStack.length - 1) undoStack.splice(leadIndex + 1);
     leadIndex = undoStack.length;
-    undoStack.push(new Undo(selectedIndex, cells));
+    undoStack.push(new Undo(selectedIndex, board));
 
     setIconState();
 }
 
-function undo(cells) {
+function undo(board) {
     if (leadIndex < 1) return;
     leadIndex--;
     setIconState();
-    return undoStack[leadIndex].apply(cells);
+    return undoStack[leadIndex].apply(board);
 }
 
-function redo(cells) {
+function redo(board) {
     if (leadIndex >= undoStack.length - 1) return;
     leadIndex++;
     setIconState();
-    return undoStack[leadIndex].apply(cells);
+    return undoStack[leadIndex].apply(board);
 }
 
 function saveData() {
     const dataStack = [];
     for (const undo of undoStack) {
+        const undoCells = [];
+        for (let i = 0; i < 81; i++) {
+            const cellData = {};
+            undo.cells[i].assignTo(cellData);
+            undoCells[i] = cellData;
+        }
         const data = {
-            grid: undo.grid,
-            candidate: undo.candidate,
-            selectedIndex: undo.selectedIndex,
+            cells: undoCells,
+            selectedIndex: undo.selectedIndex
         };
         dataStack.push(data);
     }
@@ -107,8 +125,7 @@ function loadData(data) {
     for (const undoData of data.undoStack) {
         const undo = new Undo(undoData.selectedIndex);
         for (let i = 0; i < 81; i++) {
-            undo.grid[i] = undoData.grid[i];
-            undo.candidate[i] = undoData.candidate[i];
+            undo.cells[i].assign(undoData.cells[i]);
         }
         dataStack.push(undo);
     }
