@@ -141,8 +141,7 @@
 				runningTotoal += strategyIso;
 				const runningPercent = percentage(runningTotoal, totalCount, fixed);
 
-				// const percentIso = percentage(strategyIso, totalCount, fixed);
-				const percentIso = (strategyIso * 100 / totalCount) + "%";
+				const percentIso = percentage(strategyIso, totalCount, fixed);
 				const max = strategyIsoMax.toLocaleString();
 
 				line = "";
