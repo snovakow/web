@@ -556,7 +556,103 @@ Menu.checkButton.addEventListener('click', () => {
 	}, 0);
 });
 
+let infoBacking = null;
 Menu.infoButton.addEventListener('click', () => {
+	if (!infoBacking) {
+		infoBacking = document.createElement('span');
+		infoBacking.style.position = 'absolute';
+		infoBacking.style.overflow = 'visible';
+		infoBacking.style.top = '50%';
+		infoBacking.style.left = '50%';
+		infoBacking.style.transform = 'translate(-50%, -50%)';
+		infoBacking.style.width = '256px';
+		infoBacking.style.height = '0';
+		infoBacking.style.padding = '16px';
+		infoBacking.style.border = '3.5px solid black';
+		infoBacking.style.borderRadius = '8px';
+		infoBacking.style.background = 'white';
+		infoBacking.style.display = 'none';
+
+		const frame = document.createElement('iframe');
+		frame.src = "./info.html";
+		frame.style.border = '0';
+		frame.style.position = 'absolute';
+		frame.style.top = '50%';
+		frame.style.left = '50%';
+		frame.style.transform = 'translate(-50%, -50%)';
+		frame.style.width = '256px';
+		frame.style.height = '0';
+		frame.style.transform = 'translate(-50%, -50%)';
+		frame.onload = () => {
+			infoBacking.style.display = 'block';
+
+			frame.contentWindow.document.body.style.margin = "0";
+
+			const rect = frame.contentWindow.document.body.getBoundingClientRect();
+			const height = rect.height;
+			frame.style.height = height + 'px';
+			infoBacking.style.height = height + 'px';
+		};
+
+		const closeButton = document.createElement('canvas');
+		const size = 48;
+		let storedDevicePixelRatio = window.devicePixelRatio;
+		closeButton.width = size * storedDevicePixelRatio;
+		closeButton.height = size * storedDevicePixelRatio;
+		closeButton.style.width = size + "px";
+		closeButton.style.height = size + "px";
+		closeButton.style.position = 'absolute';
+		closeButton.style.padding = '16px';
+		closeButton.style.top = '0';
+		closeButton.style.right = '0';
+		closeButton.style.transform = 'translate(50%, -50%)';
+		const closeImage = new Image();
+		let closeImageLoaded = false;
+		closeImage.src = "./icons/cancel.svg";
+
+		const drawClose = () => {
+			if (!closeImageLoaded) return;
+
+			const displaySize = size * window.devicePixelRatio;
+			const ctx = closeButton.getContext("2d");
+
+			const radius = displaySize * 0.5 * 0.77;
+			ctx.arc(displaySize * 0.5, displaySize * 0.5, radius, 0, 2 * Math.PI);
+			ctx.fillStyle = "white";
+			ctx.fill();
+
+			ctx.drawImage(closeImage, 0, 0, displaySize, displaySize);
+		};
+
+		window.addEventListener("resize", () => {
+			if (storedDevicePixelRatio !== window.devicePixelRatio) {
+				storedDevicePixelRatio = window.devicePixelRatio;
+				closeButton.width = size * storedDevicePixelRatio;
+				closeButton.height = size * storedDevicePixelRatio;
+				drawClose();
+			}
+		});
+
+		closeImage.onload = () => {
+			closeImageLoaded = true;
+			drawClose();
+		};
+
+		closeButton.addEventListener('click', () => {
+			if (infoBacking.parentElement) {
+				infoBacking.parentElement.removeChild(infoBacking);
+			}
+		});
+
+		infoBacking.appendChild(frame);
+		infoBacking.appendChild(closeButton);
+	}
+
+	if (infoBacking.parentElement) {
+		infoBacking.parentElement.removeChild(infoBacking);
+	} else {
+		document.body.appendChild(infoBacking);
+	}
 });
 
 const fillButton = document.createElement('button');
