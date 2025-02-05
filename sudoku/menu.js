@@ -225,6 +225,8 @@ if (document.fullscreenEnabled) {
 	document.addEventListener("fullscreenerror", () => {
 		updateFullscreen();
 	});
+
+	fullscreen.style.display = "none";
 }
 
 menu.style.display = "none";

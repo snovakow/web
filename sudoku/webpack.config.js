@@ -29,6 +29,7 @@ module.exports = {
 				{ from: '../sudokulib/generator.js', to: '../sudokulib/generator.js' },
 				{ from: '../sudokulib/solver.js', to: '../sudokulib/solver.js' },
 				{ from: '../sudokulib/process.js', to: '../sudokulib/process.js' },
+				{ from: 'info.html', to: 'info.html' },
 				{ from: 'about.html', to: 'about.html' },
 				{ from: 'index.html', to: 'index.html' }
 			]
