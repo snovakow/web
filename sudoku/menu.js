@@ -1,4 +1,4 @@
-const headerHeight = 32;
+const headerHeight = 40;
 const iconSize = headerHeight;
 const buttonSize = 48;
 
@@ -80,9 +80,9 @@ backing.style.padding = '4px';
 backing.style.overflowY = 'auto';
 backing.style.boxSizing = "border-box";
 
-const menu = createIcon("./icons/menu.svg");
-const reset = createIcon("./icons/replay.svg");
-const newPuzzle = createIcon("./icons/add.svg");
+const menu = createIcon("./icons/menu_40dp_000000_FILL0_wght400_GRAD0_opsz40.svg");
+const reset = createIcon("./icons/replay_40dp_000000_FILL0_wght400_GRAD0_opsz40.svg");
+const newPuzzle = createIcon("./icons/add_40dp_000000_FILL0_wght400_GRAD0_opsz40.svg");
 menu.title = "Menu";
 reset.title = "Restart Puzzle";
 newPuzzle.title = "New Puzzle";
@@ -156,25 +156,25 @@ mainBar.appendChild(menu);
 mainBar.appendChild(newPuzzle);
 mainBar.appendChild(reset);
 
-const infoButton = createIcon("./icons/question_mark.svg");
+const infoButton = createIcon("./icons/question_mark_40dp_000000_FILL0_wght400_GRAD0_opsz40.svg");
 infoButton.title = "Info";
 mainBar.appendChild(infoButton);
 
-const markerButton = createIcon("./icons/edit.svg", buttonSize);
-const deleteButton = createIcon("./icons/eraser.svg", buttonSize);
+const markerButton = createIcon("./icons/edit_48dp_000000_FILL0_wght400_GRAD0_opsz48.svg", buttonSize);
+const deleteButton = createIcon("./icons/disabled_by_default_48dp_000000_FILL0_wght400_GRAD0_opsz48.svg", buttonSize);
 deleteButton.title = "Clear";
 pickerBar.appendChild(markerButton);
 pickerBar.appendChild(deleteButton);
 
-const checkButton = createIcon("./icons/check_box.svg");
+const checkButton = createIcon("./icons/check_box_40dp_000000_FILL0_wght400_GRAD0_opsz40.svg");
 checkButton.title = "Check Puzzle";
 toolBar.appendChild(checkButton);
 
 const undoIcons = {
-	undo_on: createIcon("./icons/undo.svg"),
-	redo_on: createIcon("./icons/redo.svg"),
-	undo_off: createIcon("./icons/undo_gray.svg"),
-	redo_off: createIcon("./icons/redo_gray.svg"),
+	undo_on: createIcon("./icons/undo_40dp_000000_FILL0_wght400_GRAD0_opsz40.svg"),
+	redo_on: createIcon("./icons/redo_40dp_000000_FILL0_wght400_GRAD0_opsz40.svg"),
+	undo_off: createIcon("./icons/undo_40dp_D3D3D3_FILL0_wght400_GRAD0_opsz40.svg"),
+	redo_off: createIcon("./icons/redo_40dp_D3D3D3_FILL0_wght400_GRAD0_opsz40.svg"),
 };
 undoIcons.undo_on.title = "Undo";
 undoIcons.undo_off.title = "Undo";
@@ -187,8 +187,8 @@ toolBar.appendChild(undoIcons.redo_on);
 toolBar.appendChild(undoIcons.redo_off);
 
 if (document.fullscreenEnabled) {
-	const fullscreen = createIcon("./icons/fullscreen.svg");
-	const fullscreenExit = createIcon("./icons/fullscreen_exit.svg");
+	const fullscreen = createIcon("./icons/fullscreen_40dp_000000_FILL0_wght400_GRAD0_opsz40.svg");
+	const fullscreenExit = createIcon("./icons/fullscreen_exit_40dp_000000_FILL0_wght400_GRAD0_opsz40.svg");
 	fullscreen.title = "Full Screen";
 	fullscreenExit.title = "Exit Full Screen";
 

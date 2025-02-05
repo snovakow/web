@@ -595,7 +595,7 @@ Menu.infoButton.addEventListener('click', () => {
 		};
 
 		const closeButton = document.createElement('canvas');
-		const size = 48;
+		const size = Menu.buttonSize;
 		let storedDevicePixelRatio = window.devicePixelRatio;
 		closeButton.width = size * storedDevicePixelRatio;
 		closeButton.height = size * storedDevicePixelRatio;
@@ -608,7 +608,7 @@ Menu.infoButton.addEventListener('click', () => {
 		closeButton.style.transform = 'translate(50%, -50%)';
 		const closeImage = new Image();
 		let closeImageLoaded = false;
-		closeImage.src = "./icons/cancel.svg";
+		closeImage.src = "./icons/cancel_48dp_000000_FILL0_wght400_GRAD0_opsz48.svg";
 
 		const drawClose = () => {
 			if (!closeImageLoaded) return;
