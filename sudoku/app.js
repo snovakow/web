@@ -776,7 +776,8 @@ if (strategy === 'custom') {
 }
 
 Menu.reset.addEventListener('click', () => {
-	if (!window.confirm("Do you want to restart the " + Menu.menuTitle(strategy) + " puzzle?")) return;
+	const name = levelMode ? titleString : Menu.menuTitle(strategy);
+	if (!window.confirm("Do you want to restart the " + name + " puzzle?")) return;
 	selected = false;
 	board.resetGrid();
 	Undo.set(board);
