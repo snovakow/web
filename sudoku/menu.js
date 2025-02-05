@@ -227,7 +227,11 @@ if (document.fullscreenEnabled) {
 	});
 }
 
-export { backing, mainBar, toolBar, pickerBar, autoBar, headerHeight };
+menu.style.display = "none";
+markerButton.style.display = "none";
+autoBar.style.display = "none";
+
+export { backing, mainBar, toolBar, pickerBar, autoBar, headerHeight, buttonSize };
 export { newPuzzle, reset, menu, markerButton, deleteButton, infoButton, checkButton };
 export {
 	pickerBarLandscape, autoBarLandscape, setMenuItem, setMenuReponse,

@@ -12,40 +12,49 @@ const pickerDraw = PICKER.pickerDraw;
 const pickerMarker = PICKER.pickerMarker;
 const pixAlign = PICKER.pixAlign;
 
-const searchParams = new URLSearchParams(window.location.search);
-const strategy = searchParams.get("strategy");
-const tableNames = [
-	"simple_hidden",
-	"simple_omission",
-	"simple_naked",
-	"candidate_visible",
-	"candidate_naked2",
-	"candidate_naked3",
-	"candidate_naked4",
-	"candidate_hidden1",
-	"candidate_hidden2",
-	"candidate_hidden3",
-	"candidate_hidden4",
-	"candidate_omissions",
-	"candidate_uniqueRectangle",
-	"candidate_yWing",
-	"candidate_xyzWing",
-	"candidate_xWing",
-	"candidate_swordfish",
-	"candidate_jellyfish",
-	"super_min",
-	"super_max",
-	"custom",
-	"hardcoded",
-];
-let search = "?strategy=" + tableNames[0];
-for (const tableName of tableNames) {
-	if (strategy === tableName) {
-		search = null;
-		break;
+let levelMode = true;
+let strategy = "level";
+{
+	const searchParams = new URLSearchParams(window.location.search);
+	const strategySearch = searchParams.get("strategy");
+	const strategyNames = [
+		"simple_hidden",
+		"simple_omission",
+		"simple_naked",
+		"candidate_visible",
+		"candidate_naked2",
+		"candidate_naked3",
+		"candidate_naked4",
+		"candidate_hidden1",
+		"candidate_hidden2",
+		"candidate_hidden3",
+		"candidate_hidden4",
+		"candidate_omissions",
+		"candidate_uniqueRectangle",
+		"candidate_yWing",
+		"candidate_xyzWing",
+		"candidate_xWing",
+		"candidate_swordfish",
+		"candidate_jellyfish",
+		"super_min",
+		"super_max",
+		"custom",
+		"hardcoded",
+	];
+	for (const tableName of strategyNames) {
+		if (strategySearch === tableName) {
+			strategy = tableName;
+			levelMode = false;
+			break;
+		}
 	}
 }
-if (search !== null) window.location.search = search;
+
+if (!levelMode) {
+	Menu.menu.style.display = "block";
+	Menu.markerButton.style.display = "block";
+	Menu.autoBar.style.display = "block flex";
+}
 
 const puzzleData = {
 	id: null,
@@ -295,7 +304,7 @@ if (loadGridMetadata) {
 		metadata.strategy = strategy;
 		saveData();
 	}
-	Menu.setMenuItem(strategy);
+	if (!levelMode) Menu.setMenuItem(strategy);
 
 	Undo.loadData(metadata.undo);
 	draw();
@@ -449,11 +458,11 @@ const loadSudoku = () => {
 	});
 };
 
-if (!loaded && strategy !== 'custom' && strategy !== 'hardcoded') {
+if (!loaded && !levelMode && strategy !== 'custom' && strategy !== 'hardcoded') {
 	loadSudoku();
 }
 
-title.style.fontSize = (headerHeight - 6) + 'px';
+title.style.fontSize = (headerHeight * 0.75) + 'px';
 title.style.fontWeight = 'bold';
 title.style.lineHeight = headerHeight + 'px';
 title.style.textAlign = 'center';
@@ -482,7 +491,8 @@ if (strategy === 'candidate_swordfish') titleString = "Swordfish";
 if (strategy === 'candidate_jellyfish') titleString = "Jellyfish";
 if (strategy === 'super_min') titleString = "Other Strategies";
 if (strategy === 'super_max') titleString = "Difficult";
-if (titleString) title.appendChild(document.createTextNode(titleString));
+if (titleString === null) titleString = "Level 1";
+title.appendChild(document.createTextNode(titleString));
 
 const applyUndo = (reverse) => {
 	const selectedIndex = reverse ? Undo.redo(board) : Undo.undo(board);
