@@ -45,9 +45,7 @@
 
 		const mode3 = (data) => {
 			const simple = data.simple;
-			const candidateVisual = data.candidateVisual ?? 0;
 			const candidate = data.candidate;
-			const candidateMinimal = data.candidateMinimal;
 			const unsolvable = data.unsolvable;
 			const totalCount = data.totalCount;
 			let runningTotal = 0;
@@ -63,20 +61,11 @@
 			let number = simple.toLocaleString();
 			appendLine(`Simple: ${runningPercent} (${percent}) ${number}`);
 
-			runningTotal += candidateVisual;
+			runningTotal += candidate;
 			runningPercent = percentage(runningTotal, totalCount, fixed);
-			percent = percentage(candidateVisual, totalCount, fixed);
-			number = candidateVisual.toLocaleString();
-			appendLine(`Visual: ${runningPercent} (${percent}) ${number}`);
-
-			const strategy = candidate + candidateMinimal;
-			runningTotal += strategy;
-			runningPercent = percentage(runningTotal, totalCount, fixed);
-			const percentCandidate = percentage(strategy + candidateVisual, totalCount, fixed);
-			const minPercent = percentage(candidateMinimal, strategy, fixed);
-			percent = percentage(strategy, totalCount, fixed);
-			number = strategy.toLocaleString();
-			appendLine(`Strategy: ${runningPercent} (${percent} of ${percentCandidate}) (${minPercent} minimal) ${number}`);
+			percent = percentage(candidate, totalCount, fixed);
+			number = candidate.toLocaleString();
+			appendLine(`Strategy: ${runningPercent} (${percent}) ${number}`);
 
 			runningTotal += unsolvable;
 			runningPercent = percentage(runningTotal, totalCount, fixed);
@@ -121,7 +110,6 @@
 			titles['hiddenSimple'] = "Simple Hidden";
 			titles['omissionSimple'] = "Simple Omission";
 			titles['nakedSimple'] = "Simple Naked";
-			titles['omissionVisible'] = "Visible Omission";
 			titles['nakedVisible'] = "Visible Naked";
 
 			for (const strategy in values) {
@@ -179,11 +167,9 @@
 			appendSpace();
 
 			let countsSimple = 0;
-			let countsVisible = 0;
 			let countsCandidate = 0;
 			let countsUnsolvable = 0;
 			for (const [clueCount, count] of Object.entries(data.countSimple)) countsSimple += count;
-			for (const [clueCount, count] of Object.entries(data.countVisible)) countsVisible += count;
 			for (const [clueCount, count] of Object.entries(data.countCandidate)) countsCandidate += count;
 			for (const [clueCount, count] of Object.entries(data.countUnsolvable)) countsUnsolvable += count;
 
@@ -192,13 +178,6 @@
 			avg /= countsSimple;
 			printTitle("Simple", avg, countsSimple, data.totalCount, 2);
 			for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, data.countSimple[clueCount], count, 2);
-			appendSpace();
-
-			avg = 0;
-			for (const [clueCount, count] of Object.entries(data.countVisible)) avg += parseInt(clueCount) * count;
-			avg /= countsVisible;
-			printTitle("Visible", avg, countsVisible, data.totalCount, 2);
-			for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, data.countVisible[clueCount], count, 2);
 			appendSpace();
 
 			avg = 0;

@@ -1,6 +1,6 @@
 import {
 	candidates, simpleHidden, simpleOmissions, simpleNaked,
-	visibleOmissions, visibleNaked,
+	visibleNaked,
 	hiddenSingles, NakedHiddenGroups, omissions, uniqueRectangle,
 	yWing, xyzWing, xWing, swordfish, jellyfish, aCells, bCells,
 	simpleHiddenValid, simpleNakedValid,
@@ -10,12 +10,11 @@ const consoleOut = (result) => {
 	const lines = [];
 	lines.push("Solved: " + (result.solved ? "Yes" : "No"));
 	lines.push("Simple: " + (result.simple ? "Yes" : "No"));
-	lines.push("Visual: " + (result.candidateVisible ? "Yes" : "No"));
+	lines.push("Minimal: " + (result.minimal ? "Yes" : "No"));
 	lines.push("Simple Hidden: " + result.hiddenSimple);
 	lines.push("Simple Omission: " + result.omissionSimple);
 	lines.push("Simple Naked: " + result.nakedSimple);
 
-	lines.push("Visual Omission: " + result.omissionVisible);
 	lines.push("Visual Naked: " + result.nakedVisible);
 
 	lines.push("Naked 2: " + result.naked2);
@@ -51,7 +50,6 @@ const STRATEGY = {
 	SIMPLE_INTERSECTION: VAL++,
 	SIMPLE_NAKED: VAL++,
 
-	VISIBLE_INTERSECTION: VAL++,
 	VISIBLE_NAKED: VAL++,
 
 	NAKED_2: VAL++,
@@ -78,7 +76,6 @@ const fillSolve = (cells, simples, visibles, strategies) => {
 		STRATEGY.SIMPLE_NAKED,
 	];
 	visibles = visibles ?? [
-		STRATEGY.VISIBLE_INTERSECTION,
 		STRATEGY.VISIBLE_NAKED,
 	];
 	strategies = strategies ?? [
@@ -129,7 +126,6 @@ const fillSolve = (cells, simples, visibles, strategies) => {
 		return remaining > 0;
 	}
 
-	let omissionVisible = 0;
 	let nakedVisible = 0;
 
 	let naked2Reduced = 0;
@@ -151,10 +147,6 @@ const fillSolve = (cells, simples, visibles, strategies) => {
 	// 1 reduced
 	// 2 placed
 	const solveVisiblePriority = (strategy) => {
-		if (strategy === STRATEGY.VISIBLE_INTERSECTION && visibleOmissions(cells)) {
-			omissionVisible++;
-			return 1;
-		}
 		if (strategy === STRATEGY.VISIBLE_NAKED && visibleNaked(cells)) {
 			nakedVisible++;
 			return true;
@@ -231,7 +223,6 @@ const fillSolve = (cells, simples, visibles, strategies) => {
 	}
 
 	let simple = true;
-	let candidateVisible = true;
 	let solved = true;
 
 	do {
@@ -245,7 +236,6 @@ const fillSolve = (cells, simples, visibles, strategies) => {
 		do {
 			// for (const strategy of visibles) {
 			// }
-			candidateVisible = false;
 
 			for (const strategy of strategies) {
 				progress = solvePriority(strategy);
@@ -254,7 +244,9 @@ const fillSolve = (cells, simples, visibles, strategies) => {
 			nakedHidden = null;
 
 			if (progress) {
-				progress = solveVisiblePriority(STRATEGY.VISIBLE_NAKED);
+				if(solveVisiblePriority(visibles)) {
+					break;
+				}
 			} else {
 				solved = false;
 			}
@@ -262,16 +254,12 @@ const fillSolve = (cells, simples, visibles, strategies) => {
 
 	} while (solved);
 
-	if (simple) candidateVisible = false;
-
 	return {
 		solved,
 		simple,
-		candidateVisible,
 		hiddenSimple,
 		omissionSimple,
 		nakedSimple,
-		omissionVisible,
 		nakedVisible,
 		naked2: naked2Reduced,
 		naked3: naked3Reduced,

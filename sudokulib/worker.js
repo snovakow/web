@@ -32,7 +32,6 @@ new StrategyData(simpleDataArray, STRATEGY.SIMPLE_HIDDEN, 'hiddenSimple');
 new StrategyData(simpleDataArray, STRATEGY.SIMPLE_INTERSECTION, 'omissionSimple');
 new StrategyData(simpleDataArray, STRATEGY.SIMPLE_NAKED, 'nakedSimple');
 
-new StrategyData(visibleDataArray, STRATEGY.VISIBLE_INTERSECTION, 'omissionVisible');
 new StrategyData(visibleDataArray, STRATEGY.VISIBLE_NAKED, 'nakedVisible');
 
 new StrategyData(strategyDataArray, STRATEGY.NAKED_2, 'naked2');
@@ -99,18 +98,17 @@ const step = () => {
 
 	// solveType
 	// 0 Simple
-	// 1 Visible
-	// 2 Candidate
-	// 3 Candidate Minimal
-	// 4 Incomplete
+	// 1 Candidate
+	// 2 Incomplete
 	data.solveType = 0;
 	if (!result.simple) {
 		if (result.solved) {
 			data.solveType = 1;
 		} else {
-			data.solveType = 4;
+			data.solveType = 2;
 		}
 	}
+	data.minimal = 0;
 
 	const orderedSolve = () => {
 		const usedData = [];
@@ -136,17 +134,14 @@ const step = () => {
 		cells.fromData(save);
 		const minimalResult = fillSolve(cells, simples, visibles, minimal);
 		if (minimalResult.solved) {
-			data.solveType = 3;
+			data.minimal = 1;
 			for (const strategy of allArray) data[strategy.data] = minimalResult[strategy.data];
 		}
 	}
 
 	for (const strategy of allArray) data[strategy.data] = result[strategy.data];
 	if (data.solveType === 1) {
-		if (!result.candidateVisible) {
-			data.solveType = 2;
-			orderedSolve();
-		}
+		orderedSolve();
 	}
 	puzzleCount++;
 

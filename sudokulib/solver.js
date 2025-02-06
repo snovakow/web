@@ -111,7 +111,6 @@ const simpleNakedCell = (cells, index) => {
 // simpleOmissions
 // simpleNaked
 
-// visibleOmissions
 // visibleNaked
 
 const simpleNaked = (cells) => {

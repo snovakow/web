@@ -130,9 +130,9 @@ function tableStatement($tableCount, $select, $tableName, $logic, $min = false)
 	$order = $min ? "count, clueCount DESC" : "count DESC";
 	return tableGeneralStatement($tableCount, $tableName, $fields, $select, $logic, $order);
 }
-function tableStrategyLogic($tableCount, $solveType, $strategy, $tableName, $frequency = 1, $min = false)
+function tableStrategyLogic($tableCount, $strategy, $tableName, $frequency = 1, $min = false)
 {
-	$logic = "`solveType`=$solveType";
+	$logic = "`solveType`=1 AND `minimal`=1";
 	$logic .= tableLogic($strategy, $frequency);
 	$sql = tableStatement($tableCount, $strategy, $tableName, $logic, $min);
 	return "$sql\n";
@@ -207,10 +207,10 @@ try {
   `puzzleData` binary(32) NOT NULL DEFAULT '00000000000000000000000000000000',
   `clueCount` tinyint(2) unsigned NOT NULL DEFAULT '0',
   `solveType` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `minimal` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `hiddenSimple` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `omissionSimple` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `nakedSimple` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `omissionVisible` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `nakedVisible` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `naked2` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `naked3` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -253,20 +253,20 @@ try {
 		$logic = "`solveType`=1 AND `nakedVisible`>=4";
 		echo tableGeneralStatement($tableCount, "candidate_visible", $fields, $select, $logic, "count DESC"), "\n";
 
-		echo tableStrategyLogic($tableCount, 3, "naked2", "candidate_naked2", 4);
-		echo tableStrategyLogic($tableCount, 3, "naked3", "candidate_naked3", 4);
-		echo tableStrategyLogic($tableCount, 3, "naked4", "candidate_naked4", 3);
-		echo tableStrategyLogic($tableCount, 3, "hidden1", "candidate_hidden1");
-		echo tableStrategyLogic($tableCount, 3, "hidden2", "candidate_hidden2");
-		echo tableStrategyLogic($tableCount, 3, "hidden3", "candidate_hidden3");
-		echo tableStrategyLogic($tableCount, 3, "hidden4", "candidate_hidden4");
-		echo tableStrategyLogic($tableCount, 3, "omissions", "candidate_omissions", 2);
-		echo tableStrategyLogic($tableCount, 3, "uniqueRectangle", "candidate_uniqueRectangle", 2);
-		echo tableStrategyLogic($tableCount, 3, "yWing", "candidate_yWing", 4);
-		echo tableStrategyLogic($tableCount, 3, "xyzWing", "candidate_xyzWing", 2);
-		echo tableStrategyLogic($tableCount, 3, "xWing", "candidate_xWing", 1);
-		echo tableStrategyLogic($tableCount, 3, "swordfish", "candidate_swordfish");
-		echo tableStrategyLogic($tableCount, 3, "jellyfish", "candidate_jellyfish");
+		echo tableStrategyLogic($tableCount, "naked2", "candidate_naked2", 4);
+		echo tableStrategyLogic($tableCount, "naked3", "candidate_naked3", 4);
+		echo tableStrategyLogic($tableCount, "naked4", "candidate_naked4", 3);
+		echo tableStrategyLogic($tableCount, "hidden1", "candidate_hidden1");
+		echo tableStrategyLogic($tableCount, "hidden2", "candidate_hidden2");
+		echo tableStrategyLogic($tableCount, "hidden3", "candidate_hidden3");
+		echo tableStrategyLogic($tableCount, "hidden4", "candidate_hidden4");
+		echo tableStrategyLogic($tableCount, "omissions", "candidate_omissions", 2);
+		echo tableStrategyLogic($tableCount, "uniqueRectangle", "candidate_uniqueRectangle", 2);
+		echo tableStrategyLogic($tableCount, "yWing", "candidate_yWing", 4);
+		echo tableStrategyLogic($tableCount, "xyzWing", "candidate_xyzWing", 2);
+		echo tableStrategyLogic($tableCount, "xWing", "candidate_xWing", 1);
+		echo tableStrategyLogic($tableCount, "swordfish", "candidate_swordfish");
+		echo tableStrategyLogic($tableCount, "jellyfish", "candidate_jellyfish");
 	}
 
 	if ($mode === 2) {
@@ -361,16 +361,12 @@ try {
 		}
 
 		$simple = $counts[0];
-		$candidateVisual = $counts[1];
-		$candidate = $counts[2];
-		$candidateMinimal = $counts[3];
-		$unsolvable = $counts[4];
+		$candidate = $counts[1];
+		$unsolvable = $counts[2];
 
 		$results = [
 			'simple' => $simple,
-			'candidateVisual' => $candidateVisual,
 			'candidate' => $candidate,
-			'candidateMinimal' => $candidateMinimal,
 			'unsolvable' => $unsolvable,
 			'totalCount' => $totalCount
 		];
@@ -382,7 +378,6 @@ try {
 			"hiddenSimple",
 			"omissionSimple",
 			"nakedSimple",
-			"omissionVisible",
 			"nakedVisible",
 		];
 
@@ -390,7 +385,6 @@ try {
 		$solveTypes['hiddenSimple'] = 0;
 		$solveTypes['omissionSimple'] = 0;
 		$solveTypes['nakedSimple'] = 0;
-		$solveTypes['omissionVisible'] = 1;
 		$solveTypes['nakedVisible'] = 1;
 
 		$values = [];
@@ -465,6 +459,7 @@ try {
 
 		$results = [];
 		$total = 0;
+		$minimal = 0;
 
 		for ($i = 1; $i <= $tableCount; $i++) {
 			$table = tableName($i);
@@ -474,12 +469,13 @@ try {
 				$isolated = tableLogic($strategy);
 				$sql .= "SUM(`{$strategy}`>0) AS {$strategy}, ";
 				$sql .= "MAX(`{$strategy}`) AS {$strategy}Max, ";
-				$sql .= "SUM(`{$strategy}`>0 AND `solveType`=3) AS {$strategy}Min, ";
-				$sql .= "MAX(IF(`solveType`=3, `{$strategy}`, 0)) AS {$strategy}MinMax, ";
-				$sql .= "SUM(`solveType`=3$isolated) as {$strategy}Iso, ";
-				$sql .= "MAX(IF(`solveType`=3$isolated, `{$strategy}`, 0)) as {$strategy}IsoMax, ";
+				$sql .= "SUM(`{$strategy}`>0 AND `solveType`=1 AND `minimal`=1) AS {$strategy}Min, ";
+				$sql .= "MAX(IF(`solveType`=1 AND `minimal`=1, `{$strategy}`, 0)) AS {$strategy}MinMax, ";
+				$sql .= "SUM(`solveType`=1 AND `minimal`=1$isolated) as {$strategy}Iso, ";
+				$sql .= "MAX(IF(`solveType`=1 AND `minimal`=1$isolated, `{$strategy}`, 0)) as {$strategy}IsoMax, ";
 			}
-			$sql .= "COUNT(*) AS count FROM `$table` WHERE `solveType`=2 OR `solveType`=3";
+			$sql .= "SUM(minimal) AS minimal, ";
+			$sql .= "COUNT(*) AS count FROM `$table` WHERE `solveType`=1";
 
 			$stmt = $db->prepare($sql);
 			$stmt->execute();
@@ -487,11 +483,13 @@ try {
 
 			$results[] = $result;
 			$total += (int)$result['count'];
+			$minimal += (int)$result['minimal'];
 		}
 
+		$percentMin = percentage($minimal, $total, 2);
 		$percent = percentage($total, $totalCount, 2);
 		$number = number_format($total);
-		echo "--- Strategies $percent $number\n\n";
+		echo "--- Strategies $percent ($percentMin min) $number\n\n";
 
 		echo str_pad("Strategy", 17, " ", STR_PAD_BOTH);
 		echo str_pad("Percent (Max) Count", 34, " ", STR_PAD_BOTH);
@@ -564,7 +562,6 @@ try {
 	if ($mode === 6) {
 		$counts = [];
 		$countSimple = [];
-		$countVisible = [];
 		$countCandidate = [];
 		$countUnsolvable = [];
 
@@ -581,22 +578,18 @@ try {
 
 				if (!$counts[$clueCount]) $counts[$clueCount] = 0;
 				if (!$countSimple[$clueCount]) $countSimple[$clueCount] = 0;
-				if (!$countVisible[$clueCount]) $countVisible[$clueCount] = 0;
 				if (!$countCandidate[$clueCount]) $countCandidate[$clueCount] = 0;
 				if (!$countUnsolvable[$clueCount]) $countUnsolvable[$clueCount] = 0;
 
 				$counts[$clueCount] += $count;
 				if ($solveType == 0) $countSimple[$clueCount] += $count;
-				if ($solveType == 1) $countVisible[$clueCount] += $count;
-				if ($solveType == 2) $countCandidate[$clueCount] += $count;
-				if ($solveType == 3) $countCandidate[$clueCount] += $count;
-				if ($solveType == 4) $countUnsolvable[$clueCount] += $count;
+				if ($solveType == 1) $countCandidate[$clueCount] += $count;
+				if ($solveType == 2) $countUnsolvable[$clueCount] += $count;
 			}
 		}
 		$results = [];
 		$results['counts'] = $counts;
 		$results['countSimple'] = $countSimple;
-		$results['countVisible'] = $countVisible;
 		$results['countCandidate'] = $countCandidate;
 		$results['countUnsolvable'] = $countUnsolvable;
 		$results['totalCount'] = $totalCount;
