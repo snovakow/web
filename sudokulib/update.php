@@ -17,19 +17,15 @@ function insertValues($number, $values)
 	$valueList = implode(",", $values);
 	$table = tableName($number);
 	return "INSERT INTO `$table` (id, solveType, 
-		hiddenSimple, omissionSimple, naked2Simple, naked3Simple, nakedSimple, 
-		omissionVisible, naked2Visible, nakedVisible, 
+		hiddenSimple, omissionSimple, nakedSimple, 
+		omissionVisible, nakedVisible, 
 		naked2, naked3, naked4, hidden1, hidden2, hidden3, hidden4, omissions, 
-		uniqueRectangle, yWing, xyzWing, xWing, swordfish, jellyfish, 
-		superRank, superSize, superType, superDepth, superCount) VALUES $valueList ON DUPLICATE KEY UPDATE 
+		uniqueRectangle, yWing, xyzWing, xWing, swordfish, jellyfish) VALUES $valueList ON DUPLICATE KEY UPDATE 
         solveType = VALUES(solveType), 
         hiddenSimple = VALUES(hiddenSimple), 
         omissionSimple = VALUES(omissionSimple), 
-        naked2Simple = VALUES(naked2Simple), 
-        naked3Simple = VALUES(naked3Simple), 
         nakedSimple = VALUES(nakedSimple), 
         omissionVisible = VALUES(omissionVisible), 
-        naked2Visible = VALUES(naked2Visible), 
         nakedVisible = VALUES(nakedVisible), 
         naked2 = VALUES(naked2), 
         naked3 = VALUES(naked3), 
@@ -44,12 +40,7 @@ function insertValues($number, $values)
         xyzWing = VALUES(xyzWing), 
         xWing = VALUES(xWing), 
         swordfish = VALUES(swordfish), 
-        jellyfish = VALUES(jellyfish), 
-        superRank = VALUES(superRank), 
-        superSize = VALUES(superSize), 
-        superType = VALUES(superType), 
-        superDepth = VALUES(superDepth), 
-	    superCount = VALUES(superCount)";
+        jellyfish = VALUES(jellyfish)";
 }
 
 try {
@@ -73,11 +64,8 @@ try {
 			$post->solveType,
 			$post->hiddenSimple,
 			$post->omissionSimple,
-			$post->naked2Simple,
-			$post->naked3Simple,
 			$post->nakedSimple,
 			$post->omissionVisible,
-			$post->naked2Visible,
 			$post->nakedVisible,
 			$post->naked2,
 			$post->naked3,
@@ -93,11 +81,6 @@ try {
 			$post->xWing,
 			$post->swordfish,
 			$post->jellyfish,
-			$post->superRank,
-			$post->superSize,
-			$post->superType,
-			$post->superDepth,
-			$post->superCount,
 		];
 		$flatList = implode(',', $valueList);
 

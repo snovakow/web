@@ -14,7 +14,7 @@ const MAX_SIZE = 10000000;
 if (!isset($_GET['mode'])) die;
 
 $mode = (int)$_GET['mode'];
-if (!is_int($mode) || $mode < 0 || $mode > 7) die;
+if (!is_int($mode) || $mode < 0 || $mode > 6) die;
 
 function totalCount($tableCount, $puzzleCount)
 {
@@ -163,15 +163,6 @@ function tableLogic($strategy = "", $frequency = 1)
 	return $logic;
 }
 
-function superSort($a, $b)
-{
-	if ($a['superSize'] == $b['superSize']) {
-		if ($a['superDepth'] == $b['superDepth']) return 0;
-		return ($a['superDepth'] < $b['superDepth']) ? -1 : 1;
-	}
-	return ($a['superSize'] < $b['superSize']) ? -1 : 1;
-}
-
 try {
 	$servername = "localhost";
 	$username = "snovakow";
@@ -218,11 +209,8 @@ try {
   `solveType` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `hiddenSimple` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `omissionSimple` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `naked2Simple` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `naked3Simple` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `nakedSimple` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `omissionVisible` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `naked2Visible` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `nakedVisible` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `naked2` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `naked3` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -238,11 +226,6 @@ try {
   `xWing` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `swordfish` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `jellyfish` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `superRank` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `superSize` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `superType` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `superDepth` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `superCount` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin;";
 			echo "$sql\n";
@@ -255,11 +238,11 @@ try {
 	if ($mode === 1) {
 		$fields = ["count", "clueCount"];
 		$select = "`hiddenSimple` AS count, `clueCount`";
-		$logic = "`solveType`=0 AND `clueCount`>=28 AND `omissionSimple`=0 AND `naked2Simple`=0 AND `naked3Simple`=0 AND `nakedSimple`=0";
+		$logic = "`solveType`=0 AND `clueCount`>=28 AND `omissionSimple`=0 AND `nakedSimple`=0";
 		echo tableGeneralStatement($tableCount, "simple_hidden", $fields, $select, $logic, "count DESC"), "\n";
 
 		$select = "`omissionSimple` AS count, `clueCount`";
-		$logic = "`solveType`=0 AND `omissionSimple`>=4 AND `naked2Simple`=0 AND `naked3Simple`=0 AND `nakedSimple`=0";
+		$logic = "`solveType`=0 AND `omissionSimple`>=4 AND `nakedSimple`=0";
 		echo tableGeneralStatement($tableCount, "simple_omission", $fields, $select, $logic, "count DESC"), "\n";
 
 		$select = "`nakedSimple` AS count, `clueCount`";
@@ -284,20 +267,6 @@ try {
 		echo tableStrategyLogic($tableCount, 3, "xWing", "candidate_xWing", 1);
 		echo tableStrategyLogic($tableCount, 3, "swordfish", "candidate_swordfish");
 		echo tableStrategyLogic($tableCount, 3, "jellyfish", "candidate_jellyfish");
-
-		$fields = ["superSize", "superDepth", "superCount", "superRank", "superType"];
-		$select = implode(", ", $fields);
-		$logic = "`solveType`=4 AND `superSize`=2 AND `superDepth`<=2 AND ";
-		$logic .= "`naked2`=0 AND `naked3`=0 AND `naked4`=0 AND `hidden1`=0 AND `hidden2`=0 AND `hidden3`=0 AND `hidden4`=0 AND ";
-		$logic .= "`omissions`=0 AND `uniqueRectangle`=0 AND `yWing`=0 AND `xyzWing`=0 AND `xWing`=0 AND `swordfish`=0 AND `jellyfish`=0";
-		$order = implode(", ", $fields);
-		echo tableGeneralStatement($tableCount, "super_min", $fields, $select, $logic, $order), "\n";
-
-		$fields = ["superSize", "superCount", "superDepth", "superRank", "superType"];
-		$select = implode(", ", $fields);
-		$logic = "`solveType`=4 AND `superSize`>=4";
-		$order = implode(" DESC, ", $fields) . " DESC";
-		echo tableGeneralStatement($tableCount, "super_max", $fields, $select, $logic, $order), "\n";
 	}
 
 	if ($mode === 2) {
@@ -346,8 +315,6 @@ try {
 			"candidate_xWing",
 			"candidate_swordfish",
 			"candidate_jellyfish",
-			"super_min",
-			"super_max",
 		];
 
 		$len1 = 25;
@@ -359,9 +326,6 @@ try {
 		printf("%'-{$len1}s %'-{$len2}s %'-{$len3}s %'-{$len4}s %'-{$len5}s\n", "", "", "", "", "");
 		foreach ($tableNames as $tableName) {
 			$property = "count";
-			if ($tableName == "super_min" || $tableName == "super_max") $property = "superCount";
-			elseif (substr($tableName, -4) === "_min") $property = "clueCount";
-
 			$sql = "SELECT COUNT(*) AS count, MIN(`$property`) AS min, MAX(`$property`) AS max FROM `$tableName`";
 
 			$stmt = $db->prepare($sql);
@@ -378,69 +342,6 @@ try {
 				number_format($count)
 			);
 		}
-		echo "\n";
-
-		$sql = "SELECT ";
-		$sql .= "MIN(`superSize`) AS superSizeMin, ";
-		$sql .= "MIN(`superDepth`) AS superDepthMin, ";
-		$sql .= "MIN(`superCount`) AS superCountMin, ";
-		$sql .= "MIN(`superRank`) AS superRankMin, ";
-		$sql .= "MIN(`superType`) AS superTypeMin, ";
-		$sql .= "MAX(`superSize`) AS superSizeMax, ";
-		$sql .= "MAX(`superDepth`) AS superDepthMax, ";
-		$sql .= "MAX(`superCount`) AS superCountMax, ";
-		$sql .= "MAX(`superRank`) AS superRankMax, ";
-		$sql .= "MAX(`superType`) AS superTypeMax";
-
-		$fields = ["superSize", "superDepth", "superCount", "superRank", "superType"];
-		$tableName = "super_min";
-		echo "$tableName\n";
-
-		$stmt = $db->prepare("$sql FROM `$tableName`");
-		$stmt->execute();
-		$result = $stmt->fetch();
-
-		echo "Size: {$result['superSizeMin']} - {$result['superSizeMax']}\n";
-		$stmt = $db->prepare("SELECT `superDepth`, `superCount`, COUNT(*) AS count FROM `$tableName` GROUP BY `superDepth`, `superCount`");
-		$stmt->execute();
-		$group = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-		foreach ($group as $row) {
-			$superDepth = $row['superDepth'];
-			$superCount = $row['superCount'];
-			$count = $row['count'];
-
-			$percent = percentage($count, 1000000, 4);
-			$number = number_format($count);
-			echo "Depth $superDepth Count $superCount: $percent $number\n";
-		}
-		echo "Rank: {$result['superRankMin']} - {$result['superRankMax']}\n";
-		echo "Type: {$result['superTypeMin']} - {$result['superTypeMax']}\n";
-		echo "\n";
-
-		$fields = ["superSize", "superDepth", "superCount", "superRank", "superType"];
-		$tableName = "super_max";
-		echo "$tableName\n";
-
-		$stmt = $db->prepare("$sql FROM `$tableName`");
-		$stmt->execute();
-		$result = $stmt->fetch();
-
-		$stmt = $db->prepare("SELECT `superSize`, COUNT(*) AS count FROM `$tableName` GROUP BY `superSize`");
-		$stmt->execute();
-		$group = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-		foreach ($group as $row) {
-			$superSize = $row['superSize'];
-			$count = $row['count'];
-
-			$percent = percentage($count, 1000000, 4);
-			$number = number_format($count);
-			echo "Size $superSize: $percent $number\n";
-		}
-		// echo "Size: {$result['superSizeMin']} - {$result['superSizeMax']}\n";
-		echo "Depth: {$result['superDepthMin']} - {$result['superDepthMax']}\n";
-		echo "Count: {$result['superCountMin']} - {$result['superCountMax']}\n";
-		echo "Rank: {$result['superRankMin']} - {$result['superRankMax']}\n";
-		echo "Type: {$result['superTypeMin']} - {$result['superTypeMax']}\n";
 	}
 
 	if ($mode === 3) {
@@ -480,22 +381,16 @@ try {
 		$strategies = [
 			"hiddenSimple",
 			"omissionSimple",
-			"naked2Simple",
-			"naked3Simple",
 			"nakedSimple",
 			"omissionVisible",
-			"naked2Visible",
 			"nakedVisible",
 		];
 
 		$solveTypes = [];
 		$solveTypes['hiddenSimple'] = 0;
 		$solveTypes['omissionSimple'] = 0;
-		$solveTypes['naked2Simple'] = 0;
-		$solveTypes['naked3Simple'] = 0;
 		$solveTypes['nakedSimple'] = 0;
 		$solveTypes['omissionVisible'] = 1;
-		$solveTypes['naked2Visible'] = 1;
 		$solveTypes['nakedVisible'] = 1;
 
 		$values = [];
@@ -667,107 +562,6 @@ try {
 	}
 
 	if ($mode === 6) {
-		$number = number_format($totalCount);
-		echo "--- Superpositions $number\n\n";
-
-		$len1 = 6;
-		$len2 = 6;
-		$len3 = 6;
-		$len4 = 6;
-		$len5 = 20;
-
-		$rows = [];
-
-		for ($i = 1; $i <= $tableCount; $i++) {
-			$table = tableName($i);
-			$sql = "";
-			$sql .= "SELECT `superSize`, `superDepth`, `superCount`, COUNT(*) AS count ";
-			$sql .= "FROM `$table` WHERE `solveType`=4 GROUP BY `superSize`, `superDepth`, `superCount`";
-			$stmt = $db->prepare($sql);
-			$stmt->execute();
-
-			$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-			foreach ($result as $row) $rows[] = $row;
-		}
-
-		usort($rows, "superSort");
-
-		$results = [];
-		foreach ($rows as $row) {
-			$superSize = $row['superSize'];
-			$superDepth = $row['superDepth'];
-
-			$title =  "";
-			$title .=  str_pad("$superSize    ", $len1, " ", STR_PAD_LEFT);
-			$title .=  str_pad("$superDepth    ", $len2, " ", STR_PAD_LEFT);
-
-			$result = $results[$title] ?: [];
-			$result[] = $row;
-			$results[$title] = $result;
-		}
-
-		$titles = [];
-		$total = 0;
-		foreach ($results as $title => $value) {
-			$started = false;
-			$countTotal = 0;
-			$max = 0;
-			$min = 0;
-			foreach ($value as $row) {
-				$superCount = $row['superCount'];
-				$count = $row['count'];
-
-				$countTotal += $count;
-				if ($started) {
-					$max = max($max, $superCount);
-					$min = min($min, $superCount);
-				} else {
-					$max = $superCount;
-					$min = $superCount;
-					$started = true;
-				}
-			}
-
-			$total = max($total, $countTotal);
-
-			$values = $titles[$title] ?: [];
-			$values['count'] = $countTotal;
-			$values['max'] = $max;
-			$values['min'] = $min;
-			$titles[$title] = $values;
-		}
-
-		echo str_pad("Size", $len1, " ", STR_PAD_BOTH);
-		echo str_pad("Depth", $len2, " ", STR_PAD_BOTH);
-		echo str_pad("Min", $len3, " ", STR_PAD_BOTH);
-		echo str_pad("Max", $len4, " ", STR_PAD_BOTH);
-		echo str_pad("Total", $len5, " ", STR_PAD_BOTH);
-		echo "\n";
-		echo str_pad(str_pad("", $len1 - 1, "-", STR_PAD_BOTH), $len1, " ");
-		echo str_pad(str_pad("", $len2 - 1, "-", STR_PAD_BOTH), $len2, " ");
-		echo str_pad(str_pad("", $len3 - 1, "-", STR_PAD_BOTH), $len3, " ");
-		echo str_pad(str_pad("", $len4 - 1, "-", STR_PAD_BOTH), $len4, " ");
-		echo str_pad(str_pad("", $len5 - 1, "-", STR_PAD_BOTH), $len5, " ");
-		echo "\n";
-
-		foreach ($titles as $title => $values) {
-			$count = $values['count'];
-			$max = $values['max'];
-			$min = $values['min'];
-
-			$title .=  str_pad("$min    ", $len3, " ", STR_PAD_LEFT);
-			$title .=  str_pad("$max    ", $len4, " ", STR_PAD_LEFT);
-
-			$percent = percentage($count, $total, 5);
-			$format = number_format($count);
-
-			echo $title;
-			echo str_pad("$percent $format", $len5, " ", STR_PAD_RIGHT);
-			echo "\n";
-		}
-	}
-
-	if ($mode === 7) {
 		$counts = [];
 		$countSimple = [];
 		$countVisible = [];
@@ -809,7 +603,6 @@ try {
 
 		exit(json_encode($results));
 	}
-
 } catch (PDOException $e) {
 	// echo "Error: " . $e->getMessage();
 }

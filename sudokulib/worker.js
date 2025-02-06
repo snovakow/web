@@ -30,12 +30,9 @@ const strategyDataArray = [];
 
 new StrategyData(simpleDataArray, STRATEGY.SIMPLE_HIDDEN, 'hiddenSimple');
 new StrategyData(simpleDataArray, STRATEGY.SIMPLE_INTERSECTION, 'omissionSimple');
-new StrategyData(simpleDataArray, STRATEGY.SIMPLE_NAKED2, 'naked2Simple');
-new StrategyData(simpleDataArray, STRATEGY.SIMPLE_NAKED3, 'naked3Simple');
 new StrategyData(simpleDataArray, STRATEGY.SIMPLE_NAKED, 'nakedSimple');
 
 new StrategyData(visibleDataArray, STRATEGY.VISIBLE_INTERSECTION, 'omissionVisible');
-new StrategyData(visibleDataArray, STRATEGY.VISIBLE_NAKED2, 'naked2Visible');
 new StrategyData(visibleDataArray, STRATEGY.VISIBLE_NAKED, 'nakedVisible');
 
 new StrategyData(strategyDataArray, STRATEGY.NAKED_2, 'naked2');
@@ -89,7 +86,7 @@ const step = () => {
 	for (const cell of cells) if (cell.symbol === 0) cell.fill();
 	const save = cells.toData();
 
-	const result = fillSolve(cells, simples, visibles, strategies, true);
+	const result = fillSolve(cells, simples, visibles, strategies);
 	data.puzzleClues = data.puzzle;
 	data.puzzleFilled = puzzleFilled.join('');
 	data.clueCount = clueCount;
@@ -107,21 +104,11 @@ const step = () => {
 	// 3 Candidate Minimal
 	// 4 Incomplete
 	data.solveType = 0;
-	data.superRank = 0;
-	data.superSize = 0;
-	data.superType = 0;
-	data.superDepth = 0;
-	data.superCount = 0;
 	if (!result.simple) {
 		if (result.solved) {
 			data.solveType = 1;
 		} else {
 			data.solveType = 4;
-			data.superRank = result.superRank;
-			data.superSize = result.superSize;
-			data.superType = result.superType;
-			data.superDepth = result.superDepth;
-			data.superCount = result.superCount;
 		}
 	}
 

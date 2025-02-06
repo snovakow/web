@@ -36,8 +36,6 @@ let strategy = "level";
 		"candidate_xWing",
 		"candidate_swordfish",
 		"candidate_jellyfish",
-		"super_min",
-		"super_max",
 		"custom",
 		"hardcoded",
 	];
@@ -68,7 +66,7 @@ Object.seal(puzzleData);
 let pickerMarkerMode = false;
 
 const headerHeight = Menu.headerHeight;
-const footerHeight = 8;
+const footerHeight = 16;
 
 let selectedRow = 0;
 let selectedCol = 0;
@@ -489,8 +487,6 @@ if (strategy === 'candidate_xyzWing') titleString = "XYZ Wing";
 if (strategy === 'candidate_xWing') titleString = "X Wing";
 if (strategy === 'candidate_swordfish') titleString = "Swordfish";
 if (strategy === 'candidate_jellyfish') titleString = "Jellyfish";
-if (strategy === 'super_min') titleString = "Other Strategies";
-if (strategy === 'super_max') titleString = "Difficult";
 if (titleString === null) titleString = "Level 1";
 title.appendChild(document.createTextNode(titleString));
 

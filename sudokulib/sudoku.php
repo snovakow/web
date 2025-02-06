@@ -27,8 +27,6 @@ $tableNames = [
 	"candidate_xWing",
 	"candidate_swordfish",
 	"candidate_jellyfish",
-	"super_min",
-	"super_max",
 	"custom",
 	"hardcoded",
 ];
