@@ -211,6 +211,7 @@ try {
   `hiddenSimple` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `omissionSimple` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `nakedSimple` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `omissionVisible` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `nakedVisible` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `naked2` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `naked3` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -373,6 +374,7 @@ try {
 			"hiddenSimple",
 			"omissionSimple",
 			"nakedSimple",
+			"omissionVisible",
 			"nakedVisible",
 		];
 
@@ -380,6 +382,7 @@ try {
 		$solveTypes['hiddenSimple'] = 0;
 		$solveTypes['omissionSimple'] = 0;
 		$solveTypes['nakedSimple'] = 0;
+		$solveTypes['omissionVisible'] = 1;
 		$solveTypes['nakedVisible'] = 1;
 
 		$values = [];

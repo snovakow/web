@@ -1,6 +1,6 @@
 import {
 	candidates, simpleHidden, simpleOmissions, simpleNaked,
-	visibleNaked,
+	visibleOmissions, visibleNaked,
 	hiddenSingles, NakedHiddenGroups, omissions, uniqueRectangle,
 	yWing, xyzWing, xWing, swordfish, jellyfish, aCells, bCells,
 	simpleHiddenValid, simpleNakedValid,
@@ -15,6 +15,7 @@ const consoleOut = (result) => {
 	lines.push("Simple Omission: " + result.omissionSimple);
 	lines.push("Simple Naked: " + result.nakedSimple);
 
+	lines.push("Visual Omission: " + result.omissionVisible);
 	lines.push("Visual Naked: " + result.nakedVisible);
 
 	lines.push("Naked 2: " + result.naked2);
@@ -50,6 +51,7 @@ const STRATEGY = {
 	SIMPLE_INTERSECTION: VAL++,
 	SIMPLE_NAKED: VAL++,
 
+	VISIBLE_INTERSECTION: VAL++,
 	VISIBLE_NAKED: VAL++,
 
 	NAKED_2: VAL++,
@@ -69,14 +71,11 @@ const STRATEGY = {
 };
 Object.freeze(STRATEGY);
 
-const fillSolve = (cells, simples, visibles, strategies) => {
+const fillSolve = (cells, simples, strategies) => {
 	simples = simples ?? [
 		STRATEGY.SIMPLE_HIDDEN,
 		STRATEGY.SIMPLE_INTERSECTION,
 		STRATEGY.SIMPLE_NAKED,
-	];
-	visibles = visibles ?? [
-		STRATEGY.VISIBLE_NAKED,
 	];
 	strategies = strategies ?? [
 		STRATEGY.NAKED_2,
@@ -126,6 +125,7 @@ const fillSolve = (cells, simples, visibles, strategies) => {
 		return remaining > 0;
 	}
 
+	let omissionVisible = 0;
 	let nakedVisible = 0;
 
 	let naked2Reduced = 0;
@@ -147,6 +147,10 @@ const fillSolve = (cells, simples, visibles, strategies) => {
 	// 1 reduced
 	// 2 placed
 	const solveVisiblePriority = (strategy) => {
+		if (strategy === STRATEGY.VISIBLE_INTERSECTION && visibleOmissions(cells)) {
+			omissionVisible++;
+			return true;
+		}
 		if (strategy === STRATEGY.VISIBLE_NAKED && visibleNaked(cells)) {
 			nakedVisible++;
 			return true;
@@ -229,8 +233,19 @@ const fillSolve = (cells, simples, visibles, strategies) => {
 		const remaining = solveSimple();
 		if (!remaining) break;
 
-		simple = false;
+		// simple = false;
 		candidates(cells);
+
+		let breakOut = false;
+		while (solveVisiblePriority(STRATEGY.VISIBLE_INTERSECTION)) {
+			if (solveVisiblePriority(STRATEGY.VISIBLE_NAKED)) {
+				breakOut = true;
+				break;
+			}
+		}
+		if (breakOut) continue;
+
+		simple = false;
 
 		let progress = false;
 		do {
@@ -255,6 +270,7 @@ const fillSolve = (cells, simples, visibles, strategies) => {
 		hiddenSimple,
 		omissionSimple,
 		nakedSimple,
+		omissionVisible,
 		nakedVisible,
 		naked2: naked2Reduced,
 		naked3: naked3Reduced,
