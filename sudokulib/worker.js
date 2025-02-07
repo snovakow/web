@@ -139,7 +139,22 @@ const step = () => {
 		}
 	}
 
+	const orderedSolveSimple = () => {
+		if (result.omissionSimple === 0 && result.nakedSimple === 0) data.minimal = 1;
+		if (result.nakedSimple > 0) data.minimal = 1;
+		if (result.omissionSimple > 0 && result.nakedSimple === 0) {
+			cells.fromData(save);
+			const priority = [STRATEGY.SIMPLE_HIDDEN, STRATEGY.SIMPLE_NAKED, STRATEGY.SIMPLE_INTERSECTION];
+			const priorityResult = fillSolve(cells, priority, visibles, strategies);
+
+			if (priorityResult.omissionSimple > 0) data.minimal = 1;
+		}
+	}
+
 	for (const strategy of allArray) data[strategy.data] = result[strategy.data];
+	if (data.solveType === 0) {
+		orderedSolveSimple();
+	}
 	if (data.solveType === 1) {
 		orderedSolve();
 	}

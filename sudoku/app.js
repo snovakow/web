@@ -21,7 +21,6 @@ let strategy = "level";
 		"simple_hidden",
 		"simple_omission",
 		"simple_naked",
-		"candidate_visible",
 		"candidate_naked2",
 		"candidate_naked3",
 		"candidate_naked4",
@@ -472,7 +471,6 @@ let titleString = null;
 if (strategy === 'simple_hidden') titleString = "Hidden Single";
 if (strategy === 'simple_omission') titleString = "Intersection Removal";
 if (strategy === 'simple_naked') titleString = "Naked Single";
-if (strategy === 'candidate_visible') titleString = "Basic Candidtates";
 if (strategy === 'candidate_naked2') titleString = "Naked Pair";
 if (strategy === 'candidate_naked3') titleString = "Naked Triple";
 if (strategy === 'candidate_naked4') titleString = "Naked Quad";

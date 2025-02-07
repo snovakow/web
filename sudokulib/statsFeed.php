@@ -249,10 +249,6 @@ try {
 		$logic = "`solveType`=0 AND `nakedSimple`>=8";
 		echo tableGeneralStatement($tableCount, "simple_naked", $fields, $select, $logic, "count DESC"), "\n";
 
-		$select = "`nakedVisible` AS count, `clueCount`";
-		$logic = "`solveType`=1 AND `nakedVisible`>=4";
-		echo tableGeneralStatement($tableCount, "candidate_visible", $fields, $select, $logic, "count DESC"), "\n";
-
 		echo tableStrategyLogic($tableCount, "naked2", "candidate_naked2", 4);
 		echo tableStrategyLogic($tableCount, "naked3", "candidate_naked3", 4);
 		echo tableStrategyLogic($tableCount, "naked4", "candidate_naked4", 3);
@@ -300,7 +296,6 @@ try {
 			"simple_hidden",
 			"simple_omission",
 			"simple_naked",
-			"candidate_visible",
 			"candidate_naked2",
 			"candidate_naked3",
 			"candidate_naked4",

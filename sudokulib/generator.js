@@ -234,9 +234,6 @@ const fillSolve = (cells, simples, visibles, strategies) => {
 
 		let progress = false;
 		do {
-			// for (const strategy of visibles) {
-			// }
-
 			for (const strategy of strategies) {
 				progress = solvePriority(strategy);
 				if (progress) break;
@@ -244,9 +241,7 @@ const fillSolve = (cells, simples, visibles, strategies) => {
 			nakedHidden = null;
 
 			if (progress) {
-				if(solveVisiblePriority(visibles)) {
-					break;
-				}
+				if (solveVisiblePriority(STRATEGY.VISIBLE_NAKED)) break;
 			} else {
 				solved = false;
 			}

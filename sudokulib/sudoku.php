@@ -12,7 +12,6 @@ $tableNames = [
 	"simple_hidden",
 	"simple_omission",
 	"simple_naked",
-	"candidate_visible",
 	"candidate_naked2",
 	"candidate_naked3",
 	"candidate_naked4",

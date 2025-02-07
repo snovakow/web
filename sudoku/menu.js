@@ -130,7 +130,6 @@ const addMenuItem = (title, strategy) => {
 addMenuItem("Hidden Single", 'simple_hidden');
 addMenuItem("Intersection Removal", 'simple_omission');
 addMenuItem("Naked Single", 'simple_naked');
-addMenuItem("Basic Candidtates", 'candidate_visible');
 addMenuItem("Naked Pair", 'candidate_naked2');
 addMenuItem("Naked Triple", 'candidate_naked3');
 addMenuItem("Naked Quad", 'candidate_naked4');
