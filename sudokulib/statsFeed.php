@@ -132,7 +132,7 @@ function tableStatement($tableCount, $select, $tableName, $logic, $min = false)
 }
 function tableStrategyLogic($tableCount, $strategy, $tableName, $frequency = 1, $min = false)
 {
-	$logic = "`solveType`=1 AND `minimal`=1";
+	$logic = "`solveType`=5";
 	$logic .= tableLogic($strategy, $frequency);
 	$sql = tableStatement($tableCount, $strategy, $tableName, $logic, $min);
 	return "$sql\n";
@@ -207,7 +207,6 @@ try {
   `puzzleData` binary(32) NOT NULL DEFAULT '00000000000000000000000000000000',
   `clueCount` tinyint(2) unsigned NOT NULL DEFAULT '0',
   `solveType` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `minimal` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `hiddenSimple` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `omissionSimple` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `nakedSimple` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -239,29 +238,33 @@ try {
 	if ($mode === 1) {
 		$fields = ["count", "clueCount"];
 		$select = "`hiddenSimple` AS count, `clueCount`";
-		$logic = "`solveType`=0 AND `clueCount`>=28 AND `omissionSimple`=0 AND `nakedSimple`=0";
+		$logic = "`solveType`=0";
 		echo tableGeneralStatement($tableCount, "simple_hidden", $fields, $select, $logic, "count DESC"), "\n";
 
 		$select = "`omissionSimple` AS count, `clueCount`";
-		$logic = "`solveType`=0 AND `omissionSimple`>=4 AND `nakedSimple`=0";
+		$logic = "`solveType`=1";
 		echo tableGeneralStatement($tableCount, "simple_omission", $fields, $select, $logic, "count DESC"), "\n";
 
 		$select = "`nakedSimple` AS count, `clueCount`";
-		$logic = "`solveType`=0 AND `nakedSimple`>=8";
+		$logic = "`solveType`=2";
 		echo tableGeneralStatement($tableCount, "simple_naked", $fields, $select, $logic, "count DESC"), "\n";
 
-		echo tableStrategyLogic($tableCount, "naked2", "candidate_naked2", 4);
-		echo tableStrategyLogic($tableCount, "naked3", "candidate_naked3", 4);
-		echo tableStrategyLogic($tableCount, "naked4", "candidate_naked4", 3);
+		$select = "`omissionVisible` AS count, `clueCount`";
+		$logic = "`solveType`=3";
+		echo tableGeneralStatement($tableCount, "candidate_visible", $fields, $select, $logic, "count DESC"), "\n";
+
+		echo tableStrategyLogic($tableCount, "naked2", "candidate_naked2");
+		echo tableStrategyLogic($tableCount, "naked3", "candidate_naked3");
+		echo tableStrategyLogic($tableCount, "naked4", "candidate_naked4");
 		echo tableStrategyLogic($tableCount, "hidden1", "candidate_hidden1");
 		echo tableStrategyLogic($tableCount, "hidden2", "candidate_hidden2");
 		echo tableStrategyLogic($tableCount, "hidden3", "candidate_hidden3");
 		echo tableStrategyLogic($tableCount, "hidden4", "candidate_hidden4");
-		echo tableStrategyLogic($tableCount, "omissions", "candidate_omissions", 2);
-		echo tableStrategyLogic($tableCount, "uniqueRectangle", "candidate_uniqueRectangle", 2);
-		echo tableStrategyLogic($tableCount, "yWing", "candidate_yWing", 4);
-		echo tableStrategyLogic($tableCount, "xyzWing", "candidate_xyzWing", 2);
-		echo tableStrategyLogic($tableCount, "xWing", "candidate_xWing", 1);
+		echo tableStrategyLogic($tableCount, "omissions", "candidate_omissions");
+		echo tableStrategyLogic($tableCount, "uniqueRectangle", "candidate_uniqueRectangle");
+		echo tableStrategyLogic($tableCount, "yWing", "candidate_yWing");
+		echo tableStrategyLogic($tableCount, "xyzWing", "candidate_xyzWing");
+		echo tableStrategyLogic($tableCount, "xWing", "candidate_xWing");
 		echo tableStrategyLogic($tableCount, "swordfish", "candidate_swordfish");
 		echo tableStrategyLogic($tableCount, "jellyfish", "candidate_jellyfish");
 	}
@@ -297,6 +300,7 @@ try {
 			"simple_hidden",
 			"simple_omission",
 			"simple_naked",
+			"candidate_visible",
 			"candidate_naked2",
 			"candidate_naked3",
 			"candidate_naked4",
@@ -356,13 +360,21 @@ try {
 			}
 		}
 
-		$simple = $counts[0];
-		$candidate = $counts[1];
-		$unsolvable = $counts[2];
+		$hiddenSimple = $counts[0];
+		$omissionSimple = $counts[1];
+		$nakedSimple = $counts[2];
+		$omissionVisible = $counts[3];
+		$candidate = $counts[4];
+		$candidateMin = $counts[5];
+		$unsolvable = $counts[6];
 
 		$results = [
-			'simple' => $simple,
+			'hiddenSimple' => $hiddenSimple,
+			'omissionSimple' => $omissionSimple,
+			'nakedSimple' => $nakedSimple,
+			'omissionVisible' => $omissionVisible,
 			'candidate' => $candidate,
+			'candidateMin' => $candidateMin,
 			'unsolvable' => $unsolvable,
 			'totalCount' => $totalCount
 		];

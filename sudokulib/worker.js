@@ -95,22 +95,34 @@ const step = () => {
 	for (const strategy of allArray) data[strategy.data] = 0;
 
 	// solveType
-	// 0 Simple
-	// 1 Candidate
-	// 2 Incomplete
+	// 0 hiddenSimple
+	// 1 omissionSimple
+	// 2 nakedSimple
+	// 3 omissionVisible
+	// 4 Candidate
+	// 5 Candidate Minimal
+	// 6 Incomplete
 	data.solveType = 0;
-	if (!result.simple) {
-		if (result.solved) {
+
+	if (result.simple) {
+		if (result.omissionSimple > 0 && result.nakedSimple === 0) {
 			data.solveType = 1;
-		} else {
+		}
+		if (result.nakedSimple > 0) {
 			data.solveType = 2;
 		}
 	}
-	data.minimal = 0;
+	if (result.visible) {
+		data.solveType = 3;
+	}
+	if (!result.simple && !result.visible) {
+		if (result.solved) data.solveType = 4;
+		else data.solveType = 6;
+	}
 
 	for (const strategy of allArray) data[strategy.data] = result[strategy.data];
 
-	if (data.solveType === 1) {
+	if (data.solveType === 4) {
 		const usedData = [];
 		for (const strategy of strategyDataArray) {
 			if (result[strategy.data] > 0) usedData.push(strategy);
@@ -134,7 +146,7 @@ const step = () => {
 		cells.fromData(save);
 		const minimalResult = fillSolve(cells, simples, minimal);
 		if (minimalResult.solved) {
-			data.minimal = 1;
+			data.solveType = 5;
 			for (const strategy of allArray) data[strategy.data] = minimalResult[strategy.data];
 		}
 	}

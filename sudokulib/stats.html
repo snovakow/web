@@ -44,8 +44,12 @@
 		}
 
 		const mode3 = (data) => {
-			const simple = data.simple;
+			const hiddenSimple = data.hiddenSimple;
+			const omissionSimple = data.omissionSimple;
+			const nakedSimple = data.nakedSimple;
+			const omissionVisible = data.omissionVisible;
 			const candidate = data.candidate;
+			const candidateMin = data.candidateMin;
 			const unsolvable = data.unsolvable;
 			const totalCount = data.totalCount;
 			let runningTotal = 0;
@@ -55,23 +59,21 @@
 
 			const fixed = 2;
 
-			runningTotal += simple;
-			let runningPercent = percentage(runningTotal, totalCount, fixed);
-			let percent = percentage(simple, totalCount, fixed);
-			let number = simple.toLocaleString();
-			appendLine(`Simple: ${runningPercent} (${percent}) ${number}`);
-
-			runningTotal += candidate;
-			runningPercent = percentage(runningTotal, totalCount, fixed);
-			percent = percentage(candidate, totalCount, fixed);
-			number = candidate.toLocaleString();
-			appendLine(`Strategy: ${runningPercent} (${percent}) ${number}`);
-
-			runningTotal += unsolvable;
-			runningPercent = percentage(runningTotal, totalCount, fixed);
-			percent = percentage(unsolvable, totalCount, fixed);
-			number = unsolvable.toLocaleString();
-			appendLine(`Unsolvable: ${runningPercent} (${percent}) ${number}`);
+			const printLine = (title, count, min) => {
+				runningTotal += count;
+				const runningPercent = percentage(runningTotal, totalCount, fixed);
+				const percent = percentage(count, totalCount, fixed);
+				const number = count.toLocaleString();
+				const minLine = min ? ` (${percentage(min, count, fixed)} min)` : "";
+				const label = (title + ":").padEnd(17);
+				appendLine(`${label} ${percent} (${runningPercent})${minLine} ${number}`);
+			};
+			printLine("Hidden Simple", data.hiddenSimple);
+			printLine("Omission Simple", data.omissionSimple);
+			printLine("Naked Simple", data.nakedSimple);
+			printLine("Omission Visible", data.omissionVisible);
+			printLine("Candidate", data.candidate + data.candidateMin, data.candidateMin);
+			printLine("Unsolvable", data.unsolvable);
 
 			appendSpace();
 			const time = Math.round((performance.now() - startTime) / 1000);

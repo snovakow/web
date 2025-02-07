@@ -10,7 +10,6 @@ const consoleOut = (result) => {
 	const lines = [];
 	lines.push("Solved: " + (result.solved ? "Yes" : "No"));
 	lines.push("Simple: " + (result.simple ? "Yes" : "No"));
-	lines.push("Minimal: " + (result.minimal ? "Yes" : "No"));
 	lines.push("Simple Hidden: " + result.hiddenSimple);
 	lines.push("Simple Omission: " + result.omissionSimple);
 	lines.push("Simple Naked: " + result.nakedSimple);
@@ -227,13 +226,15 @@ const fillSolve = (cells, simples, strategies) => {
 	}
 
 	let simple = true;
+	let visible = false;
 	let solved = true;
 
 	do {
 		const remaining = solveSimple();
 		if (!remaining) break;
 
-		// simple = false;
+		simple = false;
+		visible = true;
 		candidates(cells);
 
 		let breakOut = false;
@@ -245,7 +246,7 @@ const fillSolve = (cells, simples, strategies) => {
 		}
 		if (breakOut) continue;
 
-		simple = false;
+		visible = false;
 
 		let progress = false;
 		do {
@@ -267,6 +268,7 @@ const fillSolve = (cells, simples, strategies) => {
 	return {
 		solved,
 		simple,
+		visible,
 		hiddenSimple,
 		omissionSimple,
 		nakedSimple,

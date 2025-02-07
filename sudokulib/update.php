@@ -16,13 +16,12 @@ function insertValues($number, $values)
 {
 	$valueList = implode(",", $values);
 	$table = tableName($number);
-	return "INSERT INTO `$table` (id, solveType, minimal, 
+	return "INSERT INTO `$table` (id, solveType, 
 		hiddenSimple, omissionSimple, nakedSimple, 
 		omissionVisible, nakedVisible, 
 		naked2, naked3, naked4, hidden1, hidden2, hidden3, hidden4, omissions, 
 		uniqueRectangle, yWing, xyzWing, xWing, swordfish, jellyfish) VALUES $valueList ON DUPLICATE KEY UPDATE 
         solveType = VALUES(solveType), 
-        minimal = VALUES(minimal), 
         hiddenSimple = VALUES(hiddenSimple), 
         omissionSimple = VALUES(omissionSimple), 
         nakedSimple = VALUES(nakedSimple), 
@@ -63,7 +62,6 @@ try {
 		$valueList = [
 			$id,
 			$post->solveType,
-			$post->minimal,
 			$post->hiddenSimple,
 			$post->omissionSimple,
 			$post->nakedSimple,

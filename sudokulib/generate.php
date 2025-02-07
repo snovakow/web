@@ -26,7 +26,6 @@ function addTable($number)
   `puzzleData` binary(32) NOT NULL DEFAULT '00000000000000000000000000000000',
   `clueCount` tinyint(2) unsigned NOT NULL DEFAULT '0',
   `solveType` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `minimal` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `hiddenSimple` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `omissionSimple` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `nakedSimple` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -54,7 +53,7 @@ function insertValues($number, $values)
 {
 	$valueList = implode(",", $values);
 	$table = tableName($number);
-	return "INSERT INTO `$table` (id, puzzleData, clueCount, solveType, minimal,
+	return "INSERT INTO `$table` (id, puzzleData, clueCount, solveType,
 		hiddenSimple, omissionSimple, nakedSimple,
 		omissionVisible, nakedVisible,
 		naked2, naked3, naked4, hidden1, hidden2, hidden3, hidden4, omissions,
@@ -122,7 +121,6 @@ try {
 			"X'$post->puzzleData'",
 			$post->clueCount,
 			$post->solveType,
-			$post->minimal,
 			$post->hiddenSimple,
 			$post->omissionSimple,
 			$post->nakedSimple,
