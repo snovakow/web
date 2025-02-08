@@ -106,7 +106,7 @@
 			animationTicker = tick;
 
 			if (runningSends === 0 && appStage === 2 && updateDataStack.length === 0 && updateButton.parentElement) {
-				if (stopCalled && strategyCounter.totalPuzzles % sizeETA === 0) {
+				if (stopCalled && ((strategyCounter.totalPuzzles % sizeETA) === 0)) {
 					animating = false;
 					document.body.removeChild(updateButton);
 				}
@@ -364,7 +364,7 @@
 						if (!sendRequestBusy && dataReceivedChunks.length < coreCount) sendRequest();
 					}
 
-					if (stopCalled && strategyCounter.totalPuzzles % sizeETA === 0) {
+					if (stopCalled && ((strategyCounter.totalPuzzles % sizeETA) === 0)) {
 						for (const unit of workers) {
 							const worker = unit.worker;
 							worker.terminate();
