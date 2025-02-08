@@ -286,7 +286,11 @@
 
 			let sendRequestBusy = false;
 			const sendRequest = () => {
-				if (stopCalled) return;
+				if (stopCalled) {
+					const currentTotal = strategyCounter.totalPuzzles + startCount;
+					const cutoff = Math.ceil(currentTotal / sizeETA) * sizeETA;
+					if (receivedCount >= cutoff) return;
+				}
 
 				sendRequestBusy = true;
 				const inc = Math.min(incMax, totalCount - receivedCount);
