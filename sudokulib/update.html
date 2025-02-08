@@ -95,9 +95,6 @@
 		let runningSends = 0;
 		const updateDataStack = [];
 
-		const sizeETA = MAX_SIZE;
-		let stopCalled = false;
-
 		const animateFrame = () => {
 			if (animating) window.requestAnimationFrame(animateFrame);
 
@@ -106,10 +103,8 @@
 			animationTicker = tick;
 
 			if (runningSends === 0 && appStage === 2 && updateDataStack.length === 0 && updateButton.parentElement) {
-				if (stopCalled && ((strategyCounter.totalPuzzles % sizeETA) === 0)) {
-					animating = false;
-					document.body.removeChild(updateButton);
-				}
+				animating = false;
+				document.body.removeChild(updateButton);
 			}
 
 			if (receivedNodeOverride) {
@@ -169,7 +164,7 @@
 						}
 					}
 					if (currentCount < totalCount) {
-						const chunkETA = (sizeETA - currentCount % sizeETA) * passed / updateDataSent;
+						const chunkETA = (MAX_SIZE - currentCount % MAX_SIZE) * passed / updateDataSent;
 						makeBold(body, "10M ETA", formatTime(chunkETA));
 						body.appendChild(document.createElement("br"));
 
@@ -214,7 +209,11 @@
 		let workers = null;
 		const toggleWorker = () => {
 			if (workers) {
-				stopCalled = true;
+				for (const unit of workers) {
+					const worker = unit.worker;
+					worker.terminate();
+				}
+				workers = null;
 				return;
 			}
 			if (!strategyCounter) strategyCounter = new StrategyCounter();
@@ -286,12 +285,6 @@
 
 			let sendRequestBusy = false;
 			const sendRequest = () => {
-				if (stopCalled) {
-					const currentTotal = strategyCounter.totalPuzzles + startCount;
-					const cutoff = Math.ceil(currentTotal / sizeETA) * sizeETA;
-					if (receivedCount >= cutoff) return;
-				}
-
 				sendRequestBusy = true;
 				const inc = Math.min(incMax, totalCount - receivedCount);
 
@@ -362,14 +355,6 @@
 						const dataReceivedChunk = dataReceivedChunks.shift();
 						if (dataReceivedChunk) unit.process(dataReceivedChunk);
 						if (!sendRequestBusy && dataReceivedChunks.length < coreCount) sendRequest();
-					}
-
-					if (stopCalled && ((strategyCounter.totalPuzzles % sizeETA) === 0)) {
-						for (const unit of workers) {
-							const worker = unit.worker;
-							worker.terminate();
-						}
-						workers = null;
 					}
 				};
 			}
