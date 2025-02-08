@@ -146,14 +146,8 @@ const fillSolve = (cells, simples, strategies) => {
 	// 1 reduced
 	// 2 placed
 	const solveVisiblePriority = (strategy) => {
-		if (strategy === STRATEGY.VISIBLE_INTERSECTION && visibleOmissions(cells)) {
-			omissionVisible++;
-			return true;
-		}
-		if (strategy === STRATEGY.VISIBLE_NAKED && visibleNaked(cells)) {
-			nakedVisible++;
-			return true;
-		}
+		if (strategy === STRATEGY.VISIBLE_INTERSECTION && visibleOmissions(cells)) return true;
+		if (strategy === STRATEGY.VISIBLE_NAKED && visibleNaked(cells)) return true;
 		return false;
 	}
 	const solvePriority = (strategy) => {
@@ -240,6 +234,7 @@ const fillSolve = (cells, simples, strategies) => {
 		let breakOut = false;
 		while (solveVisiblePriority(STRATEGY.VISIBLE_INTERSECTION)) {
 			if (solveVisiblePriority(STRATEGY.VISIBLE_NAKED)) {
+				omissionVisible++;
 				breakOut = true;
 				break;
 			}
@@ -257,7 +252,10 @@ const fillSolve = (cells, simples, strategies) => {
 			nakedHidden = null;
 
 			if (progress) {
-				if (solveVisiblePriority(STRATEGY.VISIBLE_NAKED)) break;
+				if (solveVisiblePriority(STRATEGY.VISIBLE_NAKED)) {
+					nakedVisible++;
+					break;
+				}
 			} else {
 				solved = false;
 			}
