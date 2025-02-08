@@ -1,5 +1,5 @@
-import { CellCandidate, Grid } from "../sudokulib/Grid.js";
-import { sudokuGenerator, fillSolve, STRATEGY } from "../sudokulib/generator.js";
+import { CellCandidate, Grid } from "./Grid.js";
+import { sudokuGenerator, fillSolve, STRATEGY } from "./generator.js";
 
 const cells = new Grid();
 for (let i = 0; i < 81; i++) cells[i] = new CellCandidate(i);
