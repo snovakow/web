@@ -268,30 +268,6 @@ try {
 	if ($mode === 2) {
 		echo "--- Populated Tables ", number_format($totalCount), "\n\n";
 
-		$len1 = 5;
-		$len2 = 9;
-		$len3 = 9;
-		$tableName = "simple_hidden";
-		echo "$tableName\n";
-		printf("%-{$len1}s %{$len2}s %{$len3}s\n", "Clues", "Percent", "Count");
-		printf("%'-{$len1}s %'-{$len2}s %'-{$len3}s\n", "", "", "");
-
-		$sql = "SELECT COUNT(*) AS groupCount, `clueCount` AS count FROM `$tableName` GROUP BY `clueCount` ORDER BY 'clueCount DESC'";
-		$stmt = $db->prepare($sql);
-		$stmt->execute();
-		$results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-		$total = 0;
-		foreach ($results as $result) $total += $result['groupCount'];
-		foreach ($results as $result) {
-			$groupCount = (int)$result['groupCount'];
-			$count = (int)$result['count'];
-
-			$percent = percentage($groupCount, $total, 4, 2);
-			$format = number_format($groupCount);
-			printf("%-{$len1}s %{$len2}s %{$len3}s\n", $count, $percent, $format);
-		}
-		echo "\n";
-
 		$tableNames = [
 			"simple_hidden",
 			"simple_omission",
