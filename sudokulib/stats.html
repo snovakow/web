@@ -57,6 +57,25 @@
 			appendLine(`--- Total ${totalCount.toLocaleString()}`);
 			appendSpace();
 
+			const len1 = 16;
+			const len2 = 7;
+			const len3 = 7;
+			const len4 = 11;
+
+			let fields = [];
+			fields.push("Strategy".padEnd(len1));
+			fields.push("Percent".padStart(len2));
+			fields.push("Sum".padStart(len3));
+			fields.push("Count".padStart(len4));
+			appendLine(fields.join(" "));
+
+			fields = [];
+			fields.push("".padStart(len1, "-"));
+			fields.push("".padStart(len2, "-"));
+			fields.push("".padStart(len3, "-"));
+			fields.push("".padStart(len4, "-"));
+			appendLine(fields.join(" "));
+
 			const fixed = 2;
 
 			const printLine = (title, count, min) => {
@@ -65,8 +84,15 @@
 				const percent = percentage(count, totalCount, fixed);
 				const number = count.toLocaleString();
 				const minLine = min ? ` (${percentage(min, count, fixed)} min)` : "";
-				const label = (title + ":").padEnd(17);
-				appendLine(`${label} ${percent} (${runningPercent})${minLine} ${number}`);
+				// appendLine(`${label} ${percent} (${runningPercent})${minLine} ${number}`);
+
+				fields = [];
+				fields.push(title.padEnd(len1));
+				fields.push(`${percent}`.padStart(len2));
+				fields.push(`${runningPercent}`.padStart(len3));
+				fields.push(`${number}`.padStart(len4));
+				appendLine(fields.join(" "));
+
 			};
 			printLine("Hidden Simple", data.hiddenSimple);
 			printLine("Omission Simple", data.omissionSimple);
@@ -81,72 +107,7 @@
 			appendSpace();
 		}
 
-		const mode4 = (data) => {
-			const values = data.values;
-			const totalCount = data.totalCount;
-
-			appendLine(`Total: ${totalCount.toLocaleString()}`);
-			appendSpace();
-
-			const len1 = 17;
-			const len2 = 10;
-			const len3 = 15;
-			const len4 = 10;
-
-			let line = "";
-			line += "Strategy".padEnd(len1);
-			line += "Total".padEnd(len2);
-			line += "Isolated".padEnd(len3);
-			line += "Percent".padEnd(len4);
-			appendLine(line);
-
-			line = "";
-			line += " ".padStart(len1, "-");
-			line += " ".padStart(len2, "-");
-			line += " ".padStart(len3, "-");
-			line += " ".padStart(len4, "-");
-			appendLine(line);
-
-			let runningTotoal = 0;
-			const titles = [];
-			titles['hiddenSimple'] = "Simple Hidden";
-			titles['omissionSimple'] = "Simple Omission";
-			titles['nakedSimple'] = "Simple Naked";
-			titles['omissionVisible'] = "Visible Omission";
-			titles['nakedVisible'] = "Visible Naked";
-
-			for (const strategy in values) {
-				const value = values[strategy];
-				const strategyValue = value['strategy'];
-				const strategyIso = value['iso'];
-				const strategyIsoMax = value['isomax'];
-
-				const title = titles[strategy];
-
-				const fixed = 5;
-				const percent = percentage(strategyValue, totalCount, fixed);
-
-				runningTotoal += strategyIso;
-				const runningPercent = percentage(runningTotoal, totalCount, fixed);
-
-				const percentIso = percentage(strategyIso, totalCount, fixed);
-				const max = strategyIsoMax.toLocaleString();
-
-				line = "";
-				line += title.padEnd(len1);
-				line += `${percent}`.padEnd(len2);
-				line += `${percentIso} (${max})`.padEnd(len3);
-				line += `${runningPercent}`.padEnd(len4);
-				appendLine(line);
-			}
-
-			appendSpace();
-			const time = Math.round((performance.now() - startTime) / 1000);
-			appendLine(`${Math.floor(time / 60)}m ${time % 60}s`);
-			appendSpace();
-		}
-
-		const mode6 = (data) => {
+		const mode5 = (data) => {
 			const printTitle = (title, avg, count, total, precision) => {
 				const percent = percentage(count, total, precision);
 				const number = count.toLocaleString();
@@ -159,8 +120,12 @@
 			}
 
 			let avg = 0;
-			for (const [clueCount, count] of Object.entries(data.counts)) avg += parseInt(clueCount) * count;
-			avg /= data.totalCount;
+			let counts = 0;
+			for (const [clueCount, count] of Object.entries(data.counts)) {
+				avg += parseInt(clueCount);
+				counts += count;
+			}
+			avg /= counts;
 			appendLine(`Clues: (${avg.toFixed(2)}) ${data.totalCount.toLocaleString()}`);
 
 			for (const clueCount in data.counts) {
@@ -169,33 +134,31 @@
 			}
 			appendSpace();
 
-			let countsSimple = 0;
-			let countsCandidate = 0;
-			let countsUnsolvable = 0;
-			for (const [clueCount, count] of Object.entries(data.countSimple)) countsSimple += count;
-			for (const [clueCount, count] of Object.entries(data.countCandidate)) countsCandidate += count;
-			for (const [clueCount, count] of Object.entries(data.countUnsolvable)) countsUnsolvable += count;
+			const titles = [
+				"Hidden Simple",
+				"Omission Simple",
+				"Naked Simple",
+				"Omission Visible",
+				"Candidate",
+				"Candidate Minimal",
+				"Incomplete",
+			];
 
-			avg = 0;
-			for (const [clueCount, count] of Object.entries(data.countSimple)) avg += parseInt(clueCount) * count;
-			avg /= countsSimple;
-			printTitle("Simple", avg, countsSimple, data.totalCount, 2);
-			for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, data.countSimple[clueCount], count, 2);
-			appendSpace();
+			for (const [solveType, countType] of Object.entries(data.countTypes)) {
+				let counts = 0;
+				let total = 0;
 
-			avg = 0;
-			for (const [clueCount, count] of Object.entries(data.countCandidate)) avg += parseInt(clueCount) * count;
-			avg /= countsCandidate;
-			printTitle("Candidate", avg, countsCandidate, data.totalCount, 2);
-			for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, data.countCandidate[clueCount], count, 2);
-			appendSpace();
-
-			avg = 0;
-			for (const [clueCount, count] of Object.entries(data.countUnsolvable)) avg += parseInt(clueCount) * count;
-			avg /= countsUnsolvable;
-			printTitle("Unsolvable", avg, countsUnsolvable, data.totalCount, 2);
-			for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, data.countUnsolvable[clueCount], count, 2);
-			appendSpace();
+				let avg = 0;
+				for (const [clueCount, count] of Object.entries(countType)) {
+					avg += parseInt(clueCount);
+					counts++;
+					total += count;
+				}
+				avg /= counts;
+				printTitle(titles[solveType], avg, total, data.totalCount, 2);
+				for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, countType[clueCount] ?? 0, count, 2);
+				appendSpace();
+			}
 
 			const time = Math.round((performance.now() - startTime) / 1000);
 			appendLine(`${Math.floor(time / 60)}m ${time % 60}s`);
@@ -206,9 +169,8 @@
 		fetch(url, { cache: "no-store" }).then(response => {
 			if (mode >= 0 && mode <= 2) response.text().then((text) => { modeText(text); });
 			if (mode === 3) response.json().then((json) => { mode3(json); });
-			if (mode === 4) response.json().then((json) => { mode4(json); });
-			if (mode === 5) response.text().then((text) => { modeText(text); });
-			if (mode === 6) response.json().then((json) => { mode6(json); });
+			if (mode === 4) response.text().then((text) => { modeText(text); });
+			if (mode === 5) response.json().then((json) => { mode5(json); });
 		});
 	</script>
 
