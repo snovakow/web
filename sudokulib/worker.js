@@ -1,8 +1,6 @@
 import { CellCandidate, Grid } from "../sudokulib/Grid.js";
 import { sudokuGenerator, fillSolve, STRATEGY } from "../sudokulib/generator.js";
 
-const PUZZLE_X_SIZE = 100000;
-
 const cells = new Grid();
 for (let i = 0; i < 81; i++) cells[i] = new CellCandidate(i);
 
@@ -16,45 +14,39 @@ let stepMode = 0; // 1=row 2=phist
 const allArray = [];
 
 class StrategyData {
-	constructor(data, strategy, result) {
+	constructor(strategyArray, strategy, result, thisArray = null) {
 		this.strategy = strategy;
 		this.data = result;
-		data.push(this);
+		if (strategyArray) strategyArray.push(strategy);
+		if (thisArray) thisArray.push(strategy);
 		allArray.push(this);
 	}
 }
 
-const simpleDataArray = [];
-const visibleDataArray = [];
+const simples = [];
+new StrategyData(simples, STRATEGY.SIMPLE_HIDDEN, 'hiddenSimple');
+new StrategyData(simples, STRATEGY.SIMPLE_INTERSECTION, 'omissionSimple');
+new StrategyData(simples, STRATEGY.SIMPLE_NAKED, 'nakedSimple');
+
+new StrategyData(null, STRATEGY.VISIBLE_INTERSECTION, 'omissionVisible');
+new StrategyData(null, STRATEGY.VISIBLE_NAKED, 'nakedVisible');
+
 const strategyDataArray = [];
-
-new StrategyData(simpleDataArray, STRATEGY.SIMPLE_HIDDEN, 'hiddenSimple');
-new StrategyData(simpleDataArray, STRATEGY.SIMPLE_INTERSECTION, 'omissionSimple');
-new StrategyData(simpleDataArray, STRATEGY.SIMPLE_NAKED, 'nakedSimple');
-
-new StrategyData(visibleDataArray, STRATEGY.VISIBLE_INTERSECTION, 'omissionVisible');
-new StrategyData(visibleDataArray, STRATEGY.VISIBLE_NAKED, 'nakedVisible');
-
-new StrategyData(strategyDataArray, STRATEGY.NAKED_2, 'naked2');
-new StrategyData(strategyDataArray, STRATEGY.NAKED_3, 'naked3');
-new StrategyData(strategyDataArray, STRATEGY.NAKED_4, 'naked4');
-new StrategyData(strategyDataArray, STRATEGY.HIDDEN_1, 'hidden1');
-new StrategyData(strategyDataArray, STRATEGY.HIDDEN_2, 'hidden2');
-new StrategyData(strategyDataArray, STRATEGY.HIDDEN_3, 'hidden3');
-new StrategyData(strategyDataArray, STRATEGY.HIDDEN_4, 'hidden4');
-new StrategyData(strategyDataArray, STRATEGY.INTERSECTION_REMOVAL, 'omissions');
-new StrategyData(strategyDataArray, STRATEGY.DEADLY_PATTERN, 'uniqueRectangle');
-new StrategyData(strategyDataArray, STRATEGY.Y_WING, 'yWing');
-new StrategyData(strategyDataArray, STRATEGY.XYZ_WING, 'xyzWing');
-new StrategyData(strategyDataArray, STRATEGY.X_WING, 'xWing');
-new StrategyData(strategyDataArray, STRATEGY.SWORDFISH, 'swordfish');
-new StrategyData(strategyDataArray, STRATEGY.JELLYFISH, 'jellyfish');
-
-const simples = [...simpleDataArray];
-for (const strategy of simpleDataArray) simples.push(strategy.strategy);
-
-const strategies = [...strategyDataArray];
-for (const strategy of strategyDataArray) strategies.push(strategy.strategy);
+const strategies = [];
+new StrategyData(strategies, STRATEGY.NAKED_2, 'naked2', strategyDataArray);
+new StrategyData(strategies, STRATEGY.NAKED_3, 'naked3', strategyDataArray);
+new StrategyData(strategies, STRATEGY.NAKED_4, 'naked4', strategyDataArray);
+new StrategyData(strategies, STRATEGY.HIDDEN_1, 'hidden1', strategyDataArray);
+new StrategyData(strategies, STRATEGY.HIDDEN_2, 'hidden2', strategyDataArray);
+new StrategyData(strategies, STRATEGY.HIDDEN_3, 'hidden3', strategyDataArray);
+new StrategyData(strategies, STRATEGY.HIDDEN_4, 'hidden4', strategyDataArray);
+new StrategyData(strategies, STRATEGY.INTERSECTION_REMOVAL, 'omissions', strategyDataArray);
+new StrategyData(strategies, STRATEGY.DEADLY_PATTERN, 'uniqueRectangle', strategyDataArray);
+new StrategyData(strategies, STRATEGY.Y_WING, 'yWing', strategyDataArray);
+new StrategyData(strategies, STRATEGY.XYZ_WING, 'xyzWing', strategyDataArray);
+new StrategyData(strategies, STRATEGY.X_WING, 'xWing', strategyDataArray);
+new StrategyData(strategies, STRATEGY.SWORDFISH, 'swordfish', strategyDataArray);
+new StrategyData(strategies, STRATEGY.JELLYFISH, 'jellyfish', strategyDataArray);
 
 const step = () => {
 	let mode = stepMode;
