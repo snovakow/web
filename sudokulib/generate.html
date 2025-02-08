@@ -292,12 +292,7 @@
 
 		window.addEventListener("beforeunload", (event) => {
 			if (appStage === 0 || !animationLoop) return;
-
-			// Recommended
 			event.preventDefault();
-
-			// Included for legacy support, e.g. Chrome/Edge < 119
-			event.returnValue = true;
 		});
 
 		let strategyCounter = null;
