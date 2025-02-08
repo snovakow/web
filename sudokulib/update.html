@@ -122,13 +122,14 @@
 				makeBold(processedNode, "Processed", strategyCounter.totalPuzzles.toLocaleString());
 				processedNodeOverride = false;
 			}
+
+			const currentCount = startCount + updateDataSent;
 			if (sentNodeOverride) {
 				while (sentNode.firstChild) sentNode.removeChild(sentNode.lastChild);
 				makeBold(sentNode, "Sent", updateDataSent.toLocaleString());
-				const progressTotal = totalCount - startCount;
-				if (progressTotal > 0) {
+				if (totalCount > 0) {
 					sentNode.appendChild(document.createElement("br"));
-					makeBold(sentNode, "Progress", (100 * updateDataSent / progressTotal).toFixed(2) + "%");
+					makeBold(sentNode, "Progress", (100 * currentCount / totalCount).toFixed(2) + "%");
 				}
 				sentNodeOverride = false;
 			}
@@ -154,7 +155,6 @@
 				body.appendChild(document.createElement("br"));
 			}
 
-			const currentCount = startCount + updateDataSent;
 			if (startTime > 0 && updateDataSent > 0) {
 				const passed = Date.now() - startTime;
 				if (passed > 3 * 1000) {
