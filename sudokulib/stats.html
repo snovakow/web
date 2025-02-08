@@ -122,7 +122,7 @@
 			let avg = 0;
 			let counts = 0;
 			for (const [clueCount, count] of Object.entries(data.counts)) {
-				avg += parseInt(clueCount);
+				avg += parseInt(clueCount) * count;
 				counts += count;
 			}
 			avg /= counts;
@@ -146,16 +146,13 @@
 
 			for (const [solveType, countType] of Object.entries(data.countTypes)) {
 				let counts = 0;
-				let total = 0;
-
 				let avg = 0;
 				for (const [clueCount, count] of Object.entries(countType)) {
-					avg += parseInt(clueCount);
-					counts++;
-					total += count;
+					avg += parseInt(clueCount) * count;
+					counts += count;
 				}
 				avg /= counts;
-				printTitle(titles[solveType], avg, total, data.totalCount, 2);
+				printTitle(titles[solveType], avg, counts, data.totalCount, 2);
 				for (const [clueCount, count] of Object.entries(data.counts)) printStat(clueCount, countType[clueCount] ?? 0, count, 2);
 				appendSpace();
 			}
