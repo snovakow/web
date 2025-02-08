@@ -18,7 +18,7 @@ class StrategyData {
 		this.strategy = strategy;
 		this.data = result;
 		if (strategyArray) strategyArray.push(strategy);
-		if (thisArray) thisArray.push(strategy);
+		if (thisArray) thisArray.push(this);
 		allArray.push(this);
 	}
 }
