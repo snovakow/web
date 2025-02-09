@@ -56,7 +56,6 @@ if (!levelMode) {
 
 const puzzleData = {
 	id: null,
-	strategy: null,
 	transform: null,
 	grid: new Uint8Array(81),
 	markers: new Uint16Array(81),
@@ -310,7 +309,7 @@ if (loadGridMetadata) {
 
 Menu.setMenuReponse((responseStrategy) => {
 	if (strategy === responseStrategy) return false;
-	if (!window.confirm("Do you want to start a new " + Menu.menuTitle(strategy) + " puzzle?")) return false;
+	if (!window.confirm("Do you want to start a new " + Menu.menuTitle(responseStrategy) + " puzzle?")) return false;
 	window.location.search = "?strategy=" + responseStrategy;
 	return true;
 });
@@ -448,6 +447,7 @@ const loadSudoku = () => {
 			puzzleData.id = puzzleId;
 			puzzleData.transform = transform;
 			puzzleData.grid = gridTransformed;
+			puzzleData.markers.fill(0);
 
 			Undo.set(board);
 			saveData();
@@ -458,6 +458,56 @@ const loadSudoku = () => {
 
 if (!loaded && !levelMode && strategy !== 'custom' && strategy !== 'hardcoded') {
 	loadSudoku();
+}
+
+if (!loaded && strategy === "level") {
+	const worker = new Worker("finder.js", { type: "module" });
+	let findCount = 0;
+	let findStartTime = performance.now();
+	worker.onmessage = (e) => {
+		const data = e.data;
+		findCount++;
+
+		const puzzleId = data.id;
+
+		const puzzle = data.puzzleClues;
+		const grid = data.puzzleFilled;
+
+		const transform = generateTransform();
+		const puzzleTransformed = generateFromSeed(puzzle, transform);
+		const gridTransformed = generateFromSeed(grid, transform);
+
+		const puzzleString = puzzleTransformed.join("");
+		board.cells.fromString(puzzleString);
+		board.puzzleSolved.set(gridTransformed);
+		for (const cell of board.cells) {
+			const startCell = board.startCells[cell.index];
+			startCell.symbol = cell.symbol;
+		}
+		board.errorCells.clear();
+
+		puzzleData.id = puzzleId;
+		puzzleData.transform = transform;
+		puzzleData.grid = gridTransformed;
+		puzzleData.markers.fill(0);
+
+		Undo.set(board);
+		saveData();
+		draw();
+
+		if (data.solved) {
+			const time = performance.now() - findStartTime;
+			console.log(`${findCount} tries in ${time / 1000}s`);
+		}
+		// data.cells;
+		// data.clueCount;
+		// data.puzzle;
+		// data.puzzleClues;
+		// data.puzzleFilled;
+	};
+	const workerData = {};
+	worker.postMessage(workerData);
+	// worker.terminate();	
 }
 
 title.style.fontSize = (headerHeight * 0.75) + 'px';
