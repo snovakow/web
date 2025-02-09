@@ -423,16 +423,15 @@ if (strategy === 'custom' || strategy === 'hardcoded') {
 }
 
 const loadLevel = () => {
-	let start = 0;
-	let tickRate = 0.1 * 1000;
-	let tickTime = 0;
+	let startTime = 0;
+	const tickRate = 0.1 * 1000;
 	const puzzles = [];
 	const worker = new Worker("finder.js", { type: "module" });
 
-	const step = (timestamp) => {
-		const animationId = requestAnimationFrame(step);
-		if (start === 0) start = timestamp;
-		const elapsed = timestamp - start;
+	const animation = (timestamp) => {
+		const animationId = requestAnimationFrame(animation);
+		if (startTime === 0) startTime = timestamp;
+		const elapsed = timestamp - startTime;
 
 		const tick = Math.floor(elapsed / tickRate) * tickRate;
 		if (tick === tickTime) return;
@@ -473,7 +472,7 @@ const loadLevel = () => {
 			saveData();
 		}
 	}
-	requestAnimationFrame(step);
+	requestAnimationFrame(animation);
 
 	let findCount = 0;
 	let findStartTime = performance.now();
