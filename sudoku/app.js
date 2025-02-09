@@ -309,7 +309,7 @@ if (loadGridMetadata) {
 
 Menu.setMenuReponse((responseStrategy) => {
 	if (strategy === responseStrategy) return false;
-	if (!window.confirm("Do you want to start a new " + Menu.menuTitle(responseStrategy) + " puzzle?")) return false;
+	if (!window.confirm("Do you want to start a " + Menu.menuTitle(responseStrategy) + " puzzle?")) return false;
 	window.location.search = "?strategy=" + responseStrategy;
 	return true;
 });
