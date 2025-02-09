@@ -422,7 +422,86 @@ if (strategy === 'custom' || strategy === 'hardcoded') {
 	});
 }
 
+const loadLevel = () => {
+	let start = 0;
+	let tickRate = 0.1 * 1000;
+	let tickTime = 0;
+	const puzzles = [];
+	const worker = new Worker("finder.js", { type: "module" });
+
+	const step = (timestamp) => {
+		const animationId = requestAnimationFrame(step);
+		if (start === 0) start = timestamp;
+		const elapsed = timestamp - start;
+
+		const tick = Math.floor(elapsed / tickRate) * tickRate;
+		if (tick === tickTime) return;
+		tickTime = tick;
+
+		const data = puzzles.shift();
+		if (!data) return;
+
+		const puzzleId = data.id;
+
+		const puzzle = data.puzzleClues;
+		const grid = data.puzzleFilled;
+
+		const transform = generateTransform();
+		const puzzleTransformed = generateFromSeed(puzzle, transform);
+		const gridTransformed = generateFromSeed(grid, transform);
+
+		const puzzleString = puzzleTransformed.join("");
+		board.cells.fromString(puzzleString);
+		board.puzzleSolved.set(gridTransformed);
+		for (const cell of board.cells) {
+			const startCell = board.startCells[cell.index];
+			startCell.symbol = cell.symbol;
+		}
+		board.errorCells.clear();
+
+		puzzleData.id = puzzleId;
+		puzzleData.transform = transform;
+		puzzleData.grid = gridTransformed;
+		puzzleData.markers.fill(0);
+
+		draw();
+
+		if (data.solved) {
+			cancelAnimationFrame(animationId);
+
+			Undo.set(board);
+			saveData();
+		}
+	}
+	requestAnimationFrame(step);
+
+	let findCount = 0;
+	let findStartTime = performance.now();
+	worker.onmessage = (e) => {
+		const data = e.data;
+		puzzles.push(data);
+		findCount++;
+		if (data.solved) {
+			const time = performance.now() - findStartTime;
+			console.log(`${findCount} tries in ${time / 1000}s`);
+			console.log(`${findCount / time * 1000}/s`);
+			console.log(`${time / findCount / 1000}s avg`);
+
+			worker.terminate();
+		}
+	};
+	const workerData = {};
+	worker.postMessage(workerData);
+}
+
 const loadSudoku = () => {
+	if (strategy === "level") {
+		loadLevel();
+		return;
+	} else {
+		if (strategy === 'custom' || strategy === 'hardcoded') return;
+	}
+
 	fetch("../sudokulib/sudoku.php?version=2&strategy=" + strategy).then(response => {
 		response.json().then((json) => {
 			const puzzleId = json.id;
@@ -456,59 +535,7 @@ const loadSudoku = () => {
 	});
 };
 
-if (!loaded && !levelMode && strategy !== 'custom' && strategy !== 'hardcoded') {
-	loadSudoku();
-}
-
-if (!loaded && strategy === "level") {
-	const worker = new Worker("finder.js", { type: "module" });
-	let findCount = 0;
-	let findStartTime = performance.now();
-	worker.onmessage = (e) => {
-		const data = e.data;
-		findCount++;
-
-		const puzzleId = data.id;
-
-		const puzzle = data.puzzleClues;
-		const grid = data.puzzleFilled;
-
-		const transform = generateTransform();
-		const puzzleTransformed = generateFromSeed(puzzle, transform);
-		const gridTransformed = generateFromSeed(grid, transform);
-
-		const puzzleString = puzzleTransformed.join("");
-		board.cells.fromString(puzzleString);
-		board.puzzleSolved.set(gridTransformed);
-		for (const cell of board.cells) {
-			const startCell = board.startCells[cell.index];
-			startCell.symbol = cell.symbol;
-		}
-		board.errorCells.clear();
-
-		puzzleData.id = puzzleId;
-		puzzleData.transform = transform;
-		puzzleData.grid = gridTransformed;
-		puzzleData.markers.fill(0);
-
-		Undo.set(board);
-		saveData();
-		draw();
-
-		if (data.solved) {
-			const time = performance.now() - findStartTime;
-			console.log(`${findCount} tries in ${time / 1000}s`);
-		}
-		// data.cells;
-		// data.clueCount;
-		// data.puzzle;
-		// data.puzzleClues;
-		// data.puzzleFilled;
-	};
-	const workerData = {};
-	worker.postMessage(workerData);
-	// worker.terminate();	
-}
+if (!loaded) loadSudoku();
 
 title.style.fontSize = (headerHeight * 0.75) + 'px';
 title.style.fontWeight = 'bold';
@@ -815,7 +842,8 @@ if (strategy === 'custom') {
 	Menu.newPuzzle.style.display = 'none';
 } else {
 	Menu.newPuzzle.addEventListener('click', () => {
-		if (!window.confirm("Do you want to start a new " + Menu.menuTitle(strategy) + " puzzle?")) return;
+		const name = levelMode ? titleString : Menu.menuTitle(strategy);
+		if (!window.confirm("Do you want to find a new " + name + " puzzle?")) return;
 		selected = false;
 		loadSudoku();
 	});
@@ -823,7 +851,7 @@ if (strategy === 'custom') {
 
 Menu.reset.addEventListener('click', () => {
 	const name = levelMode ? titleString : Menu.menuTitle(strategy);
-	if (!window.confirm("Do you want to restart the " + name + " puzzle?")) return;
+	if (!window.confirm("Do you want to restart this " + name + " puzzle?")) return;
 	selected = false;
 	board.resetGrid();
 	Undo.set(board);
