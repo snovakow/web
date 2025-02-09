@@ -15,6 +15,7 @@ module.exports = {
 		new CopyPlugin({
 			patterns: [
 				{ from: 'icons', to: 'icons' },
+				{ from: 'finder.js', to: 'finder.js' },
 				{ from: '../sudokulib/generate.html', to: '../sudokulib/generate.html' },
 				{ from: '../sudokulib/update.html', to: '../sudokulib/update.html' },
 				{ from: '../sudokulib/generate.php', to: '../sudokulib/generate.php' },
