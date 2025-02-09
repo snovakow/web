@@ -425,6 +425,7 @@ if (strategy === 'custom' || strategy === 'hardcoded') {
 const loadLevel = () => {
 	let startTime = 0;
 	const tickRate = 0.1 * 1000;
+	let tickTime = 0;
 	const puzzles = [];
 	const worker = new Worker("finder.js", { type: "module" });
 
