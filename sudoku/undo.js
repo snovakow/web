@@ -72,6 +72,12 @@ function set(board) {
     setIconState();
 }
 
+function clear() {
+    leadIndex = -1;
+    undoStack.splice(0, Infinity);
+    setIconState();
+}
+
 function add(board, selectedIndex) {
     if (leadIndex >= 0) {
         const lead = undoStack[leadIndex];
@@ -135,4 +141,4 @@ function loadData(data) {
     setIconState();
 }
 
-export { set, add, undo, redo, saveData, loadData };
+export { set, clear, add, undo, redo, saveData, loadData };

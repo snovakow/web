@@ -423,55 +423,104 @@ if (strategy === 'custom' || strategy === 'hardcoded') {
 }
 
 const loadLevel = () => {
+	class Level {
+		constructor(data) {
+			data = data ?? {
+				id: 0,
+				puzzleClues: 0,
+				puzzleFilled: 0,
+				solved: false
+			};
+
+			this.data = data;
+			this.order = new Uint8Array(81);
+
+			for (let i = 0; i < 81; i++) this.order[i] = i;
+			for (let i = 0; i < 81; i++) {
+				const position = Math.floor(Math.random() * 81);
+				if (position !== i) {
+					const tmp = this.order[position];
+					this.order[position] = this.order[i];
+					this.order[i] = tmp;
+				}
+			}
+
+			const transform = generateTransform();
+			const puzzleTransformed = generateFromSeed(data.puzzleClues, transform);
+			const gridTransformed = generateFromSeed(data.puzzleFilled, transform);
+
+			this.transform = transform;
+			this.puzzleTransformed = puzzleTransformed;
+			this.gridTransformed = gridTransformed;
+		}
+	}
 	let startTime = 0;
-	const tickRate = 0.1 * 1000;
-	let tickTime = 0;
-	const puzzles = [];
+	const puzzleDatas = [new Level()];
 	const worker = new Worker("finder.js", { type: "module" });
+
+	const cellProgressRate = 0.5 * 1000;
+	let workingLevel = null;
+
+	board.errorCells.clear();
+	Undo.clear();
 
 	const animation = (timestamp) => {
 		const animationId = requestAnimationFrame(animation);
 		if (startTime === 0) startTime = timestamp;
 		const elapsed = timestamp - startTime;
 
-		const tick = Math.floor(elapsed / tickRate) * tickRate;
-		if (tick === tickTime) return;
-		tickTime = tick;
+		const puzzleMark = Math.min(Math.floor(elapsed / cellProgressRate), puzzleDatas.length - 1);
+		if (puzzleMark < 0) return;
+		const cellMark = (elapsed - puzzleMark * cellProgressRate) / cellProgressRate;
+		const cellIndex = Math.min(Math.floor(cellMark * 81), 80);
 
-		const data = puzzles.shift();
-		if (!data) return;
-
-		const puzzleId = data.id;
-
-		const puzzle = data.puzzleClues;
-		const grid = data.puzzleFilled;
-
-		const transform = generateTransform();
-		const puzzleTransformed = generateFromSeed(puzzle, transform);
-		const gridTransformed = generateFromSeed(grid, transform);
-
-		const puzzleString = puzzleTransformed.join("");
-		board.cells.fromString(puzzleString);
-		board.puzzleSolved.set(gridTransformed);
-		for (const cell of board.cells) {
-			const startCell = board.startCells[cell.index];
-			startCell.symbol = cell.symbol;
+		const level = puzzleDatas[puzzleMark];
+		if (workingLevel !== level) {
+			if(workingLevel) {
+				const puzzle = workingLevel.puzzleTransformed;
+				for (let i = 0; i < 81; i++) {
+					const index = workingLevel.order[i];
+					const cell = board.cells[index];
+					cell.symbol = puzzle[index];
+				}	
+			}
+			workingLevel = level;
 		}
-		board.errorCells.clear();
 
-		puzzleData.id = puzzleId;
-		puzzleData.transform = transform;
-		puzzleData.grid = gridTransformed;
-		puzzleData.markers.fill(0);
+		const data = level.data;
+		const puzzle = level.puzzleTransformed;
+		for (let i = 0; i <= cellIndex; i++) {
+			const index = level.order[i];
+			const cell = board.cells[index];
+			cell.symbol = puzzle[index];
+		}
 
-		draw();
-
-		if (data.solved) {
+		if (data.solved && puzzleMark === puzzleDatas.length - 1 && cellIndex === 80) {
 			cancelAnimationFrame(animationId);
+
+			const puzzleId = data.id;
+
+			const transform = level.transform;
+			const puzzleTransformed = level.puzzleTransformed;
+			const gridTransformed = level.gridTransformed;
+
+			const puzzleString = puzzleTransformed.join("");
+			board.cells.fromString(puzzleString);
+			board.puzzleSolved.set(gridTransformed);
+			for (const cell of board.cells) {
+				const startCell = board.startCells[cell.index];
+				startCell.symbol = cell.symbol;
+			}
+
+			puzzleData.id = puzzleId;
+			puzzleData.transform = transform;
+			puzzleData.grid = gridTransformed;
+			puzzleData.markers.fill(0);
 
 			Undo.set(board);
 			saveData();
 		}
+		draw();
 	}
 	requestAnimationFrame(animation);
 
@@ -479,7 +528,7 @@ const loadLevel = () => {
 	let findStartTime = performance.now();
 	worker.onmessage = (e) => {
 		const data = e.data;
-		puzzles.push(data);
+		puzzleDatas.push(new Level(data));
 		findCount++;
 		if (data.solved) {
 			const time = performance.now() - findStartTime;
