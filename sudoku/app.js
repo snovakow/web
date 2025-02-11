@@ -453,6 +453,7 @@ const loadLevel = () => {
 	}
 	const worker = new Worker("finder.js", { type: "module" });
 	const cellProgressRate = 1.0 * 1000;
+	const cellClearRate = 3.0 * 1000;
 
 	/* animationStage
 		0 empty
@@ -488,7 +489,7 @@ const loadLevel = () => {
 
 		if (animationStage === 0) {
 			const elapsed = timestamp - startTime;
-			const cellIndex = Math.min(Math.floor(elapsed / cellProgressRate * 80), 80);
+			const cellIndex = Math.min(Math.floor(elapsed / cellClearRate * 81), 80);
 			for (let i = 0; i <= cellIndex; i++) {
 				const index = stageClear.order[i];
 				const cell = board.cells[index];
@@ -501,7 +502,7 @@ const loadLevel = () => {
 			if (stageUnsolved.length > 0) {
 				const stage = stageUnsolved[0];
 				const elapsed = timestamp - stageUnsolvedStart;
-				const cellIndex = Math.min(Math.floor(elapsed / cellProgressRate * 80), 80);
+				const cellIndex = Math.min(Math.floor(elapsed / cellProgressRate * 81), 80);
 				for (let i = 0; i <= cellIndex; i++) {
 					const index = stage.order[i];
 					const cell = board.cells[index];
@@ -509,7 +510,8 @@ const loadLevel = () => {
 				}
 				if (cellIndex === 80) {
 					stageUnsolvedStart = timestamp;
-					stageUnsolved.shift();
+					const usedLevel = stageUnsolved.shift();
+					if (stageUnsolved.length === 0) stageUnsolved.push(new Level(usedLevel.data));
 				}
 			} else {
 				stageUnsolvedStart = timestamp;
@@ -518,7 +520,7 @@ const loadLevel = () => {
 		}
 		if (animationStage === 2) {
 			const elapsed = timestamp - stageSolvedStart;
-			const cellIndex = Math.min(Math.floor(elapsed / cellProgressRate * 80), 80);
+			const cellIndex = Math.min(Math.floor(elapsed / cellProgressRate * 81), 80);
 			for (let i = 0; i <= cellIndex; i++) {
 				const index = stageSolved.order[i];
 				const cell = board.cells[index];
