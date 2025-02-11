@@ -130,6 +130,7 @@ const puzzleFinished = () => {
 
 const click = (event) => {
 	// event.preventDefault();
+	if (findAnimating) return;
 
 	const rect = event.target.getBoundingClientRect();
 	const x = event.clientX - rect.left;
@@ -422,16 +423,10 @@ if (strategy === 'custom' || strategy === 'hardcoded') {
 	});
 }
 
+let findAnimating = false;
 const loadLevel = () => {
 	class Level {
 		constructor(data) {
-			data = data ?? {
-				id: 0,
-				puzzleClues: 0,
-				puzzleFilled: 0,
-				solved: false
-			};
-
 			this.data = data;
 			this.order = new Uint8Array(81);
 
@@ -445,64 +440,102 @@ const loadLevel = () => {
 				}
 			}
 
-			const transform = generateTransform();
-			const puzzleTransformed = generateFromSeed(data.puzzleClues, transform);
-			const gridTransformed = generateFromSeed(data.puzzleFilled, transform);
+			if (data) {
+				const transform = generateTransform();
+				const puzzleTransformed = generateFromSeed(data.puzzleClues, transform);
+				const gridTransformed = generateFromSeed(data.puzzleFilled, transform);
 
-			this.transform = transform;
-			this.puzzleTransformed = puzzleTransformed;
-			this.gridTransformed = gridTransformed;
+				this.transform = transform;
+				this.puzzleTransformed = puzzleTransformed;
+				this.gridTransformed = gridTransformed;
+			}
 		}
 	}
-	let startTime = 0;
-	const puzzleDatas = [new Level()];
 	const worker = new Worker("finder.js", { type: "module" });
+	const cellProgressRate = 1.0 * 1000;
 
-	const cellProgressRate = 0.5 * 1000;
-	let workingLevel = null;
+	/* animationStage
+		0 empty
+		1 unsolved or stalled
+		2 solved
+		3 complete
+		4 animation terminated
+	*/
+	findAnimating = true;
+
+	let animationStage = 0;
+	let startTime = 0;
+	let stageSolvedStart = 0;
+	let stageUnsolvedStart = 0;
+	const stageClear = new Level();
+	const stageUnsolved = [];
+	let stageSolved = null;
 
 	board.errorCells.clear();
 	Undo.clear();
+	selected = false;
 
 	const animation = (timestamp) => {
 		const animationId = requestAnimationFrame(animation);
 		if (startTime === 0) startTime = timestamp;
-		const elapsed = timestamp - startTime;
 
-		const puzzleMark = Math.min(Math.floor(elapsed / cellProgressRate), puzzleDatas.length - 1);
-		if (puzzleMark < 0) return;
-		const cellMark = (elapsed - puzzleMark * cellProgressRate) / cellProgressRate;
-		const cellIndex = Math.min(Math.floor(cellMark * 81), 80);
+		if (animationStage === 0 && !stageSolved && stageUnsolved.length > 0) {
+			animationStage = 1;
+		}
+		if (animationStage <= 1 && stageSolved) {
+			animationStage = 2;
+		}
 
-		const level = puzzleDatas[puzzleMark];
-		if (workingLevel !== level) {
-			if(workingLevel) {
-				const puzzle = workingLevel.puzzleTransformed;
-				for (let i = 0; i < 81; i++) {
-					const index = workingLevel.order[i];
-					const cell = board.cells[index];
-					cell.symbol = puzzle[index];
-				}	
+		if (animationStage === 0) {
+			const elapsed = timestamp - startTime;
+			const cellIndex = Math.min(Math.floor(elapsed / cellProgressRate * 80), 80);
+			for (let i = 0; i <= cellIndex; i++) {
+				const index = stageClear.order[i];
+				const cell = board.cells[index];
+				cell.symbol = 0;
 			}
-			workingLevel = level;
+			stageUnsolvedStart = timestamp;
+			stageSolvedStart = timestamp;
 		}
-
-		const data = level.data;
-		const puzzle = level.puzzleTransformed;
-		for (let i = 0; i <= cellIndex; i++) {
-			const index = level.order[i];
-			const cell = board.cells[index];
-			cell.symbol = puzzle[index];
+		if (animationStage === 1) {
+			if (stageUnsolved.length > 0) {
+				const stage = stageUnsolved[0];
+				const elapsed = timestamp - stageUnsolvedStart;
+				const cellIndex = Math.min(Math.floor(elapsed / cellProgressRate * 80), 80);
+				for (let i = 0; i <= cellIndex; i++) {
+					const index = stage.order[i];
+					const cell = board.cells[index];
+					cell.symbol = stage.puzzleTransformed[index];
+				}
+				if (cellIndex === 80) {
+					stageUnsolvedStart = timestamp;
+					stageUnsolved.shift();
+				}
+			} else {
+				stageUnsolvedStart = timestamp;
+			}
+			stageSolvedStart = timestamp;
 		}
-
-		if (data.solved && puzzleMark === puzzleDatas.length - 1 && cellIndex === 80) {
+		if (animationStage === 2) {
+			const elapsed = timestamp - stageSolvedStart;
+			const cellIndex = Math.min(Math.floor(elapsed / cellProgressRate * 80), 80);
+			for (let i = 0; i <= cellIndex; i++) {
+				const index = stageSolved.order[i];
+				const cell = board.cells[index];
+				cell.symbol = stageSolved.puzzleTransformed[index];
+			}
+			if (cellIndex === 80) animationStage = 3;
+		}
+		if (animationStage === 3) {
+			animationStage = 4;
 			cancelAnimationFrame(animationId);
+			const data = stageSolved.data;
 
 			const puzzleId = data.id;
 
-			const transform = level.transform;
-			const puzzleTransformed = level.puzzleTransformed;
-			const gridTransformed = level.gridTransformed;
+			const transform = stageSolved.transform;
+			const puzzleTransformed = stageSolved.puzzleTransformed;
+			const gridTransformed = stageSolved.gridTransformed;
 
 			const puzzleString = puzzleTransformed.join("");
 			board.cells.fromString(puzzleString);
@@ -519,6 +552,7 @@ const loadLevel = () => {
 
 			Undo.set(board);
 			saveData();
+			findAnimating = false;
 		}
 		draw();
 	}
@@ -528,15 +562,18 @@ const loadLevel = () => {
 	let findStartTime = performance.now();
 	worker.onmessage = (e) => {
 		const data = e.data;
-		puzzleDatas.push(new Level(data));
 		findCount++;
 		if (data.solved) {
+			stageSolved = new Level(data);
+
 			const time = performance.now() - findStartTime;
 			console.log(`${findCount} tries in ${time / 1000}s`);
 			console.log(`${findCount / time * 1000}/s`);
 			console.log(`${time / findCount / 1000}s avg`);
 
 			worker.terminate();
+		} else {
+			stageUnsolved.push(new Level(data));
 		}
 	};
 	const workerData = {};
@@ -660,6 +697,8 @@ Menu.deleteButton.addEventListener('click', () => {
 });
 
 Menu.checkButton.addEventListener('click', () => {
+	if (findAnimating) return;
+
 	let errorCount = 0;
 	let solved = true;
 	board.errorCells.clear();
@@ -891,6 +930,8 @@ if (strategy === 'custom') {
 	Menu.newPuzzle.style.display = 'none';
 } else {
 	Menu.newPuzzle.addEventListener('click', () => {
+		if (findAnimating) return;
+
 		const name = levelMode ? titleString : Menu.menuTitle(strategy);
 		if (!window.confirm("Do you want to find a new " + name + " puzzle?")) return;
 		selected = false;
@@ -899,6 +940,8 @@ if (strategy === 'custom') {
 }
 
 Menu.reset.addEventListener('click', () => {
+	if (findAnimating) return;
+
 	const name = levelMode ? titleString : Menu.menuTitle(strategy);
 	if (!window.confirm("Do you want to restart this " + name + " puzzle?")) return;
 	selected = false;
