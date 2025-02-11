@@ -263,6 +263,15 @@ try {
 		echo tableStrategyLogic($tableCount, "xWing", "candidate_xWing");
 		echo tableStrategyLogic($tableCount, "swordfish", "candidate_swordfish");
 		echo tableStrategyLogic($tableCount, "jellyfish", "candidate_jellyfish");
+
+		$unions = [];
+		for ($i = 1; $i <= $tableCount; $i++) {
+			$table = tableName($i);
+			$unions[] = "SELECT $i AS `Table`, COUNT(*) AS `Count` FROM `$table` WHERE `hiddenSimple`=0 AND `solveType`=0";
+		}
+		$select = implode(" UNION ALL ", $unions);
+		$sql = "SELECT `Table` AS `Incomplete`, `Count` FROM ($select) AS unions WHERE `Count`>0;";
+		echo "$sql\n";
 	}
 
 	if ($mode === 2) {
