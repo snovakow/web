@@ -600,16 +600,10 @@ const loadLevel = () => {
 			const currentIndex = Math.floor(currentPoint);
 
 			if (!this.solved) {
-				if (currentIndex - this.steps.length > 81) {
-					this.startTime = timestamp;
-					this.processedIndex = -1;
-					this.steps.splice(0);
-					this.addTransform();
-				} else {
-					while (currentIndex >= this.steps.length) {
-						this.addTransform();
-					}
-				}
+				if (currentIndex >= this.steps.length) this.addTransform();
+
+				const diff = currentIndex - (this.steps.length - 1);
+				if (diff > 0) this.startTime += diff / TICK_RATE;
 			}
 
 			const currentIndexMin = Math.min(currentIndex, this.steps.length - 1);
