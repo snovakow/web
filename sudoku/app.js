@@ -48,9 +48,9 @@ let strategy = "level";
 	}
 }
 
+Menu.markerButton.style.display = "block";
 if (!levelMode) {
 	Menu.menu.style.display = "block";
-	Menu.markerButton.style.display = "block";
 	Menu.autoBar.style.display = "block flex";
 }
 
@@ -692,7 +692,7 @@ const loadLevel = () => {
 	const workerData = {};
 	worker.postMessage(workerData);
 }
-loadLevel();
+
 const loadSudoku = () => {
 	if (strategy === "level") {
 		loadLevel();
