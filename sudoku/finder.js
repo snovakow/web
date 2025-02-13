@@ -103,8 +103,6 @@ const step = () => {
 	data.puzzleFilled = puzzleFilled.join('');
 	data.clueCount = clueCount;
 
-	data.solved = solved;
-
 	puzzleCount++;
 	data.id = puzzleCount;
 	data.solved = solved;
