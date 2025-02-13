@@ -224,7 +224,7 @@ if (document.fullscreenEnabled) {
 		updateFullscreen();
 	});
 
-	fullscreen.style.display = "none";
+	// fullscreen.style.display = "none";
 }
 
 menu.style.display = "none";
