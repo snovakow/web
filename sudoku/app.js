@@ -1078,17 +1078,14 @@ const resize = () => {
 	if (landscapeSize > portraitSize) {
 		boxSize = landscapeSize;
 
-		let inset = padding;
-		if (boxSize < landscapeWidth) {
-			inset += Math.floor((landscapeWidth - boxSize) / 2);
-		}
+		const buffer = Math.max(landscapeWidth - boxSize, 0) / 3;
 
 		board.canvas.style.top = '50%';
-		board.canvas.style.left = inset + 'px';
+		board.canvas.style.left = padding + buffer + 'px';
 		board.canvas.style.transform = 'translate(0%, -50%)';
 
 		pickerContainer.style.bottom = '50%';
-		pickerContainer.style.right = padding + 'px';
+		pickerContainer.style.right = padding + buffer + 'px';
 		pickerContainer.style.transform = 'translate(0, 50%)';
 
 		Menu.pickerBar.style.top = '100%';
@@ -1107,16 +1104,13 @@ const resize = () => {
 	} else {
 		boxSize = portraitSize;
 
-		let inset = 0;
-		if (boxSize < portraitHeight) {
-			inset += Math.floor((portraitHeight - boxSize) / 2);
-		}
+		const buffer = Math.max(portraitHeight - boxSize, 0) / 3;
 
-		board.canvas.style.top = inset + 'px';
+		board.canvas.style.top = buffer + 'px';
 		board.canvas.style.left = '50%';
 		board.canvas.style.transform = 'translate(-50%, 0%)';
 
-		pickerContainer.style.bottom = 0 + 'px';
+		pickerContainer.style.bottom = buffer + 'px';
 		pickerContainer.style.right = '50%';
 		pickerContainer.style.transform = 'translate(50%, 0%)';
 
