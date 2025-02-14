@@ -137,14 +137,6 @@ function tableStrategyLogic($tableCount, $strategy, $tableName, $frequency = 1, 
 	$sql = tableStatement($tableCount, $strategy, $tableName, $logic, $min);
 	return "$sql\n";
 }
-function tableSimpleLogic($tableCount, $solveType, $strategy, $tableName, $order = "DESC")
-{
-	$fields = ["count", "clueCount"];
-	$select = "`$strategy` AS count, `clueCount`";
-	$logic = "`solveType`=$solveType";
-	$sql = tableGeneralStatement($tableCount, "$tableName", $fields, $select, $logic, "count $order");
-	return "$sql\n";
-}
 
 function strategyLogic($strategy, $priority = "", $frequency = 1)
 {
@@ -244,11 +236,6 @@ try {
 	}
 
 	if ($mode === 1) {
-		echo tableSimpleLogic($tableCount, 0, "hiddenSimple", "simple_hidden", "ASC");
-		echo tableSimpleLogic($tableCount, 1, "omissionSimple", "simple_omission");
-		echo tableSimpleLogic($tableCount, 2, "nakedSimple", "simple_naked");
-		echo tableSimpleLogic($tableCount, 3, "omissionVisible", "candidate_visible");
-
 		echo tableStrategyLogic($tableCount, "naked2", "candidate_naked2");
 		echo tableStrategyLogic($tableCount, "naked3", "candidate_naked3");
 		echo tableStrategyLogic($tableCount, "naked4", "candidate_naked4");
@@ -278,10 +265,6 @@ try {
 		echo "--- Populated Tables ", number_format($totalCount), "\n\n";
 
 		$tableNames = [
-			"simple_hidden",
-			"simple_omission",
-			"simple_naked",
-			"candidate_visible",
 			"candidate_naked2",
 			"candidate_naked3",
 			"candidate_naked4",

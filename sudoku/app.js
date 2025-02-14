@@ -18,10 +18,6 @@ let strategy = "level";
 	const searchParams = new URLSearchParams(window.location.search);
 	const strategySearch = searchParams.get("strategy");
 	const strategyNames = [
-		"simple_hidden",
-		"simple_omission",
-		"simple_naked",
-		"candidate_visible",
 		"candidate_naked2",
 		"candidate_naked3",
 		"candidate_naked4",
@@ -739,10 +735,6 @@ title.style.top = headerHeight / 2 + 'px';
 title.style.left = '50%';
 title.style.transform = 'translate(-50%, -50%)';
 let titleString = null;
-if (strategy === 'simple_hidden') titleString = "Hidden Single";
-if (strategy === 'simple_omission') titleString = "Intersection Removal";
-if (strategy === 'simple_naked') titleString = "Naked Single";
-if (strategy === 'candidate_visible') titleString = "Simple Candidates";
 if (strategy === 'candidate_naked2') titleString = "Naked Pair";
 if (strategy === 'candidate_naked3') titleString = "Naked Triple";
 if (strategy === 'candidate_naked4') titleString = "Naked Quad";

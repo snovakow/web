@@ -9,9 +9,6 @@ $type = $_GET['strategy'];
 $strategy = "";
 
 $tableNames = [
-	"simple_hidden",
-	"simple_omission",
-	"simple_naked",
 	"candidate_naked2",
 	"candidate_naked3",
 	"candidate_naked4",
