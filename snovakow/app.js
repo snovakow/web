@@ -15,12 +15,26 @@ iframe.style.width = "100%";
 iframe.style.border = 0;
 document.body.appendChild(iframe);
 
-addLink("Sudoku", "/sudoku?strategy=simple");
-addLink("Sudoku About", "/sudoku/about.html");
+addLink("Naked Pair", "./sudoku/?strategy=candidate_naked2");
+addLink("Naked Triple", "./sudoku/?strategy=candidate_naked3");
+addLink("Naked Quad", "./sudoku/?strategy=candidate_naked4");
+addLink("Hidden Single", "./sudoku/?strategy=candidate_hidden1");
+addLink("Hidden Pair", "./sudoku/?strategy=candidate_hidden2");
+addLink("Hidden Triple", "./sudoku/?strategy=candidate_hidden3");
+addLink("Hidden Quad", "./sudoku/?strategy=candidate_hidden4");
+addLink("Intersection Removal", "./sudoku/?strategy=candidate_omissions");
+addLink("Deadly Pattern", "./sudoku/?strategy=candidate_uniqueRectangle");
+addLink("Y Wing", "./sudoku/?strategy=candidate_yWing");
+addLink("XYZ Wing", "./sudoku/?strategy=candidate_xyzWing");
+addLink("X Wing", "./sudoku/?strategy=candidate_xWing");
+addLink("Swordfish", "./sudoku/?strategy=candidate_swordfish");
+addLink("Jellyfish", "./sudoku/?strategy=candidate_jellyfish");
+
+addLink("Sudoku About", "./sudoku/about.html");
 // addLink("Bounder", "/bounder/");
 
-addLink("Resume", "/resume/");
-addLink("LinkedIn", "https://www.linkedin.com/in/snovakow/");
+// addLink("Resume", "/resume/");
+// addLink("LinkedIn", "https://www.linkedin.com/in/snovakow/");
 
 function resizeIFrameToFitContent() {
 	const iframe = document.getElementById('iframe');

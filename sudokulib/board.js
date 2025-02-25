@@ -231,13 +231,17 @@ const cellsToStorage = (metadata) => {
 
 const saveGrid = (metadata) => {
 	const data = JSON.stringify(cellsToStorage(metadata));
-	sessionStorage.setItem("saveData", data);
+	// sessionStorage.setItem("saveData", data);
+	window.name = data;
 };
 const loadGrid = () => {
-	const data = sessionStorage.getItem("saveData");
-
-	if (data === null) return null;
-	return storageToCells(JSON.parse(data));
+	// const data = sessionStorage.getItem("saveData");
+	const data = window.name;
+	try {
+		return storageToCells(JSON.parse(data));
+	} catch (error) {
+		return null;
+	}
 };
 
 export { board, FONT, loadGrid, saveGrid };
