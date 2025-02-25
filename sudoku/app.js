@@ -918,11 +918,7 @@ Menu.infoButton.addEventListener('click', () => {
 		infoBacking.appendChild(closeButton);
 	}
 
-	if (infoBacking.parentElement) {
-		infoBacking.parentElement.removeChild(infoBacking);
-	} else {
-		document.body.appendChild(infoBacking);
-	}
+	if (!infoBacking.parentElement) document.body.appendChild(infoBacking);
 });
 
 const fillButton = document.createElement('button');
