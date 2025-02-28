@@ -44,13 +44,6 @@
 		}
 
 		const mode3 = (data) => {
-			const hiddenSimple = data.hiddenSimple;
-			const omissionSimple = data.omissionSimple;
-			const nakedSimple = data.nakedSimple;
-			const omissionVisible = data.omissionVisible;
-			const candidate = data.candidate;
-			const candidateMin = data.candidateMin;
-			const unsolvable = data.unsolvable;
 			const totalCount = data.totalCount;
 			let runningTotal = 0;
 
@@ -92,7 +85,6 @@
 				fields.push(`${runningPercent}`.padStart(len3));
 				fields.push(`${number}`.padStart(len4));
 				appendLine(fields.join(" "));
-
 			};
 			printLine("Hidden Simple", data.hiddenSimple);
 			printLine("Omission Simple", data.omissionSimple);
@@ -100,6 +92,25 @@
 			printLine("Omission Visible", data.omissionVisible);
 			printLine("Candidate", data.candidate + data.candidateMin, data.candidateMin);
 			printLine("Unsolvable", data.unsolvable);
+
+			const printSimpleLine = (title, count) => {
+				const percent = percentage(count, totalCount, fixed);
+				const number = count.toLocaleString();
+
+				fields = [];
+				fields.push(title.padEnd(14));
+				fields.push(`${percent}`.padStart(6));
+				fields.push(`${number}`.padStart(len4));
+				appendLine(fields.join(" "));
+			}
+			appendSpace();
+			appendLine("Isolated:");
+			printSimpleLine("Hidden", data.hiddenSimple);
+			printSimpleLine("Omission", data.omissionSimple);
+			printSimpleLine("Naked", data.nakedSimpleIsolated);
+			printSimpleLine("Naked Omission", data.nakedOmissionSimpleIsolate);
+			const totalIsolated = data.hiddenSimple + data.omissionSimple + data.nakedSimpleIsolated + data.nakedOmissionSimpleIsolate;
+			printSimpleLine("Total Simple", totalIsolated);
 
 			appendSpace();
 			const time = Math.round((performance.now() - startTime) / 1000);
