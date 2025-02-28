@@ -830,6 +830,7 @@ let infoContainer = null;
 Menu.infoButton.addEventListener('click', () => {
 	if (!infoContainer) {
 		const fixedWidth = 256;
+		const margin = 48;
 
 		infoContainer = document.createElement('div');
 		infoContainer.style.position = 'absolute';
@@ -850,47 +851,49 @@ Menu.infoButton.addEventListener('click', () => {
 		infoBacking.style.background = 'white';
 
 		const frame = document.createElement('iframe');
-		frame.src = "./info.html";
 		frame.style.border = '0';
 		frame.style.position = 'absolute';
 		frame.style.width = fixedWidth + 'px';
 		frame.style.overflowX = 'visible';
-		frame.style.overflowY = 'visible';
+		frame.style.overflowY = 'auto';
 
 		let loaded = false;
 		const resize = () => {
 			if (!loaded) return;
 
-			const max = window.innerHeight - 48;
-			frame.style.height = max + 'px';
-			frame.style.overflowY = 'hidden';
+			const body = frame.contentWindow.document.body;
+			const html = body.parentElement;
+			const scroll = html.scrollTop;
 
-			// const rect = frame.contentWindow.document.body.getBoundingClientRect();
-			// const height = rect.height + 16;
-			let height = frame.contentWindow.document.body.scrollHeight + 16;
-			if (height > max) {
-				height = max;
-				frame.style.overflowY = 'scroll';
-			} else {
-				frame.style.overflowY = 'visible';
-			}
+			const max = window.innerHeight - 48;
+			frame.style.height = frame.contentWindow.document.body.scrollHeight + margin * 2 + 'px';
+			frame.style.overflowY = 'clip';
+
+			let height = frame.contentWindow.document.body.scrollHeight + margin * 2;
+
+			if (height > max) height = max;
+
 			infoContainer.style.height = height + 'px';
 			frame.style.height = height + 'px';
+
+			html.scrollTop = scroll;
 		};
 		frame.onload = () => {
 			loaded = true;
 			infoContainer.style.display = 'block';
+			frame.contentWindow.document.body.style.margin = margin + 'px';
 			resize();
 		};
 		window.addEventListener('resize', resize);
+		frame.src = "./info.html";
 
 		const closeButton = document.createElement('canvas');
 		const size = Menu.buttonSize;
 		let storedDevicePixelRatio = window.devicePixelRatio;
 		closeButton.width = size * storedDevicePixelRatio;
 		closeButton.height = size * storedDevicePixelRatio;
-		closeButton.style.width = size + "px";
-		closeButton.style.height = size + "px";
+		closeButton.style.width = size + 'px';
+		closeButton.style.height = size + 'px';
 		closeButton.style.position = 'absolute';
 		closeButton.style.padding = '16px';
 		closeButton.style.top = '0';
