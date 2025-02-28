@@ -826,43 +826,63 @@ Menu.checkButton.addEventListener('click', () => {
 	}, 0);
 });
 
-let infoBacking = null;
+let infoContainer = null;
 Menu.infoButton.addEventListener('click', () => {
-	if (!infoBacking) {
-		infoBacking = document.createElement('span');
+	if (!infoContainer) {
+		const fixedWidth = 256;
+
+		infoContainer = document.createElement('div');
+		infoContainer.style.position = 'absolute';
+		infoContainer.style.top = '50%';
+		infoContainer.style.left = '50%';
+		infoContainer.style.transform = 'translate(-50%, -50%)';
+		infoContainer.style.width = fixedWidth + 'px';
+		infoContainer.style.display = 'none';
+
+		const infoBacking = document.createElement('div');
 		infoBacking.style.position = 'absolute';
-		infoBacking.style.overflow = 'visible';
-		infoBacking.style.top = '50%';
-		infoBacking.style.left = '50%';
-		infoBacking.style.transform = 'translate(-50%, -50%)';
-		infoBacking.style.width = '256px';
-		infoBacking.style.height = '0';
-		infoBacking.style.padding = '16px';
+		infoBacking.style.overflowX = 'clip';
+		infoBacking.style.overflowY = 'clip';
+		infoBacking.style.width = '100%';
+		infoBacking.style.height = '100%';
 		infoBacking.style.border = '3.5px solid black';
 		infoBacking.style.borderRadius = '8px';
 		infoBacking.style.background = 'white';
-		infoBacking.style.display = 'none';
 
 		const frame = document.createElement('iframe');
 		frame.src = "./info.html";
 		frame.style.border = '0';
 		frame.style.position = 'absolute';
-		frame.style.top = '50%';
-		frame.style.left = '50%';
-		frame.style.transform = 'translate(-50%, -50%)';
-		frame.style.width = '256px';
-		frame.style.height = '0';
-		frame.style.transform = 'translate(-50%, -50%)';
-		frame.onload = () => {
-			infoBacking.style.display = 'block';
+		frame.style.width = fixedWidth + 'px';
+		frame.style.overflowX = 'visible';
+		frame.style.overflowY = 'visible';
 
-			frame.contentWindow.document.body.style.margin = "0";
+		let loaded = false;
+		const resize = () => {
+			if (!loaded) return;
 
-			const rect = frame.contentWindow.document.body.getBoundingClientRect();
-			const height = rect.height;
+			const max = window.innerHeight - 48;
+			frame.style.height = max + 'px';
+			frame.style.overflowY = 'hidden';
+
+			// const rect = frame.contentWindow.document.body.getBoundingClientRect();
+			// const height = rect.height + 16;
+			let height = frame.contentWindow.document.body.scrollHeight + 16;
+			if (height > max) {
+				height = max;
+				frame.style.overflowY = 'scroll';
+			} else {
+				frame.style.overflowY = 'visible';
+			}
+			infoContainer.style.height = height + 'px';
 			frame.style.height = height + 'px';
-			infoBacking.style.height = height + 'px';
 		};
+		frame.onload = () => {
+			loaded = true;
+			infoContainer.style.display = 'block';
+			resize();
+		};
+		window.addEventListener('resize', resize);
 
 		const closeButton = document.createElement('canvas');
 		const size = Menu.buttonSize;
@@ -874,8 +894,8 @@ Menu.infoButton.addEventListener('click', () => {
 		closeButton.style.position = 'absolute';
 		closeButton.style.padding = '16px';
 		closeButton.style.top = '0';
-		closeButton.style.right = '0';
-		closeButton.style.transform = 'translate(50%, -50%)';
+		closeButton.style.left = '0';
+		closeButton.style.transform = 'translate(-50%, -50%)';
 		const closeImage = new Image();
 		let closeImageLoaded = false;
 		closeImage.src = "./icons/cancel_48dp_000000_FILL0_wght400_GRAD0_opsz48.svg";
@@ -909,16 +929,17 @@ Menu.infoButton.addEventListener('click', () => {
 		};
 
 		closeButton.addEventListener('click', () => {
-			if (infoBacking.parentElement) {
-				infoBacking.parentElement.removeChild(infoBacking);
+			if (infoContainer.parentElement) {
+				infoContainer.parentElement.removeChild(infoContainer);
 			}
 		});
 
 		infoBacking.appendChild(frame);
-		infoBacking.appendChild(closeButton);
+		infoContainer.appendChild(infoBacking);
+		infoContainer.appendChild(closeButton);
 	}
 
-	if (!infoBacking.parentElement) document.body.appendChild(infoBacking);
+	if (!infoContainer.parentElement) document.body.appendChild(infoContainer);
 });
 
 const fillButton = document.createElement('button');
