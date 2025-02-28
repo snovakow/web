@@ -1,146 +1,150 @@
-<!doctype html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
-
 <head>
-	<meta charset="utf-8">
-	<title>snovakow</title>
-	<meta name="viewport" content="width=device-width,initial-scale=1">
-	<style>
-		a {
-			font-size: 48px;
-			display: block;
-		}
-
-		body {
-			color: black;
-			background-color: white;
-		}
-	</style>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.4">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px Courier; -webkit-text-stroke: #000000}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px Courier; -webkit-text-stroke: #000000; min-height: 16.0px}
+    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px Courier}
+    span.s1 {font-kerning: none}
+    span.s2 {font-kerning: none; -webkit-text-stroke: 0px #000000}
+    span.Apple-tab-span {white-space:pre}
+  </style>
 </head>
-
 <body>
-	<pre>
-		6,670,903,752,021,072,936,960 grids
-		6.671 * 10^21
-
-		Rotation 4
-		Reflection 4
-		rows 6*6*6
-		cols 6*6*6
-		house 6*6
-		Swapping: 362880
-
-		5,472,730,538 unique grids
-		5.473 * 10^9
-
-		Semi-Normalized: 1,2,3,4,5,6,7,8,9
-
-		Clues for minimal puzzles:
-		https://en.wikipedia.org/wiki/Mathematics_of_Sudoku:
-		An ordinary puzzle with a unique solution must have at least 17 clues. There is a solvable puzzle with at most 21 clues for every solved grid. The largest minimal puzzle found so far has 40 clues in the 81 cells.
-		- 3.10 * 10^37 distinct minimal puzzles,
-		- 2.55 * 10^25 minimal puzzles that are not pseudo-equivalent
-
-		Distinct puzzles per grid = (3.10 * 10^37) / (6.671 * 10^21) = 0.4646 * 10^16
-		Unique puzzles per grid = (2.55 * 10^25) / (5.473 * 10^9) = 0.4659 * 10^16
-
-		Strategies:
-
-		There are 3.10 × 1037, or 31 trillion trillion trillion, distinct minimal puzzles.
-		Hidden Singles:
-		24.3242437% of all puzzles can be solved using only hidden singles.
-		There are 7.5405155 × 1036, or 7.5 trillion trillion trillion, hidden single puzzles.
-
-		hiddenSimple,
-		omissionSimple,
-		nakedSimple,
-
-		omissionVisible,
-		nakedVisible,
-		
-		naked2
-		naked3
-		naked4
-		hidden1
-		hidden2
-		hidden3
-		hidden4
-		omissions
-		uniqueRectangle
-		yWing
-		xyzWing
-		xWing
-		swordfish
-		jellyfish
-
-		1-0 simple naked/hidden
-		1-1/8 simple naked
-		
-		2-0 naked2 visual
-		2-1 naked2 visual omission
-		2-2/7 naked2
-		
-		3-0 naked3 visual
-		3-1 naked3 visual omission3
-		3-2/6 naked3
-		
-		4-1
-		4-2/5 naked4 true
-		
-		5-1 hidden
-		5-2
-		5-3
-		5-4
-		
-		6-1 hidden1 true
-		6-2 hidden2 true
-		6-3 hidden3 true
-		
-		7-1 hidden1 true
-		7-2 hidden2 true
-		
-		8-1 hidden1 true
-		
-<b>
-123 456 789
-333 333 330
-333 333 330
-
-333 333 330
-333 333 330
-333 333 330
-
-333 333 330
-333 333 330
-000 000 000
-
-56 * 3
-= 168 bits
-= 21 bytes
-
-+ 81 (10 bytes + 1 bit)
-= 249 bits
-= 32 bytes
- </b>
-
-https://www.learn-sudoku.com/basic-techniques.html
-
-- Open Singles
-- Lone Singles
-- Hidden Singles
-- Naked Pairs
-- Naked Triplets & Quads
-- Hidden Pairs
-- Hidden Triplets & Quads
-- Omission
-
-https://www.learn-sudoku.com/advanced-techniques.html
-https://www.sudokuonline.io/tips/advanced-sudoku-strategies
-
-https://www.conceptispuzzles.com/index.aspx?uri=puzzle/sudoku/techniques
-
-
-</pre>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>6,670,903,752,021,072,936,960 grids</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>6.671 * 10^21</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>Rotation 4</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>Reflection 4</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>rows 6*6*6</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>cols 6*6*6</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>house 6*6</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>Swapping: 362880</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>5,472,730,538 unique grids</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>5.473 * 10^9</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>Semi-Normalized: 1,2,3,4,5,6,7,8,9</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>Clues for minimal puzzles:</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>https://en.wikipedia.org/wiki/Mathematics_of_Sudoku:</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>An ordinary puzzle with a unique solution must have at least 17 clues. There is a solvable puzzle with at most 21 clues for every solved grid. The largest minimal puzzle found so far has 40 clues in the 81 cells.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>- 3.10 * 10^37 distinct minimal puzzles,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>- 2.55 * 10^25 minimal puzzles that are not pseudo-equivalent</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>Distinct puzzles per grid = (3.10 * 10^37) / (6.671 * 10^21) = 0.4646 * 10^16</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>Unique puzzles per grid = (2.55 * 10^25) / (5.473 * 10^9) = 0.4659 * 10^16</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>Strategies:</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>There are 3.10 × </span><span class="s2">e+</span><span class="s1">37, or 31 trillion trillion trillion, distinct minimal puzzles.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>Hidden Singles:</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>24.3242437% of all puzzles can be solved using only hidden singles.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>There are 7.5405155 × </span><span class="s2">e+</span><span class="s1">36, or 7.5 trillion trillion trillion, hidden single puzzles.</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>Naked Singles:</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>18.6514696% of all puzzles can be solved using only hidden and naked singles.</span></p>
+<p class="p3"><span class="s2"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>42.9757133% </span><span class="s1">of all puzzles can be solved using only hidden or naked singles.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>There are 5.7819556 e+36, or 5.8 trillion trillion trillion, naked hidden singles puzzles.</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p3"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>Pointers:</span></p>
+<p class="p3"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>5.4305901% of all puzzles can be solved using only hidden and naked singles.</span></p>
+<p class="p3"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>48.41% of all puzzles can be solved using only hidden or naked singles.</span></p>
+<p class="p3"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>There are 5.7819556 e+36, or 5.8 trillion trillion trillion, naked hidden singles puzzles.</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>hiddenSimple,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>omissionSimple,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>nakedSimple,</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>omissionVisible,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>nakedVisible,</span></p>
+<p class="p2"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>naked2</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>naked3</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>naked4</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>hidden1</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>hidden2</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>hidden3</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>hidden4</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>omissions</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>uniqueRectangle</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>yWing</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>xyzWing</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>xWing</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>swordfish</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>jellyfish</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>1-0 simple naked/hidden</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>1-1/8 simple naked</span></p>
+<p class="p2"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>2-0 naked2 visual</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>2-1 naked2 visual omission</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>2-2/7 naked2</span></p>
+<p class="p2"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>3-0 naked3 visual</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>3-1 naked3 visual omission3</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>3-2/6 naked3</span></p>
+<p class="p2"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>4-1</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>4-2/5 naked4 true</span></p>
+<p class="p2"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>5-1 hidden</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>5-2</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>5-3</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>5-4</span></p>
+<p class="p2"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>6-1 hidden1 true</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>6-2 hidden2 true</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>6-3 hidden3 true</span></p>
+<p class="p2"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>7-1 hidden1 true</span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>7-2 hidden2 true</span></p>
+<p class="p2"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>8-1 hidden1 true</span></p>
+<p class="p2"><span class="s1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span></p>
+<p class="p2"><span class="s1"><b></b></span><br></p>
+<p class="p1"><span class="s1"><b>123 456 789</b></span></p>
+<p class="p1"><span class="s1"><b>333 333 330</b></span></p>
+<p class="p1"><span class="s1"><b>333 333 330</b></span></p>
+<p class="p2"><span class="s1"><b></b></span><br></p>
+<p class="p1"><span class="s1"><b>333 333 330</b></span></p>
+<p class="p1"><span class="s1"><b>333 333 330</b></span></p>
+<p class="p1"><span class="s1"><b>333 333 330</b></span></p>
+<p class="p2"><span class="s1"><b></b></span><br></p>
+<p class="p1"><span class="s1"><b>333 333 330</b></span></p>
+<p class="p1"><span class="s1"><b>333 333 330</b></span></p>
+<p class="p1"><span class="s1"><b>000 000 000</b></span></p>
+<p class="p2"><span class="s1"><b></b></span><br></p>
+<p class="p1"><span class="s1"><b>56 * 3</b></span></p>
+<p class="p1"><span class="s1"><b>= 168 bits</b></span></p>
+<p class="p1"><span class="s1"><b>= 21 bytes</b></span></p>
+<p class="p2"><span class="s1"><b></b></span><br></p>
+<p class="p1"><span class="s1"><b>+ 81 (10 bytes + 1 bit)</b></span></p>
+<p class="p1"><span class="s1"><b>= 249 bits</b></span></p>
+<p class="p1"><span class="s1"><b>= 32 bytes</b></span></p>
+<p class="p2"><span class="s1"><b><span class="Apple-converted-space"> </span></b><b></b></span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">https://www.learn-sudoku.com/basic-techniques.html</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">- Open Singles</span></p>
+<p class="p1"><span class="s1">- Lone Singles</span></p>
+<p class="p1"><span class="s1">- Hidden Singles</span></p>
+<p class="p1"><span class="s1">- Naked Pairs</span></p>
+<p class="p1"><span class="s1">- Naked Triplets &amp; Quads</span></p>
+<p class="p1"><span class="s1">- Hidden Pairs</span></p>
+<p class="p1"><span class="s1">- Hidden Triplets &amp; Quads</span></p>
+<p class="p1"><span class="s1">- Omission</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">https://www.learn-sudoku.com/advanced-techniques.html</span></p>
+<p class="p1"><span class="s1">https://www.sudokuonline.io/tips/advanced-sudoku-strategies</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">https://www.conceptispuzzles.com/index.aspx?uri=puzzle/sudoku/techniques</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p2"><span class="s1"></span><br></p>
 </body>
-
 </html>
