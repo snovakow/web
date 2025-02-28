@@ -6,10 +6,8 @@ const MAX_SIZE = 10000000;
 // 1 = Populate Statements
 // 2 = Populated Tables
 // 3 = Totals
-// 4 = Simples and Visuals
-// 5 = Strategies
-// 6 = Superpositions
-// 7 = Clues
+// 4 = Strategies
+// 5 = Clues
 
 if (!isset($_GET['mode'])) die;
 
@@ -310,6 +308,8 @@ try {
 
 	if ($mode === 3) {
 		$counts = [];
+		$nakedSimpleIsolated = 0;
+		$nakedOmissionSimpleIsolate = 0;
 		for ($i = 1; $i <= $tableCount; $i++) {
 			$table = tableName($i);
 			$sql = "SELECT `solveType`, COUNT(*) AS count FROM `$table` GROUP BY `solveType`";
@@ -322,6 +322,18 @@ try {
 				if (array_key_exists($solveType, $counts)) $counts[$solveType] += $count;
 				else $counts[$solveType] = $count;
 			}
+
+			$sql = "SELECT COUNT(*) AS count FROM `$table` WHERE `solveType`=2 AND `omissionSimple`=0";
+			$stmt = $db->prepare($sql);
+			$stmt->execute();
+			$row = $stmt->fetch(\PDO::FETCH_ASSOC);
+			$nakedSimpleIsolated += $row['count'];
+
+			$sql = "SELECT COUNT(*) AS count FROM `$table` WHERE `solveType`=2 AND `omissionSimple`>0";
+			$stmt = $db->prepare($sql);
+			$stmt->execute();
+			$row = $stmt->fetch(\PDO::FETCH_ASSOC);
+			$nakedOmissionSimpleIsolate += $row['count'];
 		}
 
 		$hiddenSimple = $counts[0];
@@ -336,6 +348,8 @@ try {
 			'hiddenSimple' => $hiddenSimple,
 			'omissionSimple' => $omissionSimple,
 			'nakedSimple' => $nakedSimple,
+			'nakedSimpleIsolated' => $nakedSimpleIsolated,
+			'nakedOmissionSimpleIsolate' => $nakedOmissionSimpleIsolate,
 			'omissionVisible' => $omissionVisible,
 			'candidate' => $candidate,
 			'candidateMin' => $candidateMin,
