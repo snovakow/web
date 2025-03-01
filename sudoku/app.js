@@ -829,51 +829,66 @@ Menu.checkButton.addEventListener('click', () => {
 let infoContainer = null;
 Menu.infoButton.addEventListener('click', () => {
 	if (!infoContainer) {
-		const fixedWidth = 256;
-		const margin = 48;
+		const headerHeight = 24;
+		const borderWidth = 3;
+		const margin = 16;
+		const windowMargin = 64;
 
 		infoContainer = document.createElement('div');
 		infoContainer.style.position = 'absolute';
 		infoContainer.style.top = '50%';
 		infoContainer.style.left = '50%';
 		infoContainer.style.transform = 'translate(-50%, -50%)';
-		infoContainer.style.width = fixedWidth + 'px';
 		infoContainer.style.display = 'none';
+		infoContainer.style.background = 'hsl(0 100% 99%)';
+		// infoContainer.style.backdropFilter = 'blur(3px)';
 
 		const infoBacking = document.createElement('div');
 		infoBacking.style.position = 'absolute';
-		infoBacking.style.overflowX = 'clip';
-		infoBacking.style.overflowY = 'clip';
+		infoBacking.style.overflow = 'clip';
 		infoBacking.style.width = '100%';
 		infoBacking.style.height = '100%';
-		infoBacking.style.border = '3.5px solid black';
+		infoBacking.style.left = -borderWidth + 'px';
+		infoBacking.style.top = -borderWidth + 'px';
+		infoBacking.style.border = borderWidth + 'px solid black';
 		infoBacking.style.borderRadius = '8px';
-		infoBacking.style.background = 'white';
+		// infoBacking.style.boxShadow = '0px 0px 3px black';
 
 		const frame = document.createElement('iframe');
-		frame.style.border = '0';
+		frame.style.top = headerHeight + 'px';
+		frame.style.borderTop = '1px solid rgba(0,0,0,0.5)';
+		frame.style.borderBottom = 'none';
+		frame.style.borderLeft = 'none';
+		frame.style.borderRight = 'none';
 		frame.style.position = 'absolute';
-		frame.style.width = fixedWidth + 'px';
-		frame.style.overflowX = 'visible';
-		frame.style.overflowY = 'auto';
+		frame.style.overflow = 'visible';
+		frame.style.background = 'white';
+
+		const setWidth = () => {
+			const max = window.innerWidth - windowMargin;
+			let fixedWidth = Math.min(max, 512);
+			infoContainer.style.width = fixedWidth + 'px';
+			frame.style.width = fixedWidth + 'px';
+		};
+		setWidth();
 
 		let loaded = false;
 		const resize = () => {
+			setWidth();
 			if (!loaded) return;
 
 			const body = frame.contentWindow.document.body;
 			const html = body.parentElement;
 			const scroll = html.scrollTop;
 
-			const max = window.innerHeight - 48;
+			const max = window.innerHeight - windowMargin - headerHeight;
 			frame.style.height = frame.contentWindow.document.body.scrollHeight + margin * 2 + 'px';
-			frame.style.overflowY = 'clip';
 
 			let height = frame.contentWindow.document.body.scrollHeight + margin * 2;
 
 			if (height > max) height = max;
 
-			infoContainer.style.height = height + 'px';
+			infoContainer.style.height = height + headerHeight + 'px';
 			frame.style.height = height + 'px';
 
 			html.scrollTop = scroll;
@@ -887,49 +902,22 @@ Menu.infoButton.addEventListener('click', () => {
 		window.addEventListener('resize', resize);
 		frame.src = "./info.html";
 
-		const closeButton = document.createElement('canvas');
-		const size = Menu.buttonSize;
-		let storedDevicePixelRatio = window.devicePixelRatio;
-		closeButton.width = size * storedDevicePixelRatio;
-		closeButton.height = size * storedDevicePixelRatio;
+		const closeButton = document.createElement('img');
+		closeButton.src = "./icons/close_small_24dp_000000_FILL0_wght400_GRAD0_opsz24.svg";
+		const size = headerHeight;
+		const padding = 16;
+		closeButton.width = size;
+		closeButton.height = size;
 		closeButton.style.width = size + 'px';
 		closeButton.style.height = size + 'px';
 		closeButton.style.position = 'absolute';
-		closeButton.style.padding = '16px';
-		closeButton.style.top = '0';
-		closeButton.style.left = '0';
-		closeButton.style.transform = 'translate(-50%, -50%)';
-		const closeImage = new Image();
-		let closeImageLoaded = false;
-		closeImage.src = "./icons/cancel_48dp_000000_FILL0_wght400_GRAD0_opsz48.svg";
+		closeButton.style.paddingTop = padding + 'px';
+		closeButton.style.paddingLeft = padding + 'px';
+		closeButton.style.paddingRight = padding + 'px';
+		closeButton.style.paddingBottom = '0px';
 
-		const drawClose = () => {
-			if (!closeImageLoaded) return;
-
-			const displaySize = size * window.devicePixelRatio;
-			const ctx = closeButton.getContext("2d");
-
-			const radius = displaySize * 0.5 * 0.77;
-			ctx.arc(displaySize * 0.5, displaySize * 0.5, radius, 0, 2 * Math.PI);
-			ctx.fillStyle = "white";
-			ctx.fill();
-
-			ctx.drawImage(closeImage, 0, 0, displaySize, displaySize);
-		};
-
-		window.addEventListener("resize", () => {
-			if (storedDevicePixelRatio !== window.devicePixelRatio) {
-				storedDevicePixelRatio = window.devicePixelRatio;
-				closeButton.width = size * storedDevicePixelRatio;
-				closeButton.height = size * storedDevicePixelRatio;
-				drawClose();
-			}
-		});
-
-		closeImage.onload = () => {
-			closeImageLoaded = true;
-			drawClose();
-		};
+		closeButton.style.top = -padding + 'px';
+		closeButton.style.right = -padding + 'px';
 
 		closeButton.addEventListener('click', () => {
 			if (infoContainer.parentElement) {
