@@ -832,7 +832,7 @@ Menu.infoButton.addEventListener('click', () => {
 	if (!infoContainer) {
 		const headerHeight = 24;
 		const borderWidth = 3;
-		const margin = 16;
+		const margin = 32;
 		const windowMargin = 48;
 
 		infoContainer = document.createElement('div');
@@ -935,7 +935,7 @@ Menu.infoButton.addEventListener('click', () => {
 
 	if (!infoContainer.parentElement) {
 		document.body.appendChild(infoContainer);
-		if(frameResize) frameResize();
+		if (frameResize) frameResize();
 	}
 });
 
