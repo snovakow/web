@@ -827,6 +827,7 @@ Menu.checkButton.addEventListener('click', () => {
 });
 
 let infoContainer = null;
+let frameResize = null;
 Menu.infoButton.addEventListener('click', () => {
 	if (!infoContainer) {
 		const headerHeight = 24;
@@ -873,9 +874,11 @@ Menu.infoButton.addEventListener('click', () => {
 		setWidth();
 
 		let loaded = false;
-		const resize = () => {
-			setWidth();
+		frameResize = () => {
+			if (!infoContainer.parentElement) return;
 			if (!loaded) return;
+
+			setWidth();
 
 			const body = frame.contentWindow.document.body;
 			const html = body.parentElement;
@@ -897,9 +900,9 @@ Menu.infoButton.addEventListener('click', () => {
 			loaded = true;
 			infoContainer.style.display = 'block';
 			frame.contentWindow.document.body.style.margin = margin + 'px';
-			resize();
+			frameResize();
 		};
-		window.addEventListener('resize', resize);
+		window.addEventListener('resize', frameResize);
 		frame.src = "./info.html";
 
 		const closeButton = document.createElement('img');
@@ -930,7 +933,10 @@ Menu.infoButton.addEventListener('click', () => {
 		infoContainer.appendChild(closeButton);
 	}
 
-	if (!infoContainer.parentElement) document.body.appendChild(infoContainer);
+	if (!infoContainer.parentElement) {
+		document.body.appendChild(infoContainer);
+		if(frameResize) frameResize();
+	}
 });
 
 const fillButton = document.createElement('button');
