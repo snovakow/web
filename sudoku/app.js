@@ -833,7 +833,7 @@ Menu.infoButton.addEventListener('click', () => {
 		const headerHeight = 24;
 		const borderWidth = 3;
 		const margin = 16;
-		const windowMargin = 64;
+		const windowMargin = 48;
 
 		infoContainer = document.createElement('div');
 		infoContainer.style.position = 'absolute';
@@ -867,7 +867,7 @@ Menu.infoButton.addEventListener('click', () => {
 
 		const setWidth = () => {
 			const max = window.innerWidth - windowMargin;
-			let fixedWidth = Math.min(max, 512);
+			let fixedWidth = Math.min(max, 640);
 			infoContainer.style.width = fixedWidth + 'px';
 			frame.style.width = fixedWidth + 'px';
 		};
