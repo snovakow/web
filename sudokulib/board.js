@@ -231,7 +231,7 @@ const cellsToStorage = (metadata) => {
 
 const saveGrid = (metadata) => {
 	const data = JSON.stringify(cellsToStorage(metadata));
-	// sessionStorage.setItem("saveData", data);
+	sessionStorage.setItem("saveData", data);
 	window.name = data;
 };
 const loadGrid = () => {
@@ -240,7 +240,7 @@ const loadGrid = () => {
 	try {
 		return storageToCells(JSON.parse(data));
 	} catch (error) {
-		return null;
+		return sessionStorage.getItem("saveData");
 	}
 };
 
