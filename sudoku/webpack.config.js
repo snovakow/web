@@ -15,7 +15,6 @@ module.exports = {
 		new CopyPlugin({
 			patterns: [
 				{ from: 'icons', to: 'icons' },
-				{ from: 'finder.js', to: 'finder.js' },
 				{ from: '../sudokulib/generate.html', to: '../sudokulib/generate.html' },
 				{ from: '../sudokulib/update.html', to: '../sudokulib/update.html' },
 				{ from: '../sudokulib/generate.php', to: '../sudokulib/generate.php' },
@@ -25,7 +24,6 @@ module.exports = {
 				{ from: '../sudokulib/stats.html', to: '../sudokulib/stats.html' },
 				{ from: '../sudokulib/statsFeed.php', to: '../sudokulib/statsFeed.php' },
 				{ from: '../sudokulib/tables.php', to: '../sudokulib/tables.php' },
-				{ from: '../sudokulib/worker.js', to: '../sudokulib/worker.js' },
 				{ from: '../sudokulib/Grid.js', to: '../sudokulib/Grid.js' },
 				{ from: '../sudokulib/generator.js', to: '../sudokulib/generator.js' },
 				{ from: '../sudokulib/solver.js', to: '../sudokulib/solver.js' },

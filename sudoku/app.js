@@ -422,7 +422,8 @@ if (strategy === 'custom' || strategy === 'hardcoded') {
 
 let findAnimating = false;
 const loadLevel = () => {
-	const worker = new Worker("finder.js", { type: "module" });
+	const worker_url = new URL("./worker_finder.js", import.meta.url);
+	const worker = new Worker(worker_url, { type: "module" });
 	const animator = new Animator();
 	findAnimating = true;
 

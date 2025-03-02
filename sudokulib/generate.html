@@ -309,7 +309,8 @@
 			if (!strategyCounter) strategyCounter = new StrategyCounter();
 
 			workers = [];
-			for (let i = 0; i < coreCount; i++) workers[i] = new Worker("worker.js", { type: "module" });
+			const worker_url = new URL("./worker_generator.js", import.meta.url);
+			for (let i = 0; i < coreCount; i++) workers[i] = new Worker(worker_url, { type: "module" });
 		};
 
 		let sendDataSent = 0;

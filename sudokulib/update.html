@@ -205,7 +205,8 @@
 
 		const WorkerUnit = class {
 			constructor() {
-				this.worker = new Worker("worker.js", { type: "module" });
+				const worker_url = new URL("./worker_generator.js", import.meta.url);
+				this.worker = new Worker(worker_url, { type: "module" });
 				this.remaining = 0;
 			}
 			process(data) {
