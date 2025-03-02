@@ -198,7 +198,7 @@ const pickerClick = (event) => {
 
 	if (puzzleFinished()) {
 		window.setTimeout(() => {
-			alert("Puzzle Complete!!!");
+			Panel.alert("Puzzle Complete!!!");
 		}, 0);
 	}
 };
@@ -307,7 +307,7 @@ if (loadGridMetadata) {
 
 Menu.setMenuReponse((responseStrategy) => {
 	if (strategy === responseStrategy) return false;
-	if (!window.confirm("Do you want to start a " + Menu.menuTitle(responseStrategy) + " puzzle?")) return false;
+	if (!Panel.confirm("Do you want to start a " + Menu.menuTitle(responseStrategy) + " puzzle?")) return false;
 	window.location.search = "?strategy=" + responseStrategy;
 	return true;
 });
@@ -623,12 +623,12 @@ Menu.checkButton.addEventListener('click', () => {
 	draw();
 	window.setTimeout(() => {
 		if (solved) {
-			alert("Puzzle Complete!!!");
+			Panel.alert("Puzzle Complete!!!");
 		} else if (errorCount > 0) {
-			if (errorCount === 1) alert(errorCount + " Error!");
-			else alert(errorCount + " Errors!");
+			if (errorCount === 1) Panel.alert(errorCount + " Error!");
+			else Panel.alert(errorCount + " Errors!");
 		} else {
-			alert("No Errors!");
+			Panel.alert("No Errors!");
 		}
 	}, 0);
 });
@@ -853,7 +853,7 @@ if (strategy === 'custom') {
 		if (findAnimating) return;
 
 		const name = levelMode ? titleString : Menu.menuTitle(strategy);
-		if (!window.confirm("Do you want to find a new " + name + " puzzle?")) return;
+		if (!Panel.confirm("Do you want to find a new " + name + " puzzle?")) return;
 		selected = false;
 		loadSudoku();
 	});
@@ -863,7 +863,7 @@ Menu.reset.addEventListener('click', () => {
 	if (findAnimating) return;
 
 	const name = levelMode ? titleString : Menu.menuTitle(strategy);
-	if (!window.confirm("Do you want to restart this " + name + " puzzle?")) return;
+	if (!Panel.confirm("Do you want to restart this " + name + " puzzle?")) return;
 	selected = false;
 	board.resetGrid();
 	Undo.set(board);
