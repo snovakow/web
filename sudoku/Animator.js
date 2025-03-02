@@ -48,16 +48,29 @@ const randomOrder = () => {
     return order;
 }
 
-const isValid = (index, symbol, symbolGetter) => {
+const isValid = (index, symbol, grid) => {
     const row = Math.floor(index / 9);
     const col = index % 9;
     const boxRow = 3 * Math.floor(row / 3);
     const boxCol = 3 * Math.floor(col / 3);
     for (let j = 0; j < 9; j++) {
-        if (symbolGetter(row * 9 + j) === symbol || symbolGetter(j * 9 + col) === symbol) return false;
+        if (grid[row * 9 + j] === symbol || grid[j * 9 + col] === symbol) return false;
         const m = boxRow + Math.floor(j / 3);
         const n = boxCol + j % 3;
-        if (symbolGetter(m * 9 + n) === symbol) return false;
+        if (grid[m * 9 + n] === symbol) return false;
+    }
+    return true;
+}
+const isValidCell = (index, symbol, cells) => {
+    const row = Math.floor(index / 9);
+    const col = index % 9;
+    const boxRow = 3 * Math.floor(row / 3);
+    const boxCol = 3 * Math.floor(col / 3);
+    for (let j = 0; j < 9; j++) {
+        if (cells[row * 9 + j].symbol === symbol || cells[j * 9 + col].symbol === symbol) return false;
+        const m = boxRow + Math.floor(j / 3);
+        const n = boxCol + j % 3;
+        if (cells[m * 9 + n].symbol === symbol) return false;
     }
     return true;
 }
@@ -65,19 +78,19 @@ const isValid = (index, symbol, symbolGetter) => {
 const makeRandomClues = () => {
     // 19 - 31
     const spread = [
-        3,
-        1044,
-        47049,
-        677111,
-        3393135,
-        6786366,
-        5920346,
-        2438751,
-        503206,
-        55241,
-        3333,
-        143,
-        1,
+        245,
+        50530,
+        2390005,
+        34104002,
+        171311313,
+        342166749,
+        298690992,
+        122936890,
+        25392695,
+        2782047,
+        168444,
+        5950,
+        138,
     ];
     let total = 0;
     for (const amount of spread) total += amount;
@@ -104,7 +117,7 @@ const makeRandomClues = () => {
         for (let x = 0; x < 9; x++) {
             const symbol = rndx[x] + 1;
 
-            const valid = isValid(index, symbol, index => randomGrid[index]);
+            const valid = isValid(index, symbol, randomGrid);
             if (valid) {
                 randomGrid[index] = symbol;
                 filled++;
@@ -171,7 +184,7 @@ class Animator {
         for (let i = startIndex; i <= endIndex; i++) {
             const step = this.steps[i];
             if (step.symbol === 0) return i;
-            const valid = isValid(step.index, step.symbol, index => board.cells[index].symbol);
+            const valid = isValidCell(step.index, step.symbol, board.cells);
             if (valid) return i;
         }
         return startIndex;
