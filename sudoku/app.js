@@ -7,6 +7,7 @@ import * as Menu from "./menu.js";
 import * as Undo from "./undo.js";
 import * as SudokuProcess from "../sudokulib/process.js";
 import { Animator } from "./Animator.js";
+import { Panel } from "./Panel.js";
 
 const picker = PICKER.picker;
 const pickerDraw = PICKER.pickerDraw;
