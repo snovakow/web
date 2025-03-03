@@ -21,6 +21,22 @@ const candidates = (cells) => {
 		}
 	}
 }
+
+const reduceCell = (cells, index, symbol) => {
+	const row = Math.floor(index / 9);
+	const col = index % 9;
+	const boxRow = 3 * Math.floor(row / 3);
+	const boxCol = 3 * Math.floor(col / 3);
+	for (let i = 0; i < 9; i++) {
+		cells[row * 9 + i].mask &= ~(0x0001 << symbol);
+		cells[i * 9 + col].mask &= ~(0x0001 << symbol);
+
+		const m = boxRow + Math.floor(i / 3);
+		const n = boxCol + i % 3;
+		cells[m * 9 + n].mask &= ~(0x0001 << symbol);
+	}
+}
+
 const hiddenSingles = (cells) => {
 	let reduced = 0;
 	for (let x = 1; x <= 9; x++) {
@@ -41,25 +57,32 @@ const hiddenSingles = (cells) => {
 			if (symbolCell !== null) {
 				symbolCell.symbol = x;
 				symbolCell.mask = 0x0000;
-
-				const row = Math.floor(indexCell / 9);
-				const col = indexCell % 9;
-				const boxRow = 3 * Math.floor(row / 3);
-				const boxCol = 3 * Math.floor(col / 3);
-				for (let i = 0; i < 9; i++) {
-					cells[row * 9 + i].mask &= ~(0x0001 << x);
-					cells[i * 9 + col].mask &= ~(0x0001 << x);
-
-					const m = boxRow + Math.floor(i / 3);
-					const n = boxCol + i % 3;
-					cells[m * 9 + n].mask &= ~(0x0001 << x);
-				}
-
+				reduceCell(cells, indexCell, x);
 				reduced++;
 			}
 		}
 	}
 	return reduced;
+}
+
+const powerOf2 = x => (x & (x - 0x0001)) === 0x0000;
+const nakedSingles = (cells) => {
+	for (let index = 0; index < 81; index++) {
+		const cell = cells[index];
+		if (cell.symbol !== 0) continue;
+		if (!powerOf2(cell.mask)) continue;
+
+		for (let x = 1; x <= 9; x++) {
+			if (((cell.mask >>> x) & 0x001) === 0x000) {
+				cell.symbol = x;
+				cell.mask = 0x0000;
+				reduceCell(cells, index, x);
+				return true;
+			}
+		}
+
+	}
+	return false;
 }
 
 const cells = new Grid();
@@ -78,14 +101,23 @@ const emptyCount = (cells) => {
 
 const fillSolve = () => {
 	let remaining = emptyCount(cells);
+	let hiddenCount = 0;
+	let nakedCount = 0;
 	candidates(cells);
 	while (remaining > 0) {
-		const reduced = hiddenSingles(cells);
-		remaining -= reduced;
-		if (reduced === 0) break;
+		const hiddenReduced = hiddenSingles(cells);
+		hiddenCount += hiddenReduced;
+		remaining -= hiddenReduced;
+		if (hiddenReduced === 0 && remaining > 0) {
+			const nakedReduced = nakedSingles(cells);
+			if (!nakedReduced) break;
+			nakedCount++;
+			remaining--;
+		}
 	}
-
-	return (remaining === 0);
+	if (nakedCount > 0) console.log(hiddenCount, nakedCount);
+	return (remaining === 0 && nakedCount === 0);
+	// return (remaining === 0);
 }
 
 const step = () => {
