@@ -232,15 +232,14 @@ const cellsToStorage = (metadata) => {
 const saveGrid = (metadata) => {
 	const data = JSON.stringify(cellsToStorage(metadata));
 	sessionStorage.setItem("saveData", data);
-	window.name = data;
 };
 const loadGrid = () => {
-	// const data = sessionStorage.getItem("saveData");
-	const data = window.name;
+	const data = sessionStorage.getItem("saveData");
 	try {
-		return storageToCells(JSON.parse(data));
+		const json = JSON.parse(data);
+		return storageToCells(json);
 	} catch (error) {
-		return sessionStorage.getItem("saveData");
+		return null;
 	}
 };
 
