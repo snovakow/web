@@ -535,6 +535,7 @@ const loadSudoku = () => {
 if (!loaded) loadSudoku();
 
 title.style.fontSize = (headerHeight * 0.75) + 'px';
+title.style.fontFamily = 'sans-serif';
 title.style.fontWeight = 'bold';
 title.style.lineHeight = headerHeight + 'px';
 title.style.textAlign = 'center';
