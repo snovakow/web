@@ -108,16 +108,15 @@ const fillSolve = () => {
 		const hiddenReduced = hiddenSingles(cells);
 		hiddenCount += hiddenReduced;
 		remaining -= hiddenReduced;
-		if (hiddenReduced === 0 && remaining > 0) {
-			const nakedReduced = nakedSingles(cells);
-			if (!nakedReduced) break;
-			nakedCount++;
-			remaining--;
-		}
+		if (hiddenReduced === 0) break;
+		// if (hiddenReduced === 0 && remaining > 0) {
+		// 	const nakedReduced = nakedSingles(cells);
+		// 	if (!nakedReduced) break;
+		// 	nakedCount++;
+		// 	remaining--;
+		// }
 	}
-	if (nakedCount > 0) console.log(hiddenCount, nakedCount);
-	return (remaining === 0 && nakedCount === 0);
-	// return (remaining === 0);
+	return (remaining === 0);
 }
 
 const step = () => {
