@@ -17,26 +17,50 @@ const closeBlocker = () => {
         appPanel = null;
     }
 };
-blocker.onclick = (event) => {
-    if (event.target === blocker) closeBlocker();
-}
+// blocker.onclick = (event) => {
+//     if (event.target === blocker) closeBlocker();
+// }
+
+const footerHeight = 48;
+const borderWidth = 3;
+const margin = 32;
+const windowMargin = 48;
 
 export class Panel {
-    static alert(message) {
+    static alert(message, confirm) {
         const panel = new Panel();
-        panel.show(message);
+        panel.show(message, confirm);
     }
-    static confirm(message) {
-        return window.confirm(message);
+    static confirm(message, confirm) {
+        const panel = new Panel();
+        panel.show(message, confirm, true);
     }
-    constructor(responder) {
-    }
-    show(message) {
-        const headerHeight = 24;
-        const borderWidth = 3;
-        const margin = 32;
-        const windowMargin = 48;
+    constructor(src = null) {
+        if (src) {
+            this.content = document.createElement('iframe');
+            // this.content.style.overflow = 'visible';
+            this.content.style.overflow = 'clip';
+            this.content.style.width = '100%';
+            this.content.style.height = '100%';
 
+            this.content.src = src;
+            this.frame = this.content;
+        } else {
+            this.content = document.createElement('div');
+            this.content.style.overflow = 'auto';
+            this.content.style.padding = margin + 'px';
+        }
+
+        this.content.style.position = 'absolute';
+        this.content.style.top = '0px';
+        this.content.style.borderBottom = '1px solid rgba(0,0,0,0.5)';
+        this.content.style.borderTop = 'none';
+        this.content.style.borderLeft = 'none';
+        this.content.style.borderRight = 'none';
+        this.content.style.background = 'white';
+        this.content.style.color = 'black';
+    }
+    show(message, confirm, reject = false) {
         const container = document.createElement('div');
         container.style.position = 'absolute';
         container.style.top = '50%';
@@ -47,73 +71,125 @@ export class Panel {
         container.style.borderRadius = '8px';
         container.style.overflow = 'clip';
 
-        container.style.height = '100px';
+        const content = this.content;
 
-        const content = document.createElement('div');
-        content.style.position = 'absolute';
-        content.style.top = headerHeight + 'px';
-        content.style.borderTop = '1px solid rgba(0,0,0,0.5)';
-        content.style.borderBottom = 'none';
-        content.style.borderLeft = 'none';
-        content.style.borderRight = 'none';
-        // content.style.height = 100 - headerHeight + 'px';
-        content.style.overflow = 'auto';
+        if (this.frame) {
+            container.style.display = 'none';
+        }
 
-        content.style.color = 'black';
-        content.style.background = 'white';
+        const inset = margin * 2;
+        let setSize = null;
+        if (this.frame) {
+            const frame = this.frame;
 
-        content.appendChild(document.createTextNode(message));
-        for (let i = 0; i < 100; i++) content.appendChild(document.createTextNode(message));
+            const setWidth = () => {
+                const max = window.innerWidth - windowMargin;
+                let fixedWidth = Math.min(max, 640);
+                container.style.width = fixedWidth + 'px';
+                frame.style.width = fixedWidth + 'px';
+            };
+            setWidth();
 
-        const setWidth = () => {
-            const max = window.innerWidth - windowMargin;
-            let fixedWidth = Math.min(max, 640);
-            container.style.width = fixedWidth + 'px';
-            content.style.width = fixedWidth + 'px';
-        };
-        const setHeight = () => {
-            const fullHeight = content.scrollHeight + headerHeight;
-            const max = window.innerWidth - windowMargin;
-            let fixedHeight = Math.min(fullHeight, max);
-            container.style.height = fixedHeight + 'px';
-            // content.style.width = fixedHeight + 'px';
-        };
-        const resize = () => {
-            console.log(content.scrollHeight);
-        };
-        window.addEventListener('resize', resize);
+            let loaded = false;
+            setSize = () => {
+                if (!container.parentElement) return;
+                if (!loaded) return;
 
-        setWidth();
+                setWidth();
 
-        const closeButton = document.createElement('img');
-        closeButton.src = "./icons/close_small_24dp_000000_FILL0_wght400_GRAD0_opsz24.svg";
-        const size = headerHeight;
-        const padding = 16;
-        closeButton.style.position = 'absolute';
-        closeButton.style.width = size + 'px';
-        closeButton.style.height = size + 'px';
-        closeButton.style.paddingTop = padding + 'px';
-        closeButton.style.paddingLeft = padding + 'px';
-        closeButton.style.paddingRight = padding + 'px';
-        closeButton.style.paddingBottom = '0px';
+                const body = frame.contentWindow.document.body;
+                const html = body.parentElement;
+                const scroll = html.scrollTop;
 
-        closeButton.style.top = -padding + 'px';
-        closeButton.style.right = -padding + 'px';
+                const max = window.innerHeight - windowMargin - footerHeight;
+                frame.style.height = frame.contentWindow.document.body.scrollHeight + inset + 'px';
 
-        closeButton.onclick = () => {
-            closeBlocker();
-        };
+                let height = frame.contentWindow.document.body.scrollHeight + inset;
+
+                if (height > max) height = max;
+
+                container.style.height = height + footerHeight + 'px';
+                frame.style.height = height + 'px';
+
+                html.scrollTop = scroll;
+            };
+            frame.onload = () => {
+                loaded = true;
+                container.style.display = 'block';
+                frame.contentWindow.document.body.style.margin = margin + 'px';
+                setSize();
+            };
+        } else {
+            content.appendChild(document.createTextNode(message));
+
+            setSize = () => {
+                const maxWidth = window.innerWidth - windowMargin;
+                const fixedWidth = Math.min(320, maxWidth);
+                content.style.width = fixedWidth - inset + 'px';
+                content.style.height = '0px';
+                container.style.width = fixedWidth + 'px';
+
+                const fullHeight = content.scrollHeight - inset;
+                const maxHeight = window.innerHeight - windowMargin;
+                const fixedHeight = Math.min(fullHeight, maxHeight);
+                content.style.height = fixedHeight + 'px';
+
+                const containerHeight = fixedHeight + footerHeight + inset;
+                container.style.height = containerHeight + 'px';
+            };
+        }
+
+        window.addEventListener('resize', setSize);
 
         container.appendChild(content);
-        container.appendChild(closeButton);
-        // if (!infoContainer.parentElement) {
-        //     document.body.appendChild(infoContainer);
-        //     if (frameResize) frameResize();
-        // }
 
+        const buttonInset = 8;
+        const buttonSize = footerHeight - buttonInset * 2;
+        const bottom = footerHeight * 0.5;
+        const confirmButton = document.createElement('button');
+        confirmButton.style.position = 'absolute';
+        confirmButton.style.bottom = bottom + 'px';
+        confirmButton.style.height = buttonSize + 'px';
+        confirmButton.style.width = buttonSize * 2 + 'px';
+
+        if (reject) {
+            const bold = document.createElement('span');
+            bold.style.fontWeight = 'bold';
+            bold.appendChild(document.createTextNode("OK"));
+            confirmButton.appendChild(bold);
+        } else {
+            confirmButton.appendChild(document.createTextNode("Close"));
+        }
+        confirmButton.onclick = () => {
+            closeBlocker();
+            if (confirm) confirm(true);
+        };
+        if (reject) {
+            const rejectButton = document.createElement('button');
+            rejectButton.style.position = 'absolute';
+            rejectButton.style.bottom = bottom + 'px';
+            rejectButton.style.height = buttonSize + 'px';
+            rejectButton.style.width = buttonSize * 2 + 'px';
+            rejectButton.style.left = margin + 'px';
+            rejectButton.style.transform = 'translate(0%, 50%)';
+
+            rejectButton.appendChild(document.createTextNode("Cancel"));
+            rejectButton.onclick = () => {
+                closeBlocker();
+                if (confirm) confirm(false);
+            };
+            container.appendChild(rejectButton);
+
+            confirmButton.style.right = margin + 'px';
+            confirmButton.style.transform = 'translate(0%, 50%)';
+        } else {
+            confirmButton.style.left = '50%';
+            confirmButton.style.transform = 'translate(-50%, 50%)';
+        }
+        container.appendChild(confirmButton);
 
         blocker.appendChild(container);
         document.body.appendChild(blocker);
-        setHeight();
+        setSize();
     }
 }
