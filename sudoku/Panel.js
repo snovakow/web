@@ -1,4 +1,3 @@
-let appPanel = null;
 const blocker = document.createElement('div');
 blocker.style.position = 'absolute';
 blocker.style.left = '0%';
@@ -9,17 +8,32 @@ blocker.style.background = 'rgba(0,0,0,0.5)';
 
 blocker.style.fontSize = 18 + 'px';
 blocker.style.fontFamily = 'sans-serif';
-
-const closeBlocker = () => {
-    if (blocker?.parentElement) blocker.parentElement.removeChild(blocker);
-    if (appPanel) {
-        if (appPanel.parentElement === blocker) blocker.removeChild(appPanel);
-        appPanel = null;
-    }
-};
 // blocker.onclick = (event) => {
 //     if (event.target === blocker) closeBlocker();
 // }
+
+let activePanel = null;
+
+const closeBlocker = () => {
+    if (blocker.parentElement) blocker.parentElement.removeChild(blocker);
+    if (!activePanel) return;
+    activePanel.close();
+    activePanel = null;
+};
+
+class ActivePanel {
+    constructor(panel) {
+        closeBlocker();
+
+        this.panel = panel;
+
+        blocker.appendChild(panel);
+        document.body.appendChild(blocker);
+    }
+    close() {
+        if (this.panel.parentElement === blocker) blocker.removeChild(this.panel);
+    }
+}
 
 const footerHeight = 48;
 const borderWidth = 3;
@@ -28,15 +42,29 @@ const windowMargin = 48;
 
 export class Panel {
     static alert(message, confirm) {
-        const panel = new Panel();
-        panel.show(message, confirm);
+        const panel = new Panel(confirm);
+        panel.show(message);
     }
     static confirm(message, confirm) {
-        const panel = new Panel();
+        const panel = new Panel(confirm, true);
         panel.show(message, confirm, true);
     }
-    constructor(src = null) {
-        const container = document.createElement('div');
+    constructor(confirm, reject = false) {
+        const frame_src = (typeof confirm === 'string') ? confirm : null;
+        if (frame_src) {
+            confirm = null;
+            this.frame = true;
+        } else {
+            this.frame = false;
+        }
+
+
+        this.container = document.createElement('div');
+        this.content = document.createElement(frame_src ? 'iframe' : 'div');
+
+        const container = this.container;
+        const content = this.content;
+
         container.style.position = 'absolute';
         container.style.top = '50%';
         container.style.left = '50%';
@@ -46,101 +74,24 @@ export class Panel {
         container.style.borderRadius = '8px';
         container.style.overflow = 'clip';
 
-        if (src) {
+        if (frame_src) {
             container.style.display = 'none';
 
-            this.content = document.createElement('iframe');
-            // this.content.style.overflow = 'visible';
-            this.content.style.overflow = 'clip';
-            this.content.style.width = '100%';
-            this.content.style.height = '100%';
-
-            this.content.src = src;
-            this.frame = this.content;
+            content.style.overflow = 'visible';
+            content.src = frame_src;
         } else {
-            this.content = document.createElement('div');
-            this.content.style.overflow = 'auto';
-            this.content.style.padding = margin + 'px';
+            content.style.overflow = 'auto';
+            content.style.padding = margin + 'px';
         }
 
-        this.content.style.position = 'absolute';
-        this.content.style.top = '0px';
-        this.content.style.borderBottom = '1px solid rgba(0,0,0,0.5)';
-        this.content.style.borderTop = 'none';
-        this.content.style.borderLeft = 'none';
-        this.content.style.borderRight = 'none';
-        this.content.style.background = 'white';
-        this.content.style.color = 'black';
-
-        this.container = container;
-    }
-    show(message, confirm, reject = false) {
-        const container = this.container;
-        const content = this.content;
-
-        const inset = margin * 2;
-        let setSize = null;
-        if (this.frame) {
-            const frame = this.frame;
-
-            const setWidth = () => {
-                const max = window.innerWidth - windowMargin;
-                let fixedWidth = Math.min(max, 640);
-                container.style.width = fixedWidth + 'px';
-                frame.style.width = fixedWidth + 'px';
-            };
-            setWidth();
-
-            let loaded = false;
-            setSize = () => {
-                if (!container.parentElement) return;
-                if (!loaded) return;
-
-                setWidth();
-
-                const body = frame.contentWindow.document.body;
-                const html = body.parentElement;
-                const scroll = html.scrollTop;
-
-                const max = window.innerHeight - windowMargin - footerHeight;
-                frame.style.height = frame.contentWindow.document.body.scrollHeight + inset + 'px';
-
-                let height = frame.contentWindow.document.body.scrollHeight + inset;
-
-                if (height > max) height = max;
-
-                container.style.height = height + footerHeight + 'px';
-                frame.style.height = height + 'px';
-
-                html.scrollTop = scroll;
-            };
-            frame.onload = () => {
-                loaded = true;
-                container.style.display = 'block';
-                frame.contentWindow.document.body.style.margin = margin + 'px';
-                setSize();
-            };
-        } else {
-            content.appendChild(document.createTextNode(message));
-
-            setSize = () => {
-                const maxWidth = window.innerWidth - windowMargin;
-                const fixedWidth = Math.min(320, maxWidth);
-                content.style.width = fixedWidth - inset + 'px';
-                content.style.height = '0px';
-                container.style.width = fixedWidth + 'px';
-
-                const fullHeight = content.scrollHeight - inset;
-                const maxHeight = window.innerHeight - windowMargin;
-                const fixedHeight = Math.min(fullHeight, maxHeight);
-                content.style.height = fixedHeight + 'px';
-
-                const containerHeight = fixedHeight + footerHeight + inset;
-                container.style.height = containerHeight + 'px';
-            };
-        }
-
-        window.addEventListener('resize', setSize);
+        content.style.position = 'absolute';
+        content.style.top = '0px';
+        content.style.borderBottom = '1px solid rgba(0,0,0,0.5)';
+        content.style.borderTop = 'none';
+        content.style.borderLeft = 'none';
+        content.style.borderRight = 'none';
+        content.style.background = 'white';
+        content.style.color = 'black';
 
         container.appendChild(content);
 
@@ -190,9 +141,79 @@ export class Panel {
             confirmButton.style.transform = 'translate(-50%, 50%)';
         }
         container.appendChild(confirmButton);
+    }
+    show(message) {
+        activePanel = new ActivePanel(this.container);
 
-        blocker.appendChild(container);
-        document.body.appendChild(blocker);
+        const container = this.container;
+        const content = this.content;
+
+        const inset = margin * 2;
+        let setSizeFrame = null;
+        if (this.frame) {
+            const frame = this.content;
+
+            const setWidth = () => {
+                const max = window.innerWidth - windowMargin;
+                let fixedWidth = Math.min(max, 640);
+                container.style.width = fixedWidth + 'px';
+                frame.style.width = fixedWidth + 'px';
+            };
+            setWidth();
+
+            let loaded = false;
+            setSizeFrame = () => {
+                if (!container.parentElement) return;
+                if (!loaded) return;
+
+                setWidth();
+
+                const body = frame.contentWindow.document.body;
+                const html = body.parentElement;
+                const scroll = html.scrollTop;
+
+                const max = window.innerHeight - windowMargin - footerHeight;
+                frame.style.height = frame.contentWindow.document.body.scrollHeight + inset + 'px';
+
+                let height = frame.contentWindow.document.body.scrollHeight + inset;
+
+                if (height > max) height = max;
+
+                container.style.height = height + footerHeight + 'px';
+                frame.style.height = height + 'px';
+
+                html.scrollTop = scroll;
+            };
+            frame.onload = () => {
+                loaded = true;
+                container.style.display = 'block';
+                frame.contentWindow.document.body.style.margin = margin + 'px';
+                setSizeFrame();
+            };
+        } else {
+            content.appendChild(document.createTextNode(message));
+        }
+        setSize = () => {
+            const maxWidth = window.innerWidth - windowMargin;
+            if (this.frame) {
+                setSizeFrame();
+            } else {
+                const fixedWidth = Math.min(320, maxWidth);
+                content.style.width = fixedWidth - inset + 'px';
+                content.style.height = '0px';
+                container.style.width = fixedWidth + 'px';
+
+                const fullHeight = content.scrollHeight - inset;
+                const maxHeight = window.innerHeight - windowMargin;
+                const fixedHeight = Math.min(fullHeight, maxHeight);
+                content.style.height = fixedHeight + 'px';
+
+                const containerHeight = fixedHeight + footerHeight + inset;
+                container.style.height = containerHeight + 'px';
+            }
+        };
+
+        window.addEventListener('resize', setSize);
         setSize();
     }
 }
