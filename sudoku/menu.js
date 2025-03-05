@@ -118,29 +118,27 @@ const addMenuItem = (title, strategy) => {
 	item.view.appendChild(document.createTextNode(title));
 
 	item.view.addEventListener("click", () => {
-		if (!menuResponse) return;
-		if (!menuResponse(strategy, title)) return;
-		setMenuItem(strategy);
+		if (menuResponse) menuResponse(strategy);
 	});
 
 	backing.appendChild(item.view);
 
 	menuMap.set(strategy, item);
 }
-addMenuItem("Naked Pair", 'candidate_naked2');
-addMenuItem("Naked Triple", 'candidate_naked3');
-addMenuItem("Naked Quad", 'candidate_naked4');
-addMenuItem("Hidden Single", 'candidate_hidden1');
-addMenuItem("Hidden Pair", 'candidate_hidden2');
-addMenuItem("Hidden Triple", 'candidate_hidden3');
-addMenuItem("Hidden Quad", 'candidate_hidden4');
-addMenuItem("Intersection Removal (Omissions)", 'candidate_omissions');
-addMenuItem("Deadly Pattern (Unique Rectangle)", 'candidate_uniqueRectangle');
-addMenuItem("Y Wing", 'candidate_yWing');
-addMenuItem("XYZ Wing", 'candidate_xyzWing');
-addMenuItem("X Wing", 'candidate_xWing');
-addMenuItem("Swordfish", 'candidate_swordfish');
-addMenuItem("Jellyfish", 'candidate_jellyfish');
+addMenuItem("Naked Pair", 'naked2');
+addMenuItem("Naked Triple", 'naked3');
+addMenuItem("Naked Quad", 'naked4');
+addMenuItem("Hidden Single", 'hidden1');
+addMenuItem("Hidden Pair", 'hidden2');
+addMenuItem("Hidden Triple", 'hidden3');
+addMenuItem("Hidden Quad", 'hidden4');
+addMenuItem("Intersection Removal (Omissions)", 'omissions');
+addMenuItem("Deadly Pattern (Unique Rectangle)", 'uniqueRectangle');
+addMenuItem("Y Wing", 'yWing');
+addMenuItem("XYZ Wing", 'xyzWing');
+addMenuItem("X Wing", 'xWing');
+addMenuItem("Swordfish", 'swordfish');
+addMenuItem("Jellyfish", 'jellyfish');
 
 const menuTitle = (strategy) => {
 	return menuMap.get(strategy)?.title ?? "";

@@ -20,20 +20,20 @@ let strategy = "level";
 	const searchParams = new URLSearchParams(window.location.search);
 	const strategySearch = searchParams.get("strategy");
 	const strategyNames = [
-		"candidate_naked2",
-		"candidate_naked3",
-		"candidate_naked4",
-		"candidate_hidden1",
-		"candidate_hidden2",
-		"candidate_hidden3",
-		"candidate_hidden4",
-		"candidate_omissions",
-		"candidate_uniqueRectangle",
-		"candidate_yWing",
-		"candidate_xyzWing",
-		"candidate_xWing",
-		"candidate_swordfish",
-		"candidate_jellyfish",
+		"naked2",
+		"naked3",
+		"naked4",
+		"hidden1",
+		"hidden2",
+		"hidden3",
+		"hidden4",
+		"omissions",
+		"uniqueRectangle",
+		"yWing",
+		"xyzWing",
+		"xWing",
+		"swordfish",
+		"jellyfish",
 		"custom",
 		"hardcoded",
 	];
@@ -198,9 +198,7 @@ const pickerClick = (event) => {
 	}
 
 	if (puzzleFinished()) {
-		window.setTimeout(() => {
-			Panel.alert("Puzzle Complete!!!");
-		}, 0);
+		Panel.alert("Puzzle Complete!!!");
 	}
 };
 picker.addEventListener('click', pickerClick);
@@ -308,9 +306,15 @@ if (loadGridMetadata) {
 
 Menu.setMenuReponse((responseStrategy) => {
 	if (strategy === responseStrategy) return false;
-	if (!Panel.confirm("Do you want to start a " + Menu.menuTitle(responseStrategy) + " puzzle?")) return false;
-	window.location.search = "?strategy=" + responseStrategy;
-	return true;
+	const message = "Do you want to start a " + Menu.menuTitle(responseStrategy) + " puzzle?";
+	Menu.setMenuItem(responseStrategy);
+	Panel.confirm(message, confirmed => {
+		if (confirmed) {
+			window.location.search = "?strategy=" + responseStrategy;
+		} else {
+			Menu.setMenuItem(strategy);
+		}
+	});
 });
 
 const setMarkerMode = () => {
@@ -499,7 +503,7 @@ const loadSudoku = () => {
 		if (strategy === 'custom' || strategy === 'hardcoded') return;
 	}
 
-	fetch("../sudokulib/sudoku.php?version=2&strategy=" + strategy).then(response => {
+	fetch("../sudokulib/sudoku.php?version=2&strategy=candidate_" + strategy).then(response => {
 		response.json().then((json) => {
 			const puzzleId = json.id;
 			const puzzleDataHex = json.puzzleData;
@@ -544,20 +548,20 @@ title.style.top = headerHeight / 2 + 'px';
 title.style.left = '50%';
 title.style.transform = 'translate(-50%, -50%)';
 let titleString = null;
-if (strategy === 'candidate_naked2') titleString = "Naked Pair";
-if (strategy === 'candidate_naked3') titleString = "Naked Triple";
-if (strategy === 'candidate_naked4') titleString = "Naked Quad";
-if (strategy === 'candidate_hidden1') titleString = "Hidden Single";
-if (strategy === 'candidate_hidden2') titleString = "Hidden Pair";
-if (strategy === 'candidate_hidden3') titleString = "Hidden Triple";
-if (strategy === 'candidate_hidden4') titleString = "Hidden Quad";
-if (strategy === 'candidate_omissions') titleString = "Intersection Removal";
-if (strategy === 'candidate_uniqueRectangle') titleString = "Deadly Pattern";
-if (strategy === 'candidate_yWing') titleString = "Y Wing";
-if (strategy === 'candidate_xyzWing') titleString = "XYZ Wing";
-if (strategy === 'candidate_xWing') titleString = "X Wing";
-if (strategy === 'candidate_swordfish') titleString = "Swordfish";
-if (strategy === 'candidate_jellyfish') titleString = "Jellyfish";
+if (strategy === 'naked2') titleString = "Naked Pair";
+if (strategy === 'naked3') titleString = "Naked Triple";
+if (strategy === 'naked4') titleString = "Naked Quad";
+if (strategy === 'hidden1') titleString = "Hidden Single";
+if (strategy === 'hidden2') titleString = "Hidden Pair";
+if (strategy === 'hidden3') titleString = "Hidden Triple";
+if (strategy === 'hidden4') titleString = "Hidden Quad";
+if (strategy === 'omissions') titleString = "Intersection Removal";
+if (strategy === 'uniqueRectangle') titleString = "Deadly Pattern";
+if (strategy === 'yWing') titleString = "Y Wing";
+if (strategy === 'xyzWing') titleString = "XYZ Wing";
+if (strategy === 'xWing') titleString = "X Wing";
+if (strategy === 'swordfish') titleString = "Swordfish";
+if (strategy === 'jellyfish') titleString = "Jellyfish";
 if (titleString === null) titleString = "Singles";
 title.appendChild(document.createTextNode(titleString));
 
@@ -623,16 +627,14 @@ Menu.checkButton.addEventListener('click', () => {
 		}
 	}
 	draw();
-	window.setTimeout(() => {
-		if (solved) {
-			Panel.alert("Puzzle Complete!!!");
-		} else if (errorCount > 0) {
-			if (errorCount === 1) Panel.alert(errorCount + " Error!");
-			else Panel.alert(errorCount + " Errors!");
-		} else {
-			Panel.alert("No Errors!");
-		}
-	}, 0);
+	if (solved) {
+		Panel.alert("Puzzle Complete!!!");
+	} else if (errorCount > 0) {
+		if (errorCount === 1) Panel.alert(errorCount + " Error!");
+		else Panel.alert(errorCount + " Errors!");
+	} else {
+		Panel.alert("No Errors!");
+	}
 });
 
 let infoPanel = null;
@@ -748,9 +750,13 @@ if (strategy === 'custom') {
 		if (findAnimating) return;
 
 		const name = levelMode ? titleString : Menu.menuTitle(strategy);
-		if (!Panel.confirm("Do you want to find a new " + name + " puzzle?")) return;
-		selected = false;
-		loadSudoku();
+		const message = "Do you want to find a new " + name + " puzzle?";
+		Panel.confirm(message, confirmed => {
+			if (!confirmed) return;
+
+			selected = false;
+			loadSudoku();
+		});
 	});
 }
 
@@ -758,12 +764,16 @@ Menu.reset.addEventListener('click', () => {
 	if (findAnimating) return;
 
 	const name = levelMode ? titleString : Menu.menuTitle(strategy);
-	if (!Panel.confirm("Do you want to restart this " + name + " puzzle?")) return;
-	selected = false;
-	board.resetGrid();
-	Undo.set(board);
-	saveData();
-	draw();
+	const message = "Do you want to restart this " + name + " puzzle?";
+	Panel.confirm(message, confirmed => {
+		if (!confirmed) return;
+
+		selected = false;
+		board.resetGrid();
+		Undo.set(board);
+		saveData();
+		draw();
+	});
 });
 
 const resize = () => {

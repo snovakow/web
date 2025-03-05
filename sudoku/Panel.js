@@ -36,7 +36,19 @@ export class Panel {
         panel.show(message, confirm, true);
     }
     constructor(src = null) {
+        const container = document.createElement('div');
+        container.style.position = 'absolute';
+        container.style.top = '50%';
+        container.style.left = '50%';
+        container.style.transform = 'translate(-50%, -50%)';
+        container.style.background = 'hsl(0 100% 99%)';
+        container.style.border = borderWidth + 'px solid black';
+        container.style.borderRadius = '8px';
+        container.style.overflow = 'clip';
+
         if (src) {
+            container.style.display = 'none';
+
             this.content = document.createElement('iframe');
             // this.content.style.overflow = 'visible';
             this.content.style.overflow = 'clip';
@@ -59,23 +71,12 @@ export class Panel {
         this.content.style.borderRight = 'none';
         this.content.style.background = 'white';
         this.content.style.color = 'black';
+
+        this.container = container;
     }
     show(message, confirm, reject = false) {
-        const container = document.createElement('div');
-        container.style.position = 'absolute';
-        container.style.top = '50%';
-        container.style.left = '50%';
-        container.style.transform = 'translate(-50%, -50%)';
-        container.style.background = 'hsl(0 100% 99%)';
-        container.style.border = borderWidth + 'px solid black';
-        container.style.borderRadius = '8px';
-        container.style.overflow = 'clip';
-
+        const container = this.container;
         const content = this.content;
-
-        if (this.frame) {
-            container.style.display = 'none';
-        }
 
         const inset = margin * 2;
         let setSize = null;
@@ -160,7 +161,8 @@ export class Panel {
         } else {
             confirmButton.appendChild(document.createTextNode("Close"));
         }
-        confirmButton.onclick = () => {
+        confirmButton.onclick = (event) => {
+            event.stopPropagation();
             closeBlocker();
             if (confirm) confirm(true);
         };
@@ -174,7 +176,8 @@ export class Panel {
             rejectButton.style.transform = 'translate(0%, 50%)';
 
             rejectButton.appendChild(document.createTextNode("Cancel"));
-            rejectButton.onclick = () => {
+            rejectButton.onclick = (event) => {
+                event.stopPropagation();
                 closeBlocker();
                 if (confirm) confirm(false);
             };
