@@ -38,7 +38,7 @@ class ActivePanel {
 const footerHeight = 48;
 const borderWidth = 3;
 const margin = 32;
-const windowMargin = 48;
+const windowMargin = 48 * 2;
 
 export class Panel {
     static alert(message, confirm) {
@@ -47,7 +47,7 @@ export class Panel {
     }
     static confirm(message, confirm) {
         const panel = new Panel(confirm, true);
-        panel.show(message, confirm, true);
+        panel.show(message);
     }
     constructor(confirm, reject = false) {
         const frame_src = (typeof confirm === 'string') ? confirm : null;
@@ -142,12 +142,12 @@ export class Panel {
         }
         container.appendChild(confirmButton);
     }
-    show(message) {
+    show(message = null) {
         activePanel = new ActivePanel(this.container);
 
         const setWidth = (min) => {
             const maxWidth = window.innerWidth - windowMargin;
-            let fixedWidth = Math.min(maxWidth, min);
+            const fixedWidth = Math.min(maxWidth, min);
             this.container.style.width = fixedWidth + 'px';
             this.content.style.width = fixedWidth + 'px';
         };
@@ -156,18 +156,16 @@ export class Panel {
         const content = this.content;
 
         const inset = margin * 2;
-        let setSizeFrame = null;
-        if (this.frame) {
-            const frame = this.content;
+        let loaded = false;
 
-            setWidth(640);
+        const setSize = () => {
+            if (!container.parentElement) return;
+            if (!loaded) return;
 
-            let loaded = false;
-            setSizeFrame = () => {
-                if (!container.parentElement) return;
-                if (!loaded) return;
-
+            if (this.frame) {
                 setWidth(640);
+
+                const frame = this.content;
 
                 const body = frame.contentWindow.document.body;
                 const html = body.parentElement;
@@ -184,25 +182,9 @@ export class Panel {
                 frame.style.height = height + 'px';
 
                 html.scrollTop = scroll;
-            };
-            frame.onload = () => {
-                loaded = true;
-                container.style.display = 'block';
-                frame.contentWindow.document.body.style.margin = margin + 'px';
-                setSizeFrame();
-            };
-        } else {
-            content.appendChild(document.createTextNode(message));
-        }
-        const setSize = () => {
-            const maxWidth = window.innerWidth - windowMargin;
-            if (this.frame) {
-                setSizeFrame();
             } else {
-                const fixedWidth = Math.min(320, maxWidth);
-                content.style.width = fixedWidth - inset + 'px';
+                setWidth(320);
                 content.style.height = '0px';
-                container.style.width = fixedWidth + 'px';
 
                 const fullHeight = content.scrollHeight - inset;
                 const maxHeight = window.innerHeight - windowMargin;
@@ -213,6 +195,21 @@ export class Panel {
                 container.style.height = containerHeight + 'px';
             }
         };
+
+        if (this.frame) {
+            const frame = this.content;
+            frame.onload = () => {
+                loaded = true;
+                if (!activePanel) return;
+                if (activePanel.panel !== this.container) return;
+                container.style.display = 'block';
+                frame.contentWindow.document.body.style.margin = margin + 'px';
+                setSize();
+            };
+        } else {
+            loaded = true;
+            if (message) content.appendChild(document.createTextNode(message));
+        }
 
         window.addEventListener('resize', setSize);
         setSize();
