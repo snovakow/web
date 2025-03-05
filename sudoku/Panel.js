@@ -145,6 +145,13 @@ export class Panel {
     show(message) {
         activePanel = new ActivePanel(this.container);
 
+        const setWidth = (min) => {
+            const maxWidth = window.innerWidth - windowMargin;
+            let fixedWidth = Math.min(maxWidth, min);
+            this.container.style.width = fixedWidth + 'px';
+            this.content.style.width = fixedWidth + 'px';
+        };
+
         const container = this.container;
         const content = this.content;
 
@@ -153,20 +160,14 @@ export class Panel {
         if (this.frame) {
             const frame = this.content;
 
-            const setWidth = () => {
-                const max = window.innerWidth - windowMargin;
-                let fixedWidth = Math.min(max, 640);
-                container.style.width = fixedWidth + 'px';
-                frame.style.width = fixedWidth + 'px';
-            };
-            setWidth();
+            setWidth(640);
 
             let loaded = false;
             setSizeFrame = () => {
                 if (!container.parentElement) return;
                 if (!loaded) return;
 
-                setWidth();
+                setWidth(640);
 
                 const body = frame.contentWindow.document.body;
                 const html = body.parentElement;
