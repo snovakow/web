@@ -86,7 +86,7 @@ export class Panel {
 
         content.style.position = 'absolute';
         content.style.top = '0px';
-        content.style.borderBottom = '1px solid rgba(0,0,0,0.5)';
+        content.style.borderBottom = '1px solid rgba(0,0,0,0.25)';
         content.style.borderTop = 'none';
         content.style.borderLeft = 'none';
         content.style.borderRight = 'none';
@@ -193,7 +193,7 @@ export class Panel {
         } else {
             content.appendChild(document.createTextNode(message));
         }
-        setSize = () => {
+        const setSize = () => {
             const maxWidth = window.innerWidth - windowMargin;
             if (this.frame) {
                 setSizeFrame();
