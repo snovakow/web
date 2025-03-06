@@ -12,7 +12,7 @@ const MAX_SIZE = 10000000;
 if (!isset($_GET['mode'])) die;
 
 $mode = (int)$_GET['mode'];
-if (!is_int($mode) || $mode < 0 || $mode > 5) die;
+if (!is_int($mode) || $mode < 0 || $mode > 6) die;
 
 function totalCount($tableCount, $puzzleCount)
 {
@@ -174,7 +174,7 @@ try {
 
 	$tables = "tables";
 
-	$tableCount = (int)$_GET['table'];
+	$tableCount = $_GET['table'];
 	if (is_int($tableCount) && $tableCount >= 1 && $tableCount <= 1000) {
 		$puzzleCount = MAX_SIZE;
 		$totalCount = totalCount($tableCount, $puzzleCount);
@@ -182,8 +182,8 @@ try {
 		$stmt = $db->prepare("SELECT `tableCount`, `puzzleCount` FROM `$tables`");
 		$stmt->execute();
 		$result = $stmt->fetch();
-		$tableCount = (int)$result['tableCount'];
-		$puzzleCount = (int)$result['puzzleCount'];
+		$tableCount = $result['tableCount'];
+		$puzzleCount = $result['puzzleCount'];
 		$totalCount = totalCount($tableCount, $puzzleCount);
 	}
 
@@ -401,7 +401,7 @@ try {
 			$result = $stmt->fetch(\PDO::FETCH_ASSOC);
 
 			$results[] = $result;
-			$total += (int)$result['count'];
+			$total += $result['count'];
 		}
 
 		$percent = percentage($total, $totalCount, 2);
@@ -448,12 +448,12 @@ try {
 			$strategyType_IsoMax = 0;
 
 			foreach ($results as $result) {
-				$strategyType += (int)$result[$strategy];
-				$strategyType_Max = max($strategyType_Max, (int)$result["{$strategy}Max"]);
-				$strategyType_Min += (int)$result["{$strategy}Min"];
-				$strategyType_MinMax = max($strategyType_MinMax, (int)$result["{$strategy}MinMax"]);
-				$strategyType_Iso += (int)$result["{$strategy}Iso"];
-				$strategyType_IsoMax = max($strategyType_IsoMax, (int)$result["{$strategy}IsoMax"]);
+				$strategyType += $result[$strategy];
+				$strategyType_Max = max($strategyType_Max, $result["{$strategy}Max"]);
+				$strategyType_Min += $result["{$strategy}Min"];
+				$strategyType_MinMax = max($strategyType_MinMax, $result["{$strategy}MinMax"]);
+				$strategyType_Iso += $result["{$strategy}Iso"];
+				$strategyType_IsoMax = max($strategyType_IsoMax, $result["{$strategy}IsoMax"]);
 			}
 
 			$percent = percentage($strategyType, $total, 5);
@@ -476,7 +476,7 @@ try {
 		}
 	}
 
-	if ($mode === 5) {
+	if ($mode === 6) {
 		$counts = [];
 		$countTypes = [];
 
@@ -488,8 +488,8 @@ try {
 			$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 			foreach ($result as $row) {
 				$clueCount = $row['clueCount'];
-				$solveType = (int)$row['solveType'];
-				$count = (int)$row['count'];
+				$solveType = $row['solveType'];
+				$count = $row['count'];
 
 				if (!$counts[$clueCount]) $counts[$clueCount] = 0;
 				$counts[$clueCount] += $count;
