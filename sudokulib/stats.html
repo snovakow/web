@@ -118,7 +118,7 @@
 			appendSpace();
 		}
 
-		const mode5 = (data) => {
+		const mode6 = (data) => {
 			const printTitle = (title, avg, count, total, precision) => {
 				const percent = percentage(count, total, precision);
 				const number = count.toLocaleString();
@@ -175,10 +175,9 @@
 
 		const url = './statsFeed.php' + window.location.search;
 		fetch(url, { cache: "no-store" }).then(response => {
-			if (mode >= 0 && mode <= 2) response.text().then((text) => { modeText(text); });
+			if (mode >= 0 && mode <= 5 && mode !== 3) response.text().then((text) => { modeText(text); });
 			if (mode === 3) response.json().then((json) => { mode3(json); });
-			if (mode === 4) response.text().then((text) => { modeText(text); });
-			if (mode === 5) response.json().then((json) => { mode5(json); });
+			if (mode === 6) response.json().then((json) => { mode6(json); });
 		});
 	</script>
 
