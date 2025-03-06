@@ -26,12 +26,17 @@ class ActivePanel {
         closeBlocker();
 
         this.panel = panel;
+        this.resizeListener = null;
 
         blocker.appendChild(panel);
         document.body.appendChild(blocker);
     }
     close() {
         if (this.panel.parentElement === blocker) blocker.removeChild(this.panel);
+        if (this.resizeListener) {
+            window.removeEventListener('resize', this.resizeListener);
+            this.resizeListener = null;
+        }
     }
 }
 
@@ -57,7 +62,7 @@ export class Panel {
         } else {
             this.frame = false;
         }
-
+        this.loaded = false;
 
         this.container = document.createElement('div');
         this.content = document.createElement(frame_src ? 'iframe' : 'div');
@@ -77,7 +82,7 @@ export class Panel {
         if (frame_src) {
             container.style.display = 'none';
 
-            content.style.overflow = 'visible';
+            content.style.overflow = 'clip';
             content.src = frame_src;
         } else {
             content.style.overflow = 'auto';
@@ -156,11 +161,10 @@ export class Panel {
         const content = this.content;
 
         const inset = margin * 2;
-        let loaded = false;
 
         const setSize = () => {
             if (!container.parentElement) return;
-            if (!loaded) return;
+            if (!this.loaded) return;
 
             if (this.frame) {
                 setWidth(640);
@@ -197,20 +201,23 @@ export class Panel {
         };
 
         if (this.frame) {
-            const frame = this.content;
-            frame.onload = () => {
-                loaded = true;
-                if (!activePanel) return;
-                if (activePanel.panel !== this.container) return;
-                container.style.display = 'block';
-                frame.contentWindow.document.body.style.margin = margin + 'px';
-                setSize();
-            };
+            if (!this.loaded) {
+                const frame = this.content;
+                frame.onload = () => {
+                    this.loaded = true;
+                    if (!activePanel) return;
+                    if (activePanel.panel !== this.container) return;
+                    container.style.display = 'block';
+                    frame.contentWindow.document.body.style.margin = margin + 'px';
+                    setSize();
+                };
+            }
         } else {
-            loaded = true;
+            this.loaded = true;
             if (message) content.appendChild(document.createTextNode(message));
         }
 
+        activePanel.resizeListener = setSize;
         window.addEventListener('resize', setSize);
         setSize();
     }
