@@ -714,9 +714,15 @@ Menu.toolBar.style.right = "0%";
 Menu.toolBar.style.paddingRight = "8px";
 document.body.appendChild(Menu.toolBar);
 
+const mainBodySize = () => {
+	const width = window.innerWidth;
+	const height = window.innerHeight - headerHeight - footerHeight;
+	return { width, height };
+};
+
 const sizeMenu = () => {
 	if (!Menu.backing.parentElement) return;
-	const boundingClientRect = mainBody.getBoundingClientRect();
+	const boundingClientRect = mainBodySize();
 	const maxPoint = boundingClientRect.top + boundingClientRect.height;
 	const menuClientRect = Menu.backing.getBoundingClientRect();
 	const maxHeight = maxPoint - menuClientRect.top;
@@ -777,26 +783,23 @@ Menu.reset.addEventListener('click', () => {
 });
 
 const resize = () => {
-	const boundingClientRect = mainBody.getBoundingClientRect();
+	const boundingClientRect = mainBodySize();
 
 	const width = boundingClientRect.width;
 	const height = boundingClientRect.height;
-
 	const padding = 8;
-
-	const landscapeWidth = width - PICKER.cellsSize - padding * 3;
-	const landscapeHeight = height;
-	const landscapeSize = Math.min(landscapeWidth, landscapeHeight);
 
 	const portraitWidth = width;
 	const portraitHeight = height - PICKER.cellsSize - padding * 1;
 	const portraitSize = Math.min(portraitWidth, portraitHeight);
 
-	let boxSize;
-	if (landscapeSize > portraitSize) {
-		boxSize = landscapeSize;
+	const landscapeWidth = width - PICKER.cellsSize - padding * 3;
+	const landscapeHeight = height;
+	const landscapeSize = Math.min(landscapeWidth, landscapeHeight);
 
-		const buffer = Math.max(landscapeWidth - boxSize, 0) / 3;
+	const boxSize = Math.max(portraitSize, landscapeSize);
+	if (landscapeSize > portraitSize) {
+		const buffer = (landscapeWidth > landscapeSize) ? (landscapeWidth - landscapeSize) / 3 : 0;
 
 		board.canvas.style.top = '50%';
 		board.canvas.style.left = padding + buffer + 'px';
@@ -820,9 +823,7 @@ const resize = () => {
 
 		Menu.autoBar.style.gap = '16px';
 	} else {
-		boxSize = portraitSize;
-
-		const buffer = Math.max(portraitHeight - boxSize, 0) / 3;
+		const buffer = (portraitHeight > portraitSize) ? (portraitHeight - portraitSize) / 3 : 0;
 
 		board.canvas.style.top = buffer + 'px';
 		board.canvas.style.left = '50%';
