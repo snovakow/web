@@ -449,7 +449,6 @@ const loadLevel = () => {
 		if (complete) {
 			cancelAnimationFrame(animationId);
 			const data = complete.data;
-			console.log(data.clueCount, data.hiddenCount, data.nakedCount);
 			const puzzleId = data.id;
 
 			const transform = complete.transform;
@@ -472,6 +471,10 @@ const loadLevel = () => {
 			Undo.set(board);
 			saveData();
 			findAnimating = false;
+
+			// console.log(data.clueCount, data.hiddenCount, data.nakedCount);
+			// const message = `Found a puzzle with ${data.clueCount} clues, and ${data.nakedCount} Naked Singles`;
+			// Panel.alert(message);
 		}
 		draw();
 	}

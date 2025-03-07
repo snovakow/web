@@ -165,11 +165,11 @@ export class Panel {
     show(message = null) {
         activePanel = new ActivePanel(this.container);
 
-        const setWidth = (min) => {
+        const setWidth = (min, inset = 0) => {
             const maxWidth = window.innerWidth - windowMargin;
             const fixedWidth = Math.min(maxWidth, min);
             this.container.style.width = fixedWidth + 'px';
-            this.content.style.width = fixedWidth + 'px';
+            this.content.style.width = fixedWidth - inset + 'px';
         };
 
         const container = this.container;
@@ -183,7 +183,6 @@ export class Panel {
 
             if (this.frame) {
                 setWidth(640);
-
                 const frame = this.content;
 
                 const body = frame.contentWindow.document.body;
@@ -202,7 +201,7 @@ export class Panel {
 
                 html.scrollTop = scroll;
             } else {
-                setWidth(320);
+                setWidth(320, inset);
                 content.style.height = '0px';
 
                 const fullHeight = content.scrollHeight - inset;
