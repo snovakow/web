@@ -93,25 +93,6 @@
 			printLine("Candidate", data.candidate + data.candidateMin, data.candidateMin);
 			printLine("Unsolvable", data.unsolvable);
 
-			const printSimpleLine = (title, count) => {
-				const percent = percentage(count, totalCount, fixed);
-				const number = count.toLocaleString();
-
-				fields = [];
-				fields.push(title.padEnd(14));
-				fields.push(`${percent}`.padStart(6));
-				fields.push(`${number}`.padStart(len4));
-				appendLine(fields.join(" "));
-			}
-			appendSpace();
-			appendLine("Isolated:");
-			printSimpleLine("Hidden", data.hiddenSimple);
-			printSimpleLine("Omission", data.omissionSimple);
-			printSimpleLine("Naked", data.nakedSimpleIsolated);
-			printSimpleLine("Naked Omission", data.nakedOmissionSimpleIsolate);
-			const totalIsolated = data.hiddenSimple + data.omissionSimple + data.nakedSimpleIsolated + data.nakedOmissionSimpleIsolate;
-			printSimpleLine("Total Simple", totalIsolated);
-
 			appendSpace();
 			const time = Math.round((performance.now() - startTime) / 1000);
 			appendLine(`${Math.floor(time / 60)}m ${time % 60}s`);
