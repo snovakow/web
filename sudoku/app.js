@@ -449,6 +449,7 @@ const loadLevel = () => {
 		if (complete) {
 			cancelAnimationFrame(animationId);
 			const data = complete.data;
+			console.log(data.clueCount, data.hiddenCount, data.nakedCount);
 			const puzzleId = data.id;
 
 			const transform = complete.transform;

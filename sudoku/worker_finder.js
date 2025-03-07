@@ -37,7 +37,7 @@ const reduceCell = (cells, index, symbol) => {
 	}
 }
 
-const hiddenSingles = (cells, single = false) => {
+const hiddenSingles = (cells) => {
 	let reduced = 0;
 	for (let x = 1; x <= 9; x++) {
 		for (const group of Grid.groupTypes) {
@@ -58,18 +58,15 @@ const hiddenSingles = (cells, single = false) => {
 				symbolCell.symbol = x;
 				symbolCell.mask = 0x0000;
 				reduceCell(cells, indexCell, x);
-				if (single) return true;
 				reduced++;
 			}
 		}
 	}
-	if (single) return false;
 	return reduced;
 }
 
 const powerOf2 = x => (x & (x - 0x0001)) === 0x0000;
-const nakedSingles = (cells, single = false) => {
-	let reduced = 0;
+const nakedSingles = (cells) => {
 	for (let index = 0; index < 81; index++) {
 		const cell = cells[index];
 		if (cell.symbol !== 0) continue;
@@ -80,14 +77,12 @@ const nakedSingles = (cells, single = false) => {
 				cell.symbol = x;
 				cell.mask = 0x0000;
 				reduceCell(cells, index, x);
-				if (single) return true;
-				reduced++;
+				return true;
 			}
 		}
 
 	}
-	if (single) return false;
-	return reduced;
+	return false;
 }
 
 const cells = new Grid();
@@ -109,15 +104,12 @@ const fillSolve = () => {
 	let hiddenCount = 0;
 	let nakedCount = 0;
 	while (remaining > 0) {
-		do {
-			const hiddenReduced = hiddenSingles(cells);
-			hiddenCount += hiddenReduced;
-			remaining -= hiddenReduced;
-			if (hiddenReduced === 0) break;
-		} while (remaining > 0);
+		const hiddenReduced = hiddenSingles(cells);
+		hiddenCount += hiddenReduced;
+		remaining -= hiddenReduced;
 
-		if (remaining > 0) {
-			const nakedReduced = nakedSingles(cells, true);
+		if (hiddenReduced === 0 && remaining > 0) {
+			const nakedReduced = nakedSingles(cells);
 			if (!nakedReduced) break;
 			nakedCount++;
 			remaining--;
