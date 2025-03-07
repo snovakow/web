@@ -6,8 +6,9 @@ const MAX_SIZE = 10000000;
 // 1 = Populate Statements
 // 2 = Populated Tables
 // 3 = Totals
-// 4 = Strategies
-// 5 = Clues
+// 4 = Visuals
+// 5 = Strategies
+// 6 = Clues
 
 if (!isset($_GET['mode'])) die;
 
@@ -308,8 +309,6 @@ try {
 
 	if ($mode === 3) {
 		$counts = [];
-		$nakedSimpleIsolated = 0;
-		$nakedOmissionSimpleIsolate = 0;
 		for ($i = 1; $i <= $tableCount; $i++) {
 			$table = tableName($i);
 			$sql = "SELECT `solveType`, COUNT(*) AS count FROM `$table` GROUP BY `solveType`";
@@ -322,18 +321,6 @@ try {
 				if (array_key_exists($solveType, $counts)) $counts[$solveType] += $count;
 				else $counts[$solveType] = $count;
 			}
-
-			$sql = "SELECT COUNT(*) AS count FROM `$table` WHERE `solveType`=2 AND `omissionSimple`=0";
-			$stmt = $db->prepare($sql);
-			$stmt->execute();
-			$row = $stmt->fetch(\PDO::FETCH_ASSOC);
-			$nakedSimpleIsolated += $row['count'];
-
-			$sql = "SELECT COUNT(*) AS count FROM `$table` WHERE `solveType`=2 AND `omissionSimple`>0";
-			$stmt = $db->prepare($sql);
-			$stmt->execute();
-			$row = $stmt->fetch(\PDO::FETCH_ASSOC);
-			$nakedOmissionSimpleIsolate += $row['count'];
 		}
 
 		$hiddenSimple = $counts[0];
@@ -348,8 +335,6 @@ try {
 			'hiddenSimple' => $hiddenSimple,
 			'omissionSimple' => $omissionSimple,
 			'nakedSimple' => $nakedSimple,
-			'nakedSimpleIsolated' => $nakedSimpleIsolated,
-			'nakedOmissionSimpleIsolate' => $nakedOmissionSimpleIsolate,
 			'omissionVisible' => $omissionVisible,
 			'candidate' => $candidate,
 			'candidateMin' => $candidateMin,
@@ -360,6 +345,173 @@ try {
 	}
 
 	if ($mode === 4) {
+		$strategies = [
+			"hiddenSimple",
+			"nakedSimple",
+			"omissionSimple",
+			"nakedPointer",
+		];
+
+		$results = [];
+		foreach ($strategies as $strategy) {
+			if ($strategy == "hiddenSimple") {
+				$results[$strategy] = ['min' => 82, 'max' => 0, 'count' => 0];
+			} elseif ($strategy == "nakedPointer") {
+				$results[$strategy] = ['maxNaked' => 0, 'maxPointer' => 0, 'count' => 0];
+			} else {
+				$results[$strategy] = ['max' => 0, 'count' => 0];
+			}
+		}
+
+		for ($i = 1; $i <= $tableCount; $i++) {
+			$table = tableName($i);
+
+			foreach ($strategies as $strategy) {
+				if ($strategy == 'hiddenSimple') {
+					$sql = "SELECT COUNT(*) AS count, MIN(`$strategy`) AS min, MAX(`$strategy`) AS max FROM `$table` ";
+					$sql .= "WHERE `solveType`=0";
+
+					$stmt = $db->prepare($sql);
+					$stmt->execute();
+					$row = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+					$result = &$results[$strategy];
+					$result['count'] += $row['count'];
+					$result['min'] = min($row['min'], $result['min']);
+					$result['max'] = max($row['max'], $result['max']);
+				} elseif ($strategy == 'nakedPointer') {
+					$sql = "SELECT COUNT(*) AS count, MAX(`nakedSimple`) AS maxNaked, ";
+					$sql .= "MAX(`omissionSimple`) AS maxPointer ";
+					$sql .= "FROM `$table` WHERE `omissionSimple`>0 AND `solveType`=2";
+
+					$stmt = $db->prepare($sql);
+					$stmt->execute();
+					$row = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+					$result = &$results[$strategy];
+					$result['count'] += $row['count'];
+					$result['maxNaked'] = max($row['maxNaked'], $result['maxNaked']);
+					$result['maxPointer'] = max($row['maxPointer'], $result['maxPointer']);
+				} else {
+					$sql = "SELECT COUNT(*) AS count, MAX(`$strategy`) AS max FROM `$table` ";
+					if ($strategy == 'nakedSimple') $sql .= "WHERE `omissionSimple`=0 AND `solveType`=2";
+					if ($strategy == 'omissionSimple') $sql .= "WHERE `solveType`=1";
+
+					$stmt = $db->prepare($sql);
+					$stmt->execute();
+					$row = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+					$result = &$results[$strategy];
+					$result['count'] += $row['count'];
+					$result['max'] = max($row['max'], $result['max']);
+				}
+			}
+		}
+
+		$number = number_format($totalCount);
+		echo "--- Total $number\n\n";
+
+		$len_1 = 13;
+		$len_2 = 10;
+		$len_3 = 3;
+		$len_4 = 11;
+
+		echo str_pad("Strategy", $len_1, " ", STR_PAD_RIGHT);
+		echo str_pad("%", $len_2 + 1, " ", STR_PAD_LEFT);
+		echo str_pad("Max", $len_3 + 1, " ", STR_PAD_LEFT);
+		echo str_pad("Count", $len_4 + 1, " ", STR_PAD_LEFT);
+		echo "\n";
+		echo str_pad("", $len_1, "-", STR_PAD_RIGHT);
+		echo str_pad(str_pad("", $len_2, "-", STR_PAD_RIGHT), $len_2 + 1, " ", STR_PAD_LEFT);
+		echo str_pad(str_pad("", $len_3, "-", STR_PAD_RIGHT), $len_3 + 1, " ", STR_PAD_LEFT);
+		echo str_pad(str_pad("", $len_4, "-", STR_PAD_RIGHT), $len_4 + 1, " ", STR_PAD_LEFT);
+		echo "\n";
+
+		foreach ($strategies as $strategy) {
+			$result = &$results[$strategy];
+			if ($strategy == 'hiddenSimple') $title = "Hidden Min"; // $title = "Hidden Max";			
+			if ($strategy == 'nakedSimple') $title = "Naked";
+			if ($strategy == 'omissionSimple') $title = "Pointer";
+			if ($strategy == 'nakedPointer') $title = "Naked Pointer"; // $title = "Pointer Naked";
+
+			$percent = percentage($result['count'], $totalCount, 5);
+			$number = number_format($result['count']);
+			echo str_pad("$title", $len_1, " ", STR_PAD_RIGHT);
+			echo str_pad("$percent", $len_2 + 1, " ", STR_PAD_LEFT);
+
+			if ($strategy == 'hiddenSimple' || $strategy == 'nakedSimple' || $strategy == 'omissionSimple') {
+				if ($strategy == 'hiddenSimple') {
+					$min = number_format($result['min']);
+
+					echo str_pad("$min", $len_3 + 1, " ", STR_PAD_LEFT);
+					echo str_pad("$number", $len_4 + 1, " ", STR_PAD_LEFT);
+					echo "\n";
+
+					$title = "Hidden Max";
+					echo str_pad("$title", $len_1, " ", STR_PAD_RIGHT);
+					echo str_pad("$percent", $len_2 + 1, " ", STR_PAD_LEFT);
+				}
+				$max = number_format($result['max']);
+
+				echo str_pad("$max", $len_3 + 1, " ", STR_PAD_LEFT);
+				echo str_pad("$number", $len_4 + 1, " ", STR_PAD_LEFT);
+				echo "\n";
+			}
+			if ($strategy == 'nakedPointer') {
+				$max = number_format($result['maxNaked']);
+
+				echo str_pad("$max", $len_3 + 1, " ", STR_PAD_LEFT);
+				echo str_pad("$number", $len_4 + 1, " ", STR_PAD_LEFT);
+				echo "\n";
+
+				$title = "Pointer Naked";
+				$max = number_format($result['maxPointer']);
+
+				echo str_pad("$title", $len_1, " ", STR_PAD_RIGHT);
+				echo str_pad("$percent", $len_2 + 1, " ", STR_PAD_LEFT);
+				echo str_pad("$max", $len_3 + 1, " ", STR_PAD_LEFT);
+				echo str_pad("$number", $len_4 + 1, " ", STR_PAD_LEFT);
+				echo "\n";
+			}
+		}
+		echo "\n";
+
+		$total = 0;
+		$total += $results['hiddenSimple']['count'];
+		$total += $results['nakedSimple']['count'];
+		$percent = percentage($total, $totalCount, 5);
+		$number = number_format($total);
+		echo str_pad("Hidden Naked", $len_1, " ", STR_PAD_RIGHT);
+		echo str_pad("$percent", $len_2 + 1, " ", STR_PAD_LEFT);
+		echo str_pad("", $len_3 + 1, " ", STR_PAD_LEFT);
+		echo str_pad("$number", $len_4 + 1, " ", STR_PAD_LEFT);
+		echo "\n";
+
+		$total = 0;
+		$total += $results['omissionSimple']['count'];
+		$total += $results['nakedPointer']['count'];
+		$percent = percentage($total, $totalCount, 5);
+		$number = number_format($total);
+		echo str_pad("Pointers", $len_1, " ", STR_PAD_RIGHT);
+		echo str_pad("$percent", $len_2 + 1, " ", STR_PAD_LEFT);
+		echo str_pad("", $len_3 + 1, " ", STR_PAD_LEFT);
+		echo str_pad("$number", $len_4 + 1, " ", STR_PAD_LEFT);
+		echo "\n";
+
+		$total = 0;
+		foreach ($strategies as $strategy) {
+			$total += $results[$strategy]['count'];
+		}
+		$percent = percentage($total, $totalCount, 5);
+		$number = number_format($total);
+		echo str_pad("Total", $len_1, " ", STR_PAD_RIGHT);
+		echo str_pad("$percent", $len_2 + 1, " ", STR_PAD_LEFT);
+		echo str_pad("", $len_3 + 1, " ", STR_PAD_LEFT);
+		echo str_pad("$number", $len_4 + 1, " ", STR_PAD_LEFT);
+		echo "\n";
+	}
+
+	if ($mode === 5) {
 		$strategies = [
 			"naked2",
 			"naked3",
