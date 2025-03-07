@@ -37,7 +37,7 @@ const reduceCell = (cells, index, symbol) => {
 	}
 }
 
-const hiddenSingles = (cells) => {
+const hiddenSingles = (cells, single = false) => {
 	let reduced = 0;
 	for (let x = 1; x <= 9; x++) {
 		for (const group of Grid.groupTypes) {
@@ -58,15 +58,18 @@ const hiddenSingles = (cells) => {
 				symbolCell.symbol = x;
 				symbolCell.mask = 0x0000;
 				reduceCell(cells, indexCell, x);
+				if (single) return true;
 				reduced++;
 			}
 		}
 	}
+	if (single) return false;
 	return reduced;
 }
 
 const powerOf2 = x => (x & (x - 0x0001)) === 0x0000;
-const nakedSingles = (cells) => {
+const nakedSingles = (cells, single = false) => {
+	let reduced = 0;
 	for (let index = 0; index < 81; index++) {
 		const cell = cells[index];
 		if (cell.symbol !== 0) continue;
@@ -77,12 +80,14 @@ const nakedSingles = (cells) => {
 				cell.symbol = x;
 				cell.mask = 0x0000;
 				reduceCell(cells, index, x);
-				return true;
+				if (single) return true;
+				reduced++;
 			}
 		}
 
 	}
-	return false;
+	if (single) return false;
+	return reduced;
 }
 
 const cells = new Grid();
@@ -103,20 +108,26 @@ const fillSolve = () => {
 	let remaining = emptyCount(cells);
 	let hiddenCount = 0;
 	let nakedCount = 0;
-	candidates(cells);
 	while (remaining > 0) {
-		const hiddenReduced = hiddenSingles(cells);
-		hiddenCount += hiddenReduced;
-		remaining -= hiddenReduced;
-		if (hiddenReduced === 0) break;
-		// if (hiddenReduced === 0 && remaining > 0) {
-		// 	const nakedReduced = nakedSingles(cells);
-		// 	if (!nakedReduced) break;
-		// 	nakedCount++;
-		// 	remaining--;
-		// }
+		do {
+			const hiddenReduced = hiddenSingles(cells);
+			hiddenCount += hiddenReduced;
+			remaining -= hiddenReduced;
+			if (hiddenReduced === 0) break;
+		} while (remaining > 0);
+
+		if (remaining > 0) {
+			const nakedReduced = nakedSingles(cells, true);
+			if (!nakedReduced) break;
+			nakedCount++;
+			remaining--;
+		}
 	}
-	return (remaining === 0);
+	return {
+		solved: (remaining === 0),
+		hiddenCount,
+		nakedCount,
+	};
 }
 
 const step = () => {
@@ -126,21 +137,23 @@ const step = () => {
 		puzzleClues: cells.string(),
 		cells: cells.toData()
 	};
-
 	for (const cell of cells) if (cell.symbol === 0) cell.fill();
+	candidates(cells);
 
-	const solved = fillSolve();
+	const results = fillSolve();
 
 	data.puzzleFilled = puzzleFilled.join('');
 	data.clueCount = clueCount;
 
 	puzzleCount++;
 	data.id = puzzleCount;
-	data.solved = solved;
+	data.solved = results.solved;
+	data.hiddenCount = results.hiddenCount;
+	data.nakedCount = results.nakedCount;
 
 	postMessage(data);
 
-	return solved;
+	return results.solved;
 };
 
 onmessage = (event) => {
