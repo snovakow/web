@@ -27,6 +27,8 @@ class ActivePanel {
 
         this.panel = panel;
         this.resizeListener = null;
+        this.keydownListener = null;
+        this.keyupListener = null;
 
         blocker.appendChild(panel);
         document.body.appendChild(blocker);
@@ -36,6 +38,14 @@ class ActivePanel {
         if (this.resizeListener) {
             window.removeEventListener('resize', this.resizeListener);
             this.resizeListener = null;
+        }
+        if (this.keydownListener) {
+            document.body.removeEventListener('keydown', this.keydownListener);
+            this.keydownListener = null;
+        }
+        if (this.keyupListener) {
+            document.body.removeEventListener('keyup', this.keyupListener);
+            this.keyupListener = null;
         }
     }
 }
@@ -122,6 +132,9 @@ export class Panel {
             closeBlocker();
             if (confirm) confirm(true);
         };
+
+        this.confirmButton = confirmButton;
+        this.rejectButton = null;
         if (reject) {
             const rejectButton = document.createElement('button');
             rejectButton.style.position = 'absolute';
@@ -137,10 +150,12 @@ export class Panel {
                 closeBlocker();
                 if (confirm) confirm(false);
             };
-            container.appendChild(rejectButton);
 
+            container.appendChild(rejectButton);
             confirmButton.style.right = margin + 'px';
             confirmButton.style.transform = 'translate(0%, 50%)';
+
+            this.rejectButton = rejectButton;
         } else {
             confirmButton.style.left = '50%';
             confirmButton.style.transform = 'translate(-50%, 50%)';
@@ -217,8 +232,51 @@ export class Panel {
             if (message) content.appendChild(document.createTextNode(message));
         }
 
+        activePanel.keydownListener = (event) => {
+            if (!activePanel) return;
+            if (event.code === "Enter") {
+                if (this.confirmButton) {
+                    event.preventDefault();
+                    this.confirmButton.focus();
+                }
+            } else if (event.code === "Escape") {
+                if (document.activeElement === this.confirmButton) {
+                    this.confirmButton.blur();
+                } else {
+                    if (this.rejectButton) {
+                        event.preventDefault();
+                        this.rejectButton.focus();
+                    }
+                }
+            } else {
+                if (document.activeElement === this.confirmButton) this.confirmButton.blur();
+                if (document.activeElement === this.rejectButton) this.rejectButton.blur();
+            }
+        };
+        document.body.addEventListener('keydown', activePanel.keydownListener);
+
+        activePanel.keyupListener = (event) => {
+            if (!activePanel) return;
+
+            if (event.code === "Enter") {
+                if (document.activeElement === this.confirmButton) {
+                    event.preventDefault();
+                    this.confirmButton.click();
+                }
+            } else if (event.code === "Escape") {
+                if (document.activeElement === this.rejectButton) {
+                    event.preventDefault();
+                    this.rejectButton.click();
+                }
+            } else {
+                if (document.activeElement === this.confirmButton) this.confirmButton.blur();
+                if (document.activeElement === this.rejectButton) this.rejectButton.blur();
+            }
+        };
+        document.body.addEventListener('keyup', activePanel.keyupListener);
+
         activePanel.resizeListener = setSize;
-        window.addEventListener('resize', setSize);
+        window.addEventListener('resize', activePanel.resizeListener);
         setSize();
     }
 }
