@@ -85,6 +85,7 @@ export class Panel {
         container.style.border = borderWidth + 'px solid black';
         container.style.borderRadius = '8px';
         container.style.overflow = 'clip';
+        container.style.pointerEvents = "auto";
 
         if (frame_src) {
             container.style.display = 'none';
@@ -273,11 +274,14 @@ export class Panel {
 
         if (clearBacking) {
             blocker.style.background = 'rgba(0,0,0,0)';
-            blocker.onclick = event => { if (event.target === blocker) closeBlocker() };
+            blocker.style.pointerEvents = "none";
+            // blocker.onclick = null;
         } else {
             blocker.style.background = 'rgba(0,0,0,0.5)';
-            blocker.onclick = null;
+            blocker.style.pointerEvents = "auto";
+            // blocker.onclick = event => { if (event.target === blocker) closeBlocker() };
         }
+
 
         activePanel.resizeListener = setSize;
         window.addEventListener('resize', activePanel.resizeListener);
