@@ -20,8 +20,6 @@ const closeBlocker = () => {
 
 class ActivePanel {
     constructor(panel) {
-        closeBlocker();
-
         this.panel = panel;
         this.resizeListener = null;
         this.keydownListener = null;
@@ -69,6 +67,7 @@ export class Panel {
         } else {
             this.frame = false;
         }
+        this.confirm = confirm;
         this.loaded = false;
 
         this.container = document.createElement('div');
@@ -161,6 +160,8 @@ export class Panel {
         container.appendChild(confirmButton);
     }
     show(message = null, clearBacking = false) {
+        if (activePanel && this.confirm) this.confirm(false);
+        closeBlocker();
         activePanel = new ActivePanel(this.container);
 
         const setWidth = (min, inset = 0) => {
@@ -237,37 +238,26 @@ export class Panel {
                     this.confirmButton.focus();
                 }
             } else if (event.code === "Escape") {
-                if (document.activeElement === this.confirmButton) {
-                    this.confirmButton.blur();
-                } else {
-                    if (this.rejectButton) {
-                        event.preventDefault();
-                        this.rejectButton.focus();
-                    }
-                }
-            } else {
-                if (document.activeElement === this.confirmButton) this.confirmButton.blur();
-                if (document.activeElement === this.rejectButton) this.rejectButton.blur();
+                event.preventDefault();
+                const button = this.rejectButton ?? this.confirmButton;
+                button.focus();
             }
         };
         document.body.addEventListener('keydown', activePanel.keydownListener);
 
         activePanel.keyupListener = (event) => {
             if (!activePanel) return;
-
             if (event.code === "Enter") {
                 if (document.activeElement === this.confirmButton) {
                     event.preventDefault();
                     this.confirmButton.click();
                 }
             } else if (event.code === "Escape") {
-                if (document.activeElement === this.rejectButton) {
+                const button = this.rejectButton ?? this.confirmButton;
+                if (document.activeElement === button) {
                     event.preventDefault();
-                    this.rejectButton.click();
+                    button.click();
                 }
-            } else {
-                if (document.activeElement === this.confirmButton) this.confirmButton.blur();
-                if (document.activeElement === this.rejectButton) this.rejectButton.blur();
             }
         };
         document.body.addEventListener('keyup', activePanel.keyupListener);
