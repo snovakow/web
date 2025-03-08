@@ -8,9 +8,6 @@ blocker.style.background = 'rgba(0,0,0,0.5)';
 
 blocker.style.fontSize = 18 + 'px';
 blocker.style.fontFamily = 'sans-serif';
-// blocker.onclick = (event) => {
-//     if (event.target === blocker) closeBlocker();
-// }
 
 let activePanel = null;
 
@@ -56,13 +53,13 @@ const margin = 32;
 const windowMargin = 48 * 2;
 
 export class Panel {
-    static alert(message, confirm) {
+    static alert(message, confirm, backing) {
         const panel = new Panel(confirm);
-        panel.show(message);
+        panel.show(message, backing);
     }
-    static confirm(message, confirm) {
+    static confirm(message, confirm, backing) {
         const panel = new Panel(confirm, true);
-        panel.show(message);
+        panel.show(message, backing);
     }
     constructor(confirm, reject = false) {
         const frame_src = (typeof confirm === 'string') ? confirm : null;
@@ -162,7 +159,7 @@ export class Panel {
         }
         container.appendChild(confirmButton);
     }
-    show(message = null) {
+    show(message = null, clearBacking = false) {
         activePanel = new ActivePanel(this.container);
 
         const setWidth = (min, inset = 0) => {
@@ -273,6 +270,14 @@ export class Panel {
             }
         };
         document.body.addEventListener('keyup', activePanel.keyupListener);
+
+        if (clearBacking) {
+            blocker.style.background = 'rgba(0,0,0,0)';
+            blocker.onclick = event => { if (event.target === blocker) closeBlocker() };
+        } else {
+            blocker.style.background = 'rgba(0,0,0,0.5)';
+            blocker.onclick = null;
+        }
 
         activePanel.resizeListener = setSize;
         window.addEventListener('resize', activePanel.resizeListener);

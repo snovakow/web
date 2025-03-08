@@ -472,9 +472,12 @@ const loadLevel = () => {
 			saveData();
 			findAnimating = false;
 
-			// console.log(data.clueCount, data.hiddenCount, data.nakedCount);
-			// const message = `Found a puzzle with ${data.clueCount} clues, and ${data.nakedCount} Naked Singles`;
-			// Panel.alert(message);
+			const messageClues = `Found a Sudoku with ${data.clueCount} clues, `;
+			let messageNaked;
+			if (data.nakedCount === 0) messageNaked = `and is possible to solve with only Hidden Singles.`;
+			else if (data.nakedCount === 1) messageNaked = `and ${data.nakedCount} Naked Single not finadable using Hidden Singles.`;
+			else messageNaked = `and ${data.nakedCount} Naked Singles not finadable using Hidden Singles.`;
+			Panel.alert(messageClues + messageNaked, null, true);
 		}
 		draw();
 	}
