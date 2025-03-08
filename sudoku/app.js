@@ -583,7 +583,15 @@ const applyUndo = (reverse) => {
 	draw();
 };
 Menu.undoIcons.undo_on.addEventListener('click', () => { applyUndo(false) });
+Menu.undoIcons.undo_on.addEventListener("dblclick", (event) => {
+	applyUndo(false);
+	event.preventDefault();
+});
 Menu.undoIcons.redo_on.addEventListener('click', () => { applyUndo(true) });
+Menu.undoIcons.redo_on.addEventListener('dblclick', (event) => {
+	applyUndo(true);
+	event.preventDefault();
+});
 
 const setMarkerButton = () => {
 	Menu.markerButton.title = pickerMarkerMode ? "Digits" : "Candidates";
