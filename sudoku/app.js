@@ -472,11 +472,11 @@ const loadLevel = () => {
 			saveData();
 			findAnimating = false;
 
-			const messageClues = `Found a Sudoku with ${data.clueCount} clues, `;
+			const messageClues = `Found a ${data.clueCount} clue Sudoku`;
 			let messageNaked;
-			if (data.nakedCount === 0) messageNaked = `and is possible to solve with only Hidden Singles.`;
-			else if (data.nakedCount === 1) messageNaked = `and ${data.nakedCount} Naked Single not finadable using Hidden Singles.`;
-			else messageNaked = `and ${data.nakedCount} Naked Singles not finadable using Hidden Singles.`;
+			if (data.nakedCount === 0) messageNaked = `, solvable using only Hidden Singles.`;
+			else if (data.nakedCount === 1) messageNaked = `, solvable using ${data.nakedCount} Single found only as Naked.`;
+			else messageNaked = `, solvable using ${data.nakedCount} Singles found only as Naked.`;
 			Panel.alert(messageClues + messageNaked, null, true);
 		}
 		draw();
