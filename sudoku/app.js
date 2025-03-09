@@ -166,25 +166,31 @@ const clickLocation = (event) => {
 	return [r, c];
 };
 
-const pickerClick = (event) => {
-	// event.preventDefault();
-
-	if (!selected) return;
-
+const numberEntry = (pickerSymbol) => {
 	const running = timer ? true : false;
 	if (timer && superimposeCandidates) superimposeCandidates(false);
 
-	const [r, c] = clickLocation(event);
-
-	const index = r * 3 + c + 1;
 	const selectedIndex = selectedRow * 9 + selectedCol;
-	const symbol = board.cells[selectedIndex].symbol;
-
-	// if (index === symbol) return;
-	// board.cells[selectedIndex].setSymbol(index);
 	const cell = board.cells[selectedIndex];
-	if (symbol === index) cell.setSymbol(0);
-	else cell.setSymbol(index);
+	if (pickerMarkerMode) {
+		if (pickerSymbol === 0) {
+			if (cell.symbol === 0 && cell.mask === 0x0000) return;
+			cell.setSymbol(0);
+		} else {
+			if (cell.symbol === 0) {
+				const had = cell.delete(pickerSymbol);
+				if (!had) cell.add(pickerSymbol);
+			} else {
+				cell.setSymbol(0);
+				cell.add(pickerSymbol);
+			}
+		}
+	} else {
+		// if (pickerSymbol === cell.symbol) return;
+		// cell.setSymbol(pickerSymbol);
+		if (pickerSymbol === cell.symbol) cell.setSymbol(0);
+		else cell.setSymbol(pickerSymbol);
+	}
 	board.errorCells.delete(selectedIndex);
 
 	Undo.add(board, selectedIndex);
@@ -197,46 +203,56 @@ const pickerClick = (event) => {
 		if (superimposeCandidates) superimposeCandidates();
 	}
 
-	if (puzzleFinished()) {
+	if (!pickerMarkerMode && puzzleFinished()) {
 		Panel.alert("Puzzle Complete!!!");
 	}
+}
+const pickerClick = (event) => {
+	if (!selected) return;
+	const [r, c] = clickLocation(event);
+	numberEntry(r * 3 + c + 1);
 };
 picker.addEventListener('click', pickerClick);
+pickerMarker.addEventListener('click', pickerClick);
 
-const pickerMarkerClick = (event) => {
-	// event.preventDefault();
-
-	if (!selected) return;
-
-	const running = timer ? true : false;
-	if (timer) superimposeCandidates(false);
-
-	const [r, c] = clickLocation(event);
-
-	const symbol = r * 3 + c + 1;
-	const selectedIndex = selectedRow * 9 + selectedCol;
-	const cell = board.cells[selectedIndex];
-	if (cell.symbol === 0) {
-		const had = cell.delete(symbol);
-		if (!had) cell.add(symbol);
-	} else {
-		cell.setSymbol(0);
-		cell.add(symbol);
-	}
-	board.errorCells.delete(selectedIndex);
-
-	Undo.add(board, selectedIndex);
-
+const setMarkerButton = () => {
+	Menu.markerButton.title = pickerMarkerMode ? "Digits" : "Candidates";
+}
+const toggleMarkerMode = () => {
+	pickerMarkerMode = !pickerMarkerMode;
+	setMarkerButton();
+	setMarkerMode();
 	saveData();
 	draw();
+}
+Menu.markerButton.addEventListener('click', () => {
+	toggleMarkerMode();
+});
+setMarkerButton();
 
-	if (running) {
-		fillSolve(board.cells, null, []);
-		saveData();
-		if (superimposeCandidates) superimposeCandidates();
+document.body.addEventListener('keydown', event => {
+	if (!selected) return;
+	let number = 0;
+	switch (event.key) {
+		case "1":
+		case "2":
+		case "3":
+		case "4":
+		case "5":
+		case "6":
+		case "7":
+		case "8":
+		case "9": number = parseInt(event.key);
+			// case "Backspace":
+			event.preventDefault();
+			numberEntry(number);
+			break;
+		// case " ":
+		// 	event.preventDefault();
+		// 	toggleMarkerMode();
+		// 	break;
 	}
-};
-pickerMarker.addEventListener('click', pickerMarkerClick);
+});
 
 const onFocus = () => {
 	// console.log("onFocus");
@@ -586,21 +602,12 @@ const applyUndo = (reverse) => {
 	draw();
 };
 Menu.undoIcons.undo_on.addEventListener('click', () => { applyUndo(false) });
-Menu.undoIcons.undo_on.addEventListener("dblclick", (event) => { event.preventDefault() });
 Menu.undoIcons.redo_on.addEventListener('click', () => { applyUndo(true) });
-Menu.undoIcons.redo_on.addEventListener('dblclick', (event) => { event.preventDefault() });
-
-const setMarkerButton = () => {
-	Menu.markerButton.title = pickerMarkerMode ? "Digits" : "Candidates";
-}
-Menu.markerButton.addEventListener('click', () => {
-	pickerMarkerMode = !pickerMarkerMode;
-	setMarkerButton();
-	setMarkerMode();
-	saveData();
-	draw();
-});
-setMarkerButton();
+const preventDefault = event => { event.preventDefault() };
+Menu.undoIcons.undo_on.addEventListener("dblclick", preventDefault);
+Menu.undoIcons.redo_on.addEventListener('dblclick', preventDefault);
+Menu.undoIcons.undo_off.addEventListener("dblclick", preventDefault);
+Menu.undoIcons.redo_off.addEventListener('dblclick', preventDefault);
 
 Menu.deleteButton.addEventListener('click', () => {
 	if (!selected) return;
