@@ -217,7 +217,7 @@ picker.addEventListener('click', pickerClick);
 pickerMarker.addEventListener('click', pickerClick);
 
 const setMarkerButton = () => {
-	Menu.markerButton.title = pickerMarkerMode ? "Digits (Space)" : "Candidates (Space)";
+	Menu.markerButton.title = pickerMarkerMode ? "Digits" : "Candidates";
 }
 const toggleMarkerMode = () => {
 	pickerMarkerMode = !pickerMarkerMode;
@@ -237,8 +237,12 @@ document.body.addEventListener('keydown', event => {
 		toggleMarkerMode();
 		return;
 	}
+	// if (event.key === "Backspace") {
+	// 	event.preventDefault();
+	// 	numberEntry(0);
+	// 	return;
+	// }
 
-	let number = 0;
 	if (!selected) return;
 	switch (event.key) {
 		case "1":
@@ -249,10 +253,9 @@ document.body.addEventListener('keydown', event => {
 		case "6":
 		case "7":
 		case "8":
-		case "9": number = parseInt(event.key);
-		case "Backspace":
+		case "9":
 			event.preventDefault();
-			numberEntry(number);
+			numberEntry(parseInt(event.key));
 	}
 });
 
