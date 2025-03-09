@@ -232,8 +232,14 @@ Menu.markerButton.addEventListener('click', () => {
 setMarkerButton();
 
 document.body.addEventListener('keydown', event => {
-	if (!selected) return;
+	if (event.key === " ") {
+		event.preventDefault();
+		toggleMarkerMode();
+		return;
+	}
+
 	let number = 0;
+	if (!selected) return;
 	switch (event.key) {
 		case "1":
 		case "2":
@@ -247,11 +253,6 @@ document.body.addEventListener('keydown', event => {
 		case "Backspace":
 			event.preventDefault();
 			numberEntry(number);
-			break;
-		case " ":
-			event.preventDefault();
-			toggleMarkerMode();
-			break;
 	}
 });
 
