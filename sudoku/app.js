@@ -186,10 +186,11 @@ const numberEntry = (pickerSymbol) => {
 			}
 		}
 	} else {
-		// if (pickerSymbol === cell.symbol) return;
-		// cell.setSymbol(pickerSymbol);
-		if (pickerSymbol === cell.symbol) cell.setSymbol(0);
-		else cell.setSymbol(pickerSymbol);
+		if (pickerSymbol === cell.symbol) return;
+		cell.setSymbol(pickerSymbol);
+		// Toggle
+		// if (pickerSymbol === cell.symbol) cell.setSymbol(0);
+		// else cell.setSymbol(pickerSymbol);
 	}
 	board.errorCells.delete(selectedIndex);
 
@@ -216,7 +217,7 @@ picker.addEventListener('click', pickerClick);
 pickerMarker.addEventListener('click', pickerClick);
 
 const setMarkerButton = () => {
-	Menu.markerButton.title = pickerMarkerMode ? "Digits" : "Candidates";
+	Menu.markerButton.title = pickerMarkerMode ? "Digits (Space)" : "Candidates (Space)";
 }
 const toggleMarkerMode = () => {
 	pickerMarkerMode = !pickerMarkerMode;
@@ -243,14 +244,14 @@ document.body.addEventListener('keydown', event => {
 		case "7":
 		case "8":
 		case "9": number = parseInt(event.key);
-			// case "Backspace":
+		case "Backspace":
 			event.preventDefault();
 			numberEntry(number);
 			break;
-		// case " ":
-		// 	event.preventDefault();
-		// 	toggleMarkerMode();
-		// 	break;
+		case " ":
+			event.preventDefault();
+			toggleMarkerMode();
+			break;
 	}
 });
 

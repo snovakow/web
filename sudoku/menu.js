@@ -154,7 +154,7 @@ mainBar.appendChild(infoButton);
 
 const markerButton = createIcon("./icons/edit_48dp_000000_FILL0_wght400_GRAD0_opsz48.svg", buttonSize);
 const deleteButton = createIcon("./icons/disabled_by_default_48dp_000000_FILL0_wght400_GRAD0_opsz48.svg", buttonSize);
-deleteButton.title = "Clear";
+deleteButton.title = "Clear (delete)";
 pickerBar.appendChild(markerButton);
 pickerBar.appendChild(deleteButton);
 
