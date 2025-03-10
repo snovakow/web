@@ -1,5 +1,6 @@
 import { undoIcons } from "./menu.js";
 
+const undoStackMax = 100;
 const undoStack = [];
 let leadIndex = -1;
 
@@ -85,8 +86,12 @@ function add(board, selectedIndex) {
     }
 
     if (leadIndex < undoStack.length - 1) undoStack.splice(leadIndex + 1);
-    leadIndex = undoStack.length;
     undoStack.push(new Undo(selectedIndex, board));
+
+    if (undoStack.length > undoStackMax) {
+        undoStack.splice(0, undoStack.length - undoStackMax);
+    }
+    leadIndex = undoStack.length - 1;
 
     setIconState();
 }

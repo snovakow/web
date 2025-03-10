@@ -5,6 +5,7 @@ blocker.style.top = '0%';
 blocker.style.width = '100%';
 blocker.style.height = '100%';
 blocker.style.background = 'rgba(0,0,0,0.5)';
+blocker.style.zIndex = 1;
 
 const footerHeight = 48;
 const borderWidth = 3;
@@ -148,8 +149,6 @@ class PanelBase {
         this.resizeListener = this.setSize;
         window.addEventListener('resize', this.resizeListener);
 
-        this.domParent.appendChild(this.container);
-
         return true;
     }
     hide() {
@@ -168,8 +167,6 @@ class PanelBase {
             window.removeEventListener('resize', this.resizeListener);
             this.resizeListener = null;
         }
-
-        this.domParent.removeChild(this.container);
 
         return true;
     }
@@ -204,14 +201,23 @@ export class Panel extends PanelBase {
     show() {
         if (!super.show()) return false;
 
+        this.domParent.appendChild(this.container);
         this.content.appendChild(document.createTextNode(this.message));
         this.setSize();
+
+        return true;
+    }
+    hide() {
+        if (!super.hide()) return false;
+
+        this.domParent.removeChild(this.container);
 
         return true;
     }
 }
 
 let activePanel = null;
+let framePanels = 0;
 export class AlertPanel extends Panel {
     static alert(message, confirm) {
         const panel = new AlertPanel(message, confirm);
@@ -226,14 +232,13 @@ export class AlertPanel extends Panel {
     }
     show() {
         if (activePanel) activePanel.hide();
-        activePanel = this;
         if (!blocker.parentElement) document.body.appendChild(blocker);
+        activePanel = this;
         return super.show();
     }
     hide() {
         if (!super.hide()) return false;
-
-        if (blocker.parentElement) blocker.parentElement.removeChild(blocker);
+        if (blocker.parentElement && framePanels === 0) blocker.parentElement.removeChild(blocker);
         activePanel = null;
         return true;
     }
@@ -245,8 +250,10 @@ export class FramePanel extends PanelBase {
         super(contentElement);
 
         this.loaded = false;
+        this.loading = false;
 
         this.container.style.display = 'none';
+        this.container.style.zIndex = 2;
         this.content.style.overflow = 'clip';
         this.content.src = src;
 
@@ -277,18 +284,41 @@ export class FramePanel extends PanelBase {
         html.scrollTop = scroll;
     }
     show() {
-        if (!super.show()) return false;
-
         if (!this.loaded) {
-            const frame = this.content;
-            frame.onload = () => {
-                this.loaded = true;
-                frame.contentWindow.document.body.style.margin = margin + 'px';
-                this.container.style.display = 'block';
-                this.setSize();
-            };
-        }
+            if (!this.loading) {
+                this.content.onload = () => {
+                    this.loaded = true;
+                    this.loading = false;
+                    this.content.onload = null;
 
+                    this.content.contentWindow.document.body.style.margin = margin + 'px';
+                    this.container.style.display = 'block';
+                    this.show();
+
+                    // if (!blocker.parentElement) document.body.appendChild(blocker);
+                    // if (!super.show()) return false;
+                    // framePanels++;
+
+                };
+                this.loading = true;
+            }
+
+            return false;
+        }
+        this.domParent.appendChild(this.container);
+
+        if (!blocker.parentElement) document.body.appendChild(blocker);
+        if (!super.show()) return false;
+        this.setSize();
+        framePanels++;
+        return true;
+    }
+    hide() {
+this.domParent.removeChild(this.container);
+
+        if (!super.hide()) return false;
+        framePanels--;
+        if (blocker.parentElement && framePanels === 0 && !activePanel) blocker.parentElement.removeChild(blocker);
         return true;
     }
 }

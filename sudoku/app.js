@@ -63,7 +63,8 @@ Object.seal(puzzleData);
 let pickerMarkerMode = false;
 
 const headerHeight = Menu.headerHeight;
-const footerHeight = 16;
+const footerHeight = 8;
+const spacing = 8;
 
 let selectedRow = 0;
 let selectedCol = 0;
@@ -260,13 +261,13 @@ document.body.addEventListener('keydown', event => {
 });
 
 const onFocus = () => {
-	// console.log("onFocus");
+	resize();
 	draw();
 };
 const offFocus = () => {
 
 };
-// window.addEventListener("focus", onFocus);
+window.addEventListener("focus", onFocus);
 // window.addEventListener("blur", offFocus);
 
 const pickerContainer = document.createElement('span');
@@ -504,11 +505,6 @@ const loadLevel = () => {
 			if (foundPanel) foundPanel.hide();
 			foundPanel = new Panel(messageClues + messageNaked);
 			foundPanel.show();
-
-			if (infoPanel && infoPanel.active) {
-				foundPanel.domParent.removeChild(foundPanel.container);
-				infoPanel.domParent.insertBefore(foundPanel.container, infoPanel.container);
-			}
 		}
 		draw();
 	}
@@ -822,26 +818,25 @@ const resize = () => {
 
 	const width = boundingClientRect.width;
 	const height = boundingClientRect.height;
-	const padding = 8;
 
 	const portraitWidth = width;
-	const portraitHeight = height - PICKER.cellsSize - padding * 1;
+	const portraitHeight = height - PICKER.cellsSize - spacing * 1;
 	const portraitSize = Math.min(portraitWidth, portraitHeight);
 
-	const landscapeWidth = width - PICKER.cellsSize - padding * 3;
+	const landscapeWidth = width - PICKER.cellsSize - spacing * 3;
 	const landscapeHeight = height;
 	const landscapeSize = Math.min(landscapeWidth, landscapeHeight);
 
 	const boxSize = Math.max(portraitSize, landscapeSize);
 	if (landscapeSize > portraitSize) {
-		const buffer = (landscapeWidth > landscapeSize) ? (landscapeWidth - landscapeSize) / 3 : 0;
+		const buffer = (landscapeWidth > landscapeSize) ? (landscapeWidth - landscapeSize) / 2 : 0;
 
 		board.canvas.style.top = '50%';
-		board.canvas.style.left = padding + buffer + 'px';
+		board.canvas.style.left = spacing + buffer + 'px';
 		board.canvas.style.transform = 'translate(0%, -50%)';
 
 		pickerContainer.style.bottom = '50%';
-		pickerContainer.style.right = padding + buffer + 'px';
+		pickerContainer.style.right = spacing + buffer + 'px';
 		pickerContainer.style.transform = 'translate(0, 50%)';
 
 		Menu.pickerBar.style.top = '100%';
@@ -858,7 +853,7 @@ const resize = () => {
 
 		Menu.autoBar.style.gap = '16px';
 	} else {
-		const buffer = (portraitHeight > portraitSize) ? (portraitHeight - portraitSize) / 3 : 0;
+		const buffer = (portraitHeight > portraitSize) ? (portraitHeight - portraitSize) / 2 : 0;
 
 		board.canvas.style.top = buffer + 'px';
 		board.canvas.style.left = '50%';
