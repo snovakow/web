@@ -7,7 +7,7 @@ import * as Menu from "./menu.js";
 import * as Undo from "./undo.js";
 import * as SudokuProcess from "../sudokulib/process.js";
 import { Animator } from "./Animator.js";
-import { Panel } from "./Panel.js";
+import { Panel, AlertPanel, FramePanel } from "./Panel.js";
 
 const picker = PICKER.picker;
 const pickerDraw = PICKER.pickerDraw;
@@ -205,7 +205,7 @@ const numberEntry = (pickerSymbol) => {
 	}
 
 	if (!pickerMarkerMode && puzzleFinished()) {
-		Panel.alert("Puzzle Complete!!!");
+		AlertPanel.alert("Puzzle Complete!!!");
 	}
 }
 const pickerClick = (event) => {
@@ -329,7 +329,7 @@ Menu.setMenuReponse((responseStrategy) => {
 	if (strategy === responseStrategy) return false;
 	const message = "Do you want to start a " + Menu.menuTitle(responseStrategy) + " puzzle?";
 	Menu.setMenuItem(responseStrategy);
-	Panel.confirm(message, confirmed => {
+	AlertPanel.confirm(message, confirmed => {
 		if (confirmed) {
 			window.location.search = "?strategy=" + responseStrategy;
 		} else {
@@ -447,6 +447,9 @@ if (strategy === 'custom' || strategy === 'hardcoded') {
 }
 
 let findAnimating = false;
+let foundPanel = null;
+let infoPanel = null;
+
 const loadLevel = () => {
 	const worker_url = new URL("./worker_finder.js", import.meta.url);
 	const worker = new Worker(worker_url, { type: "module" });
@@ -496,9 +499,16 @@ const loadLevel = () => {
 			const messageClues = `Found a ${data.clueCount} clue Sudoku`;
 			let messageNaked;
 			if (data.nakedCount === 0) messageNaked = `, solvable using only Hidden Singles.`;
-			else if (data.nakedCount === 1) messageNaked = `, solvable using ${data.nakedCount} Single found only as Naked.`;
-			else messageNaked = `, solvable using ${data.nakedCount} Singles found only as Naked.`;
-			Panel.alert(messageClues + messageNaked, null, true);
+			else messageNaked = `, solvable using Singles, ${data.nakedCount} found only as Naked.`;
+
+			if (foundPanel) foundPanel.hide();
+			foundPanel = new Panel(messageClues + messageNaked);
+			foundPanel.show();
+
+			if (infoPanel && infoPanel.active) {
+				foundPanel.domParent.removeChild(foundPanel.container);
+				infoPanel.domParent.insertBefore(foundPanel.container, infoPanel.container);
+			}
 		}
 		draw();
 	}
@@ -649,18 +659,17 @@ Menu.checkButton.addEventListener('click', () => {
 	}
 	draw();
 	if (solved) {
-		Panel.alert("Puzzle Complete!!!");
+		AlertPanel.alert("Puzzle Complete!!!");
 	} else if (errorCount > 0) {
-		if (errorCount === 1) Panel.alert(errorCount + " Error!");
-		else Panel.alert(errorCount + " Errors!");
+		if (errorCount === 1) AlertPanel.alert(errorCount + " Error!");
+		else AlertPanel.alert(errorCount + " Errors!");
 	} else {
-		Panel.alert("No Errors!");
+		AlertPanel.alert("No Errors!");
 	}
 });
 
-let infoPanel = null;
 Menu.infoButton.addEventListener('click', () => {
-	if (!infoPanel) infoPanel = new Panel("./info.html");
+	if (!infoPanel) infoPanel = new FramePanel("./info.html");
 	infoPanel.show();
 });
 
@@ -778,8 +787,13 @@ if (strategy === 'custom') {
 
 		const name = levelMode ? titleString : Menu.menuTitle(strategy);
 		const message = "Do you want to find a new " + name + " puzzle?";
-		Panel.confirm(message, confirmed => {
+		AlertPanel.confirm(message, confirmed => {
 			if (!confirmed) return;
+
+			if (foundPanel) {
+				foundPanel.hide();
+				foundPanel = null;
+			}
 
 			selected = false;
 			loadSudoku();
@@ -792,7 +806,7 @@ Menu.reset.addEventListener('click', () => {
 
 	const name = levelMode ? titleString : Menu.menuTitle(strategy);
 	const message = "Do you want to restart this " + name + " puzzle?";
-	Panel.confirm(message, confirmed => {
+	AlertPanel.confirm(message, confirmed => {
 		if (!confirmed) return;
 
 		selected = false;

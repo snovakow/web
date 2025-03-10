@@ -6,72 +6,25 @@ blocker.style.width = '100%';
 blocker.style.height = '100%';
 blocker.style.background = 'rgba(0,0,0,0.5)';
 
-blocker.style.fontSize = 18 + 'px';
-blocker.style.fontFamily = 'sans-serif';
-
-let activePanel = null;
-
-const closeBlocker = () => {
-    if (blocker.parentElement) blocker.parentElement.removeChild(blocker);
-    if (!activePanel) return;
-    activePanel.close();
-    activePanel = null;
-};
-
-class ActivePanel {
-    constructor(panel) {
-        this.panel = panel;
-        this.resizeListener = null;
-        this.keydownListener = null;
-        this.keyupListener = null;
-
-        blocker.appendChild(panel);
-        document.body.appendChild(blocker);
-    }
-    close() {
-        if (this.panel.parentElement === blocker) blocker.removeChild(this.panel);
-        if (this.resizeListener) {
-            window.removeEventListener('resize', this.resizeListener);
-            this.resizeListener = null;
-        }
-        if (this.keydownListener) {
-            document.body.removeEventListener('keydown', this.keydownListener);
-            this.keydownListener = null;
-        }
-        if (this.keyupListener) {
-            document.body.removeEventListener('keyup', this.keyupListener);
-            this.keyupListener = null;
-        }
-    }
-}
-
 const footerHeight = 48;
 const borderWidth = 3;
 const margin = 32;
 const windowMargin = 48 * 2;
 
-export class Panel {
-    static alert(message, confirm, backing) {
-        const panel = new Panel(confirm);
-        panel.show(message, backing);
-    }
-    static confirm(message, confirm, backing) {
-        const panel = new Panel(confirm, true);
-        panel.show(message, backing);
-    }
-    constructor(confirm, reject = false) {
-        const frame_src = (typeof confirm === 'string') ? confirm : null;
-        if (frame_src) {
-            confirm = null;
-            this.frame = true;
-        } else {
-            this.frame = false;
-        }
+class PanelBase {
+    constructor(contentElement, confirm = null, reject = false) {
         this.confirm = confirm;
-        this.loaded = false;
+        this.active = false;
+
+        this.confirmButton = null;
+        this.rejectButton = null;
+
+        this.resizeListener = null;
+        this.keydownListener = null;
+        this.keyupListener = null;
 
         this.container = document.createElement('div');
-        this.content = document.createElement(frame_src ? 'iframe' : 'div');
+        this.content = contentElement;
 
         const container = this.container;
         const content = this.content;
@@ -85,16 +38,8 @@ export class Panel {
         container.style.borderRadius = '8px';
         container.style.overflow = 'clip';
         container.style.pointerEvents = "auto";
-
-        if (frame_src) {
-            container.style.display = 'none';
-
-            content.style.overflow = 'clip';
-            content.src = frame_src;
-        } else {
-            content.style.overflow = 'auto';
-            content.style.padding = margin + 'px';
-        }
+        container.style.fontSize = 18 + 'px';
+        container.style.fontFamily = 'sans-serif';
 
         content.style.position = 'absolute';
         content.style.top = '0px';
@@ -126,12 +71,11 @@ export class Panel {
         }
         confirmButton.onclick = (event) => {
             event.stopPropagation();
-            closeBlocker();
+            this.hide();
             if (confirm) confirm(true);
         };
 
         this.confirmButton = confirmButton;
-        this.rejectButton = null;
         if (reject) {
             const rejectButton = document.createElement('button');
             rejectButton.style.position = 'absolute';
@@ -144,7 +88,7 @@ export class Panel {
             rejectButton.appendChild(document.createTextNode("Cancel"));
             rejectButton.onclick = (event) => {
                 event.stopPropagation();
-                closeBlocker();
+                this.hide();
                 if (confirm) confirm(false);
             };
 
@@ -159,94 +103,33 @@ export class Panel {
         }
         container.appendChild(confirmButton);
     }
-    show(message = null, clearBacking = false) {
-        if (activePanel && this.confirm) this.confirm(false);
-        closeBlocker();
-        activePanel = new ActivePanel(this.container);
+    get domParent() {
+        return document.body;
+    }
+    setWidth(min, inset = 0) {
+        const maxWidth = window.innerWidth - windowMargin;
+        const fixedWidth = Math.min(maxWidth, min);
+        this.container.style.width = fixedWidth + 'px';
+        this.content.style.width = fixedWidth - inset + 'px';
+    }
+    setSize() { }
+    show() {
+        if (this.active) return false;
+        this.active = true;
 
-        const setWidth = (min, inset = 0) => {
-            const maxWidth = window.innerWidth - windowMargin;
-            const fixedWidth = Math.min(maxWidth, min);
-            this.container.style.width = fixedWidth + 'px';
-            this.content.style.width = fixedWidth - inset + 'px';
-        };
-
-        const container = this.container;
-        const content = this.content;
-
-        const inset = margin * 2;
-
-        const setSize = () => {
-            if (!container.parentElement) return;
-            if (!this.loaded) return;
-
-            if (this.frame) {
-                setWidth(640);
-                const frame = this.content;
-
-                const body = frame.contentWindow.document.body;
-                const html = body.parentElement;
-                const scroll = html.scrollTop;
-
-                const max = window.innerHeight - windowMargin - footerHeight;
-                frame.style.height = frame.contentWindow.document.body.scrollHeight + inset + 'px';
-
-                let height = frame.contentWindow.document.body.scrollHeight + inset;
-
-                if (height > max) height = max;
-
-                container.style.height = height + footerHeight + 'px';
-                frame.style.height = height + 'px';
-
-                html.scrollTop = scroll;
-            } else {
-                setWidth(320, inset);
-                content.style.height = '0px';
-
-                const fullHeight = content.scrollHeight - inset;
-                const maxHeight = window.innerHeight - windowMargin;
-                const fixedHeight = Math.min(fullHeight, maxHeight);
-                content.style.height = fixedHeight + 'px';
-
-                const containerHeight = fixedHeight + footerHeight + inset;
-                container.style.height = containerHeight + 'px';
-            }
-        };
-
-        if (this.frame) {
-            if (!this.loaded) {
-                const frame = this.content;
-                frame.onload = () => {
-                    this.loaded = true;
-                    if (!activePanel) return;
-                    if (activePanel.panel !== this.container) return;
-                    container.style.display = 'block';
-                    frame.contentWindow.document.body.style.margin = margin + 'px';
-                    setSize();
-                };
-            }
-        } else {
-            this.loaded = true;
-            if (message) content.appendChild(document.createTextNode(message));
-        }
-
-        activePanel.keydownListener = (event) => {
-            if (!activePanel) return;
+        this.keydownListener = (event) => {
             if (event.code === "Enter") {
-                if (this.confirmButton) {
-                    event.preventDefault();
-                    this.confirmButton.focus();
-                }
+                event.preventDefault();
+                this.confirmButton.focus();
             } else if (event.code === "Escape") {
                 event.preventDefault();
                 const button = this.rejectButton ?? this.confirmButton;
                 button.focus();
             }
         };
-        document.body.addEventListener('keydown', activePanel.keydownListener);
+        document.body.addEventListener('keydown', this.keydownListener);
 
-        activePanel.keyupListener = (event) => {
-            if (!activePanel) return;
+        this.keyupListener = (event) => {
             if (event.code === "Enter") {
                 if (document.activeElement === this.confirmButton) {
                     event.preventDefault();
@@ -260,21 +143,152 @@ export class Panel {
                 }
             }
         };
-        document.body.addEventListener('keyup', activePanel.keyupListener);
+        document.body.addEventListener('keyup', this.keyupListener);
 
-        if (clearBacking) {
-            blocker.style.background = 'rgba(0,0,0,0)';
-            blocker.style.pointerEvents = "none";
-            // blocker.onclick = null;
-        } else {
-            blocker.style.background = 'rgba(0,0,0,0.5)';
-            blocker.style.pointerEvents = "auto";
-            // blocker.onclick = event => { if (event.target === blocker) closeBlocker() };
+        this.resizeListener = this.setSize;
+        window.addEventListener('resize', this.resizeListener);
+
+        this.domParent.appendChild(this.container);
+
+        return true;
+    }
+    hide() {
+        if (!this.active) return false;
+        this.active = false;
+
+        if (this.keydownListener) {
+            document.body.removeEventListener('keydown', this.keydownListener);
+            this.keydownListener = null;
+        }
+        if (this.keyupListener) {
+            document.body.removeEventListener('keyup', this.keyupListener);
+            this.keyupListener = null;
+        }
+        if (this.resizeListener) {
+            window.removeEventListener('resize', this.resizeListener);
+            this.resizeListener = null;
         }
 
+        this.domParent.removeChild(this.container);
 
-        activePanel.resizeListener = setSize;
-        window.addEventListener('resize', activePanel.resizeListener);
-        setSize();
+        return true;
+    }
+}
+
+export class Panel extends PanelBase {
+    constructor(message, confirm, reject) {
+        const contentElement = document.createElement('div');
+        super(contentElement, confirm, reject);
+
+        this.message = message;
+
+        this.content.style.overflow = 'auto';
+        this.content.style.padding = margin + 'px';
+    }
+    setSize() {
+        if (!this.container.parentElement) return;
+
+        const inset = margin * 2;
+        this.setWidth(320, inset);
+
+        this.content.style.height = '0px';
+
+        const fullHeight = this.content.scrollHeight - inset;
+        const maxHeight = window.innerHeight - windowMargin;
+        const fixedHeight = Math.min(fullHeight, maxHeight);
+        this.content.style.height = fixedHeight + 'px';
+
+        const containerHeight = fixedHeight + footerHeight + inset;
+        this.container.style.height = containerHeight + 'px';
+    }
+    show() {
+        if (!super.show()) return false;
+
+        this.content.appendChild(document.createTextNode(this.message));
+        this.setSize();
+
+        return true;
+    }
+}
+
+let activePanel = null;
+export class AlertPanel extends Panel {
+    static alert(message, confirm) {
+        const panel = new AlertPanel(message, confirm);
+        panel.show();
+    }
+    static confirm(message, confirm) {
+        const panel = new AlertPanel(message, confirm, true);
+        panel.show();
+    }
+    get domParent() {
+        return blocker;
+    }
+    show() {
+        if (activePanel) activePanel.hide();
+        activePanel = this;
+        if (!blocker.parentElement) document.body.appendChild(blocker);
+        return super.show();
+    }
+    hide() {
+        if (!super.hide()) return false;
+
+        if (blocker.parentElement) blocker.parentElement.removeChild(blocker);
+        activePanel = null;
+        return true;
+    }
+}
+
+export class FramePanel extends PanelBase {
+    constructor(src) {
+        const contentElement = document.createElement('iframe');
+        super(contentElement);
+
+        this.loaded = false;
+
+        this.container.style.display = 'none';
+        this.content.style.overflow = 'clip';
+        this.content.src = src;
+
+        document.body.appendChild(this.container);
+    }
+    setSize() {
+        if (!this.container.parentElement) return;
+        if (!this.loaded) return;
+
+        this.setWidth(640);
+        const frame = this.content;
+
+        const body = frame.contentWindow.document.body;
+        const html = body.parentElement;
+        const scroll = html.scrollTop;
+
+        const inset = margin * 2;
+        const max = window.innerHeight - windowMargin - footerHeight;
+        frame.style.height = frame.contentWindow.document.body.scrollHeight + inset + 'px';
+
+        let height = frame.contentWindow.document.body.scrollHeight + inset;
+
+        if (height > max) height = max;
+
+        this.container.style.height = height + footerHeight + 'px';
+        frame.style.height = height + 'px';
+
+        html.scrollTop = scroll;
+    }
+    show() {
+        if (!super.show()) return false;
+
+        if (!this.loaded) {
+            const frame = this.content;
+            frame.onload = () => {
+                this.loaded = true;
+                frame.contentWindow.document.body.style.margin = margin + 'px';
+                this.container.style.display = 'block';
+                this.setSize();
+            };
+        }
+
+        return true;
     }
 }
