@@ -127,4 +127,41 @@ const puzzleHexGrid = (puzzleDataHex) => {
 	return [puzzle, grid];
 }
 
+const puzzleGridBase64 = (clues, filled) => {
+	const binaryFilled = [];
+	for (let row = 1; row < 8; row++) {
+		for (let i = 0; i < 8; i++) {
+			const index = row * 9 + i;
+			const symbol = parseInt(filled[index]) - 1;
+
+			let encode = symbol;
+			if (i < encode) encode--;
+
+			const symbolBit1 = encode % 2;
+			encode = Math.floor(encode / 2);
+			const symbolBit2 = encode % 2;
+			encode = Math.floor(encode / 2);
+			const symbolBit3 = encode % 2;
+
+			binaryFilled.push(symbolBit3);
+			binaryFilled.push(symbolBit2);
+			binaryFilled.push(symbolBit1);
+		}
+	}
+	const gridLength = 56;
+	const bitLength = gridLength * 3;
+	const byteLength = bitLength / 8; // 21
+	const hexFilled = new Uint8Array(byteLength);
+	let index = 0;
+	for (let i = 0; i < byteLength; i++) {
+		let char = 0x00;
+		for (let offset = 0; offset < 8; offset++) {
+			if (binaryFilled[index] !== 0) char |= 0x80 >>> offset;
+			index++;
+		}
+		hexFilled[i] = char;
+	}
+	return puzzleCluesHex(clues) + bin2hex(hexFilled);
+}
+
 export { puzzleGridHex, puzzleHexGrid };
