@@ -12,6 +12,8 @@ const borderWidth = 3;
 const margin = 32;
 const windowMargin = 48 * 2;
 
+const domParent = document.body;
+
 class PanelBase {
     constructor(contentElement, confirm = null, reject = false) {
         this.confirm = confirm;
@@ -104,9 +106,6 @@ class PanelBase {
         }
         container.appendChild(confirmButton);
     }
-    get domParent() {
-        return document.body;
-    }
     setWidth(min, inset = 0) {
         const maxWidth = window.innerWidth - windowMargin;
         const fixedWidth = Math.min(maxWidth, min);
@@ -149,6 +148,8 @@ class PanelBase {
         this.resizeListener = this.setSize;
         window.addEventListener('resize', this.resizeListener);
 
+        domParent.appendChild(this.container);
+
         return true;
     }
     hide() {
@@ -167,6 +168,8 @@ class PanelBase {
             window.removeEventListener('resize', this.resizeListener);
             this.resizeListener = null;
         }
+
+        domParent.removeChild(this.container);
 
         return true;
     }
@@ -201,16 +204,8 @@ export class Panel extends PanelBase {
     show() {
         if (!super.show()) return false;
 
-        this.domParent.appendChild(this.container);
         this.content.appendChild(document.createTextNode(this.message));
         this.setSize();
-
-        return true;
-    }
-    hide() {
-        if (!super.hide()) return false;
-
-        this.domParent.removeChild(this.container);
 
         return true;
     }
@@ -227,19 +222,25 @@ export class AlertPanel extends Panel {
         const panel = new AlertPanel(message, confirm, true);
         panel.show();
     }
-    get domParent() {
-        return blocker;
+    constructor(...args) {
+        super(...args);
+        this.container.style.zIndex = 2;
     }
     show() {
+        if (!super.show()) return false;
+
         if (activePanel) activePanel.hide();
-        if (!blocker.parentElement) document.body.appendChild(blocker);
         activePanel = this;
-        return super.show();
+        if (!blocker.parentElement) domParent.appendChild(blocker);
+
+        return true;
     }
     hide() {
         if (!super.hide()) return false;
-        if (blocker.parentElement && framePanels === 0) blocker.parentElement.removeChild(blocker);
+
         activePanel = null;
+        if (blocker.parentElement && framePanels === 0) blocker.parentElement.removeChild(blocker);
+
         return true;
     }
 }
@@ -249,22 +250,21 @@ export class FramePanel extends PanelBase {
         const contentElement = document.createElement('iframe');
         super(contentElement);
 
-        this.loaded = false;
-        this.loading = false;
-
-        this.container.style.zIndex = 2;
+        this.container.style.zIndex = 3;
         this.content.style.overflow = 'clip';
         this.content.src = src;
 
         this.content.onload = () => {
-            this.loaded = true;
             this.content.contentWindow.document.body.style.margin = margin + 'px';
-            this.show();
+
+            framePanels++;
+            if (!blocker.parentElement) domParent.appendChild(blocker);
+            this.container.style.display = 'block';
+            this.setSize();
         };
     }
     setSize() {
         if (!this.container.parentElement) return;
-        if (!this.loaded) return;
 
         this.setWidth(640);
         const frame = this.content;
@@ -287,28 +287,18 @@ export class FramePanel extends PanelBase {
         html.scrollTop = scroll;
     }
     show() {
-        if (!this.loaded) {
-            if (!this.container.parentElement) {
-                this.domParent.appendChild(this.container);
-                this.container.style.display = 'none';
-                return true;
-            }
-            return false;
-        }
         if (!super.show()) return false;
 
-        framePanels++;
-        if (!blocker.parentElement) document.body.appendChild(blocker);
-        this.container.style.display = 'block';
-        this.setSize();
+        this.container.style.display = 'none';
+
         return true;
     }
     hide() {
         if (!super.hide()) return false;
+
         framePanels--;
-        this.domParent.removeChild(this.container);
-        this.loaded = false;
         if (blocker.parentElement && framePanels === 0 && !activePanel) blocker.parentElement.removeChild(blocker);
+
         return true;
     }
 }
