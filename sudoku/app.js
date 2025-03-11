@@ -55,8 +55,6 @@ if (!levelMode) {
 const puzzleData = {
 	id: null,
 	transform: null,
-	grid: new Uint8Array(81),
-	markers: new Uint16Array(81),
 }
 Object.seal(puzzleData);
 
