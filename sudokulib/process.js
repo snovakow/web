@@ -47,28 +47,10 @@ const puzzleCluesHex = (clues) => {
 	return bin2hex(hexClues);
 }
 const puzzleGridHex = (clues, filled) => {
-	const binaryFilled = [];
-	for (let row = 1; row < 8; row++) {
-		for (let i = 0; i < 8; i++) {
-			const index = row * 9 + i;
-			const symbol = parseInt(filled[index]) - 1;
+	const binaryFilled = binaryFill(filled);
 
-			let encode = symbol;
-			if (i < encode) encode--;
-
-			const symbolBit1 = encode % 2;
-			encode = Math.floor(encode / 2);
-			const symbolBit2 = encode % 2;
-			encode = Math.floor(encode / 2);
-			const symbolBit3 = encode % 2;
-
-			binaryFilled.push(symbolBit3);
-			binaryFilled.push(symbolBit2);
-			binaryFilled.push(symbolBit1);
-		}
-	}
 	const gridLength = 56;
-	const bitLength = gridLength * 3;
+	const bitLength = gridLength * 3; // 168
 	const byteLength = bitLength / 8; // 21
 	const hexFilled = new Uint8Array(byteLength);
 	let index = 0;
