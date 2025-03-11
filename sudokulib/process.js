@@ -7,6 +7,30 @@ const bin2hex = (buff) => {
 	return hexOctets.join("");
 }
 
+const binaryFill = (filled) => {
+	const binaryFilled = [];
+	for (let row = 1; row < 8; row++) {
+		for (let i = 0; i < 8; i++) {
+			const index = row * 9 + i;
+			const symbol = parseInt(filled[index]) - 1;
+
+			let encode = symbol;
+			if (i < encode) encode--;
+
+			const symbolBit1 = encode % 2;
+			encode = Math.floor(encode / 2);
+			const symbolBit2 = encode % 2;
+			encode = Math.floor(encode / 2);
+			const symbolBit3 = encode % 2;
+
+			binaryFilled.push(symbolBit3);
+			binaryFilled.push(symbolBit2);
+			binaryFilled.push(symbolBit1);
+		}
+	}
+	return binaryFilled;
+}
+
 const puzzleCluesHex = (clues) => {
 	const hexClues = new Uint8Array(11);
 	if (clues[0] === "0") hexClues[0] = 0x00;
