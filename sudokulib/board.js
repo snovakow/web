@@ -140,6 +140,10 @@ class Board {
 			for (let c = 0; c < GRID_SIDE; c++, coff += unitSize) {
 				const index = r * 9 + c;
 				const cell = this.cells[index];
+
+				if (cell.symbol > 0 && board.errorCells.has(index)) ctx.fillStyle = 'HSL(9 100% 50%)';
+				else ctx.fillStyle = 'Black';
+
 				if (cell.symbol === 0) {
 					ctx.font = pixAlign(unitSize * 0.7 * 1 / 3) + "px " + FONT;
 
@@ -170,8 +174,6 @@ class Board {
 						measured = measureClue;
 					}
 
-					if (board.errorCells.has(index)) ctx.fillStyle = 'HSL(9 100% 50%)';
-					else ctx.fillStyle = 'Black';
 					const x = pixAlign(coff);
 					const y = pixAlign(roff + (measured.actualBoundingBoxAscent * 0.5 - measured.actualBoundingBoxDescent * 0.5));
 					ctx.fillText(cell.symbol, x, y);
