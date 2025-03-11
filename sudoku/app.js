@@ -817,9 +817,9 @@ const resize = () => {
 		board.canvas.style.left = spacing + buffer + 'px';
 		board.canvas.style.transform = 'translate(0%, -50%)';
 
-		pickerContainer.style.bottom = '50%';
+		pickerContainer.style.top = '50%';
 		pickerContainer.style.right = spacing + buffer + 'px';
-		pickerContainer.style.transform = 'translate(0, 50%)';
+		pickerContainer.style.transform = 'translate(0, -50%)';
 
 		Menu.pickerBar.style.top = '100%';
 		Menu.pickerBar.style.margin = '8px 0px 0px 0px';
@@ -841,9 +841,9 @@ const resize = () => {
 		board.canvas.style.left = '50%';
 		board.canvas.style.transform = 'translate(-50%, 0%)';
 
-		pickerContainer.style.bottom = buffer + 'px';
+		pickerContainer.style.top = height - buffer + 'px';
 		pickerContainer.style.right = '50%';
-		pickerContainer.style.transform = 'translate(50%, 0%)';
+		pickerContainer.style.transform = 'translate(50%, -100%)';
 
 		Menu.pickerBar.style.top = '50%';
 		Menu.pickerBar.style.margin = '0px 0px 0px 8px';
