@@ -75,8 +75,6 @@ const saveData = () => {
 		id: puzzleData.id,
 		strategy: strategy,
 		transform: puzzleData.transform,
-		grid: puzzleData.grid.join(""),
-		markers: puzzleData.markers.join(""),
 		pickerMarkerMode,
 		selected,
 		selectedRow,
@@ -290,7 +288,6 @@ pickerMarker.style.width = PICKER.cellsSize + 'px';
 pickerMarker.style.height = PICKER.cellsSize + 'px';
 
 board.canvas.style.position = 'absolute';
-board.canvas.style.left = '50%';
 board.canvas.style.touchAction = "manipulation";
 picker.style.touchAction = "manipulation";
 pickerMarker.style.touchAction = "manipulation";
@@ -309,7 +306,6 @@ if (loadGridMetadata) {
 
 		if (metadata.id !== undefined) puzzleData.id = metadata.id;
 		if (metadata.transform !== undefined) puzzleData.transform = metadata.transform;
-		if (metadata.grid !== undefined) puzzleData.grid.set(metadata.grid);
 
 		loaded = true;
 	}
@@ -402,23 +398,12 @@ if (strategy === 'custom' || strategy === 'hardcoded') {
 					for (const cell of board.startCells) cell.symbol = 0;
 
 					puzzleData.id = "";
-					puzzleData.grid.fill(0);
-					puzzleData.markers.fill(0);
 				} else {
 					const index = select.selectedIndex - 1;
 					const entry = entries[index];
 					board.setGrid(entry.puzzleData);
 
-					const grid = new Uint8Array(81);
-					const markers = new Uint16Array(81);
-					for (let i = 0; i < 81; i++) {
-						grid[i] = board.cells[i].symbol;
-						markers[i] = board.cells[i].mask;
-					}
-
 					puzzleData.id = entry.id;
-					puzzleData.grid = grid;
-					puzzleData.markers = markers;
 				}
 				puzzleData.transform = null;
 				board.puzzleSolved.fill(0);
@@ -490,8 +475,6 @@ const loadLevel = () => {
 
 			puzzleData.id = puzzleId;
 			puzzleData.transform = transform;
-			puzzleData.grid = gridTransformed;
-			puzzleData.markers.fill(0);
 
 			Undo.set(board);
 			saveData();
@@ -560,8 +543,6 @@ const loadSudoku = () => {
 
 			puzzleData.id = puzzleId;
 			puzzleData.transform = transform;
-			puzzleData.grid = gridTransformed;
-			puzzleData.markers.fill(0);
 
 			Undo.set(board);
 			saveData();
@@ -653,6 +634,7 @@ Menu.checkButton.addEventListener('click', () => {
 			solved = false;
 		}
 	}
+	saveData();
 	draw();
 	if (solved) {
 		AlertPanel.alert("Puzzle Complete!!!");
