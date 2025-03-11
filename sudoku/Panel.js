@@ -252,12 +252,15 @@ export class FramePanel extends PanelBase {
         this.loaded = false;
         this.loading = false;
 
-        this.container.style.display = 'none';
         this.container.style.zIndex = 2;
         this.content.style.overflow = 'clip';
         this.content.src = src;
 
-        document.body.appendChild(this.container);
+        this.content.onload = () => {
+            this.loaded = true;
+            this.content.contentWindow.document.body.style.margin = margin + 'px';
+            this.show();
+        };
     }
     setSize() {
         if (!this.container.parentElement) return;
@@ -285,39 +288,26 @@ export class FramePanel extends PanelBase {
     }
     show() {
         if (!this.loaded) {
-            if (!this.loading) {
-                this.content.onload = () => {
-                    this.loaded = true;
-                    this.loading = false;
-                    this.content.onload = null;
-
-                    this.content.contentWindow.document.body.style.margin = margin + 'px';
-                    this.container.style.display = 'block';
-                    this.show();
-
-                    // if (!blocker.parentElement) document.body.appendChild(blocker);
-                    // if (!super.show()) return false;
-                    // framePanels++;
-
-                };
-                this.loading = true;
+            if (!this.container.parentElement) {
+                this.domParent.appendChild(this.container);
+                this.container.style.display = 'none';
+                return true;
             }
-
             return false;
         }
-        this.domParent.appendChild(this.container);
-
-        if (!blocker.parentElement) document.body.appendChild(blocker);
         if (!super.show()) return false;
-        this.setSize();
+
         framePanels++;
+        if (!blocker.parentElement) document.body.appendChild(blocker);
+        this.container.style.display = 'block';
+        this.setSize();
         return true;
     }
     hide() {
-this.domParent.removeChild(this.container);
-
         if (!super.hide()) return false;
         framePanels--;
+        this.domParent.removeChild(this.container);
+        this.loaded = false;
         if (blocker.parentElement && framePanels === 0 && !activePanel) blocker.parentElement.removeChild(blocker);
         return true;
     }
