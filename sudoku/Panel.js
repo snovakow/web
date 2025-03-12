@@ -112,7 +112,10 @@ class PanelBase {
         this.container.style.width = fixedWidth + 'px';
         this.content.style.width = fixedWidth - inset + 'px';
     }
-    setSize() { }
+    handleEvent(event) {
+        if (event.type !== 'resize') return;
+        if (this.setSize) this.setSize();
+    }
     show() {
         if (this.active) return false;
         this.active = true;
@@ -145,7 +148,7 @@ class PanelBase {
         };
         document.body.addEventListener('keyup', this.keyupListener);
 
-        this.resizeListener = this.setSize;
+        this.resizeListener = this;
         window.addEventListener('resize', this.resizeListener);
 
         domParent.appendChild(this.container);
