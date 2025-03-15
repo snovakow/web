@@ -15,20 +15,22 @@ iframe.style.width = "100%";
 iframe.style.border = 0;
 document.body.appendChild(iframe);
 
-addLink("Naked Pair", "./sudoku/?strategy=candidate_naked2");
-addLink("Naked Triple", "./sudoku/?strategy=candidate_naked3");
-addLink("Naked Quad", "./sudoku/?strategy=candidate_naked4");
-addLink("Hidden Single", "./sudoku/?strategy=candidate_hidden1");
-addLink("Hidden Pair", "./sudoku/?strategy=candidate_hidden2");
-addLink("Hidden Triple", "./sudoku/?strategy=candidate_hidden3");
-addLink("Hidden Quad", "./sudoku/?strategy=candidate_hidden4");
-addLink("Intersection Removal", "./sudoku/?strategy=candidate_omissions");
-addLink("Deadly Pattern", "./sudoku/?strategy=candidate_uniqueRectangle");
-addLink("Y Wing", "./sudoku/?strategy=candidate_yWing");
-addLink("XYZ Wing", "./sudoku/?strategy=candidate_xyzWing");
-addLink("X Wing", "./sudoku/?strategy=candidate_xWing");
-addLink("Swordfish", "./sudoku/?strategy=candidate_swordfish");
-addLink("Jellyfish", "./sudoku/?strategy=candidate_jellyfish");
+addLink("Singles", "./sudoku/");
+
+addLink("Naked Pair", "./sudoku/?strategy=naked2");
+addLink("Naked Triple", "./sudoku/?strategy=naked3");
+addLink("Naked Quad", "./sudoku/?strategy=naked4");
+addLink("Hidden Single", "./sudoku/?strategy=hidden1");
+addLink("Hidden Pair", "./sudoku/?strategy=hidden2");
+addLink("Hidden Triple", "./sudoku/?strategy=hidden3");
+addLink("Hidden Quad", "./sudoku/?strategy=hidden4");
+addLink("Intersection Removal", "./sudoku/?strategy=omissions");
+addLink("Deadly Pattern", "./sudoku/?strategy=uniqueRectangle");
+addLink("Y Wing", "./sudoku/?strategy=yWing");
+addLink("XYZ Wing", "./sudoku/?strategy=xyzWing");
+addLink("X Wing", "./sudoku/?strategy=xWing");
+addLink("Swordfish", "./sudoku/?strategy=swordfish");
+addLink("Jellyfish", "./sudoku/?strategy=jellyfish");
 
 addLink("Sudoku About", "./sudoku/about.html");
 // addLink("Bounder", "/bounder/");
