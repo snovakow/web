@@ -189,18 +189,23 @@ const board = new Board();
 const saveGrid = (metadata) => {
 	const data = JSON.stringify(metadata);
 	const encoded = SudokuProcess.puzzleGridBase64(board);
-	window.location.hash = encoded;
+	// window.location.hash = encoded;
+	history.replaceState(undefined, undefined, "#" + encoded)
 	sessionStorage.setItem("saveData", data);
 };
 const loadGrid = () => {
 	try {
 		SudokuProcess.puzzleBase64Grid(board, window.location.hash.substring(1));
-
-		const data = sessionStorage.getItem("saveData");
-		return JSON.parse(data);
 	} catch (error) {
 		console.log(error);
-		return null;
+		sessionStorage.removeItem("saveData");
+		return { coded: false, metadata: null };
+	}
+	try {
+		const data = sessionStorage.getItem("saveData");
+		return { coded: true, metadata: JSON.parse(data) };
+	} catch (error) {
+		return { coded: true, metadata: null };
 	}
 };
 

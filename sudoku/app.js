@@ -295,33 +295,40 @@ const header = document.createElement('DIV');
 const mainBody = document.createElement('DIV');
 
 let loaded = false;
-const loadGridMetadata = loadGrid();
-if (loadGridMetadata) {
-	const metadata = loadGridMetadata;
-	if (metadata.strategy === strategy) {
-		if (metadata.selected !== undefined) selected = metadata.selected;
-		if (metadata.selectedRow !== undefined) selectedRow = metadata.selectedRow;
-		if (metadata.selectedCol !== undefined) selectedCol = metadata.selectedCol;
+{
+	const loadGridData = loadGrid();
+	if (loadGridData) {
+		loaded = loadGridData.coded;
+		if (loadGridData.metadata) {
+			const metadata = loadGridData.metadata;
+			if (metadata.strategy === strategy) {
+				if (metadata.selected !== undefined) selected = metadata.selected;
+				if (metadata.selectedRow !== undefined) selectedRow = metadata.selectedRow;
+				if (metadata.selectedCol !== undefined) selectedCol = metadata.selectedCol;
 
-		if (metadata.id !== undefined) puzzleData.id = metadata.id;
-		if (metadata.transform !== undefined) puzzleData.transform = metadata.transform;
+				if (metadata.id !== undefined) puzzleData.id = metadata.id;
+				if (metadata.transform !== undefined) puzzleData.transform = metadata.transform;
 
-		loaded = true;
+				loaded = true;
+			}
+
+			if (metadata.pickerMarkerMode !== undefined) pickerMarkerMode = metadata.pickerMarkerMode;
+
+			board.errorCells.clear();
+			for (const error of metadata.errorCells) board.errorCells.add(error);
+
+			if (metadata.strategy !== strategy) {
+				metadata.strategy = strategy;
+				saveData();
+			}
+			if (!levelMode) Menu.setMenuItem(strategy);
+
+			Undo.loadData(metadata.undo);
+		} else {
+			if (loaded) Undo.set(board);
+		}
+		draw();
 	}
-
-	board.errorCells.clear();
-	for (const error of metadata.errorCells) board.errorCells.add(error);
-
-	if (metadata.pickerMarkerMode !== undefined) pickerMarkerMode = metadata.pickerMarkerMode;
-
-	if (metadata.strategy !== strategy) {
-		metadata.strategy = strategy;
-		saveData();
-	}
-	if (!levelMode) Menu.setMenuItem(strategy);
-
-	Undo.loadData(metadata.undo);
-	draw();
 }
 
 Menu.setMenuReponse((responseStrategy) => {
