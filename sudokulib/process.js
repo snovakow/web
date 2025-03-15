@@ -334,8 +334,6 @@ const puzzleBase64Grid = (board, puzzleDataBase64) => {
 		}
 	}
 	const gridSeed = decompressGrid(bits);
-	console.log(bits.length, bits.length / 6);
-
 	for (let i = 0; i < 81; i++) board.puzzleSolved[i] = gridSeed[i];
 
 	let bitIndex = 0;

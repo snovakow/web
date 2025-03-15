@@ -1,6 +1,6 @@
 import { undoIcons } from "./menu.js";
 
-const undoStackMax = 100;
+const undoStackMax = 1000;
 const undoStack = [];
 let leadIndex = -1;
 

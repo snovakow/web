@@ -195,15 +195,12 @@ const saveGrid = (metadata) => {
 const loadGrid = () => {
 	try {
 		SudokuProcess.puzzleBase64Grid(board, window.location.hash.substring(1));
+
+		const data = sessionStorage.getItem("saveData");
+		return JSON.parse(data);
 	} catch (error) {
 		console.log(error);
-	} finally {
-		try {
-			const data = sessionStorage.getItem("saveData");
-			return JSON.parse(data);
-		} catch (error) {
-			return null;
-		}
+		return null;
 	}
 };
 
