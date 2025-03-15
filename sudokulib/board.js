@@ -193,13 +193,17 @@ const saveGrid = (metadata) => {
 	history.replaceState(undefined, undefined, "#" + encoded)
 	sessionStorage.setItem("saveData", data);
 };
-const loadGrid = () => {
+const loadGrid = (hash, fresh = false) => {
 	try {
-		SudokuProcess.puzzleBase64Grid(board, window.location.hash.substring(1));
+		SudokuProcess.puzzleBase64Grid(board, hash);
 	} catch (error) {
 		console.log(error);
 		sessionStorage.removeItem("saveData");
 		return { coded: false, metadata: null };
+	}
+	if (fresh) {
+		sessionStorage.removeItem("saveData");
+		return { coded: true, metadata: null };
 	}
 	try {
 		const data = sessionStorage.getItem("saveData");

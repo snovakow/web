@@ -58,12 +58,11 @@ const puzzleData = {
 }
 Object.seal(puzzleData);
 
-let pickerMarkerMode = false;
-
 const headerHeight = Menu.headerHeight;
 const footerHeight = 8;
 const spacing = 8;
 
+let pickerMarkerMode = false;
 let selectedRow = 0;
 let selectedCol = 0;
 let selected = false;
@@ -295,41 +294,66 @@ const header = document.createElement('DIV');
 const mainBody = document.createElement('DIV');
 
 let loaded = false;
-{
-	const loadGridData = loadGrid();
-	if (loadGridData) {
-		loaded = loadGridData.coded;
-		if (loadGridData.metadata) {
-			const metadata = loadGridData.metadata;
-			if (metadata.strategy === strategy) {
-				if (metadata.selected !== undefined) selected = metadata.selected;
-				if (metadata.selectedRow !== undefined) selectedRow = metadata.selectedRow;
-				if (metadata.selectedCol !== undefined) selectedCol = metadata.selectedCol;
-
-				if (metadata.id !== undefined) puzzleData.id = metadata.id;
-				if (metadata.transform !== undefined) puzzleData.transform = metadata.transform;
-
-				loaded = true;
-			}
-
-			if (metadata.pickerMarkerMode !== undefined) pickerMarkerMode = metadata.pickerMarkerMode;
-
-			board.errorCells.clear();
-			for (const error of metadata.errorCells) board.errorCells.add(error);
-
-			if (metadata.strategy !== strategy) {
-				metadata.strategy = strategy;
-				saveData();
-			}
-			if (!levelMode) Menu.setMenuItem(strategy);
-
-			Undo.loadData(metadata.undo);
-		} else {
-			if (loaded) Undo.set(board);
-		}
-		draw();
+const loadGridData = (hash, fresh) => {
+	if (fresh) {
+		pickerMarkerMode = false;
+		selected = false;
+		selectedRow = 0;
+		selectedCol = 0;
+		board.errorCells.clear();
 	}
+	const loadGridData = loadGrid(hash, fresh);
+	if (!loadGridData) return;
+
+	loaded = loadGridData.coded;
+	if (loadGridData.metadata) {
+		const metadata = loadGridData.metadata;
+		if (metadata.strategy === strategy) {
+			if (metadata.selected !== undefined) selected = metadata.selected;
+			if (metadata.selectedRow !== undefined) selectedRow = metadata.selectedRow;
+			if (metadata.selectedCol !== undefined) selectedCol = metadata.selectedCol;
+
+			if (metadata.id !== undefined) puzzleData.id = metadata.id;
+			if (metadata.transform !== undefined) puzzleData.transform = metadata.transform;
+
+			loaded = true;
+		}
+
+		if (metadata.pickerMarkerMode !== undefined) pickerMarkerMode = metadata.pickerMarkerMode;
+
+		board.errorCells.clear();
+		for (const error of metadata.errorCells) board.errorCells.add(error);
+
+		if (metadata.strategy !== strategy) {
+			metadata.strategy = strategy;
+			saveData();
+		}
+		if (!levelMode) Menu.setMenuItem(strategy);
+
+		Undo.loadData(metadata.undo);
+	} else {
+		if (loaded) Undo.set(board);
+	}
+	draw();
 }
+loadGridData(window.location.hash.substring(1));
+
+window.addEventListener("hashchange", (event) => {
+	const url = new URL(event.newURL);
+	loadGridData(url.hash.substring(1), true);
+	saveData();
+
+	if (foundPanel) {
+		foundPanel.hide();
+		foundPanel = null;
+	}
+	if (infoPanel) {
+		infoPanel.hide();
+	}
+	AlertPanel.hide();
+
+	draw();
+});
 
 Menu.setMenuReponse((responseStrategy) => {
 	if (strategy === responseStrategy) return false;

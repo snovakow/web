@@ -225,6 +225,9 @@ export class AlertPanel extends Panel {
         const panel = new AlertPanel(message, confirm, true);
         panel.show();
     }
+    static hide() {
+        if (activePanel) activePanel.hide();
+    }
     constructor(...args) {
         super(...args);
         this.container.style.zIndex = 2;
