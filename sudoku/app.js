@@ -322,10 +322,6 @@ const loadGridData = (hash) => {
 		board.errorCells.clear();
 		for (const error of metadata.errorCells) board.errorCells.add(error);
 
-		metadata.strategy = strategy;
-
-		saveData();
-
 		Undo.loadData(metadata.undo);
 
 		loaded = true;
