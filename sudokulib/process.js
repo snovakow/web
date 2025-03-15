@@ -232,6 +232,7 @@ const compressGrid = (grid) => {
 	return binary;
 }
 
+const throwError = "Board data decompress error!";
 const decompressGrid = (binary) => {
 	const possibilities = [];
 	for (let i = 0; i < 81; i++) {
@@ -245,15 +246,13 @@ const decompressGrid = (binary) => {
 		const bitCount = possibility.bitCount();
 		let compressed = 0x0;
 		for (let shift = bitCount - 1; shift >= 0; shift--) {
-			if (bitIndex === binary.length) {
-				console.log("error");
-				break;
-			}
+			if (bitIndex === binary.length) throw new Error(throwError);
 			const bit = binary[bitIndex];
 			compressed |= bit << shift;
 			bitIndex++;
 		}
 		const symbol = possibility.decompress(compressed);
+		if (symbol === 0) throw new Error(throwError);
 		grid[index] = symbol;
 		reducePossibility(symbol, index, possibilities);
 	}
@@ -319,7 +318,6 @@ const puzzleGridBase64 = (board) => {
 	return binaryToBase64(binaryData);
 }
 
-const throwError = "Board data decompress error!";
 const puzzleBase64Grid = (board, puzzleDataBase64) => {
 	// min = 81*2/6 = 27
 	if (!puzzleDataBase64 || puzzleDataBase64.length <= 27) throw new Error(throwError);
@@ -334,7 +332,13 @@ const puzzleBase64Grid = (board, puzzleDataBase64) => {
 		}
 	}
 	const gridSeed = decompressGrid(bits);
-	for (let i = 0; i < 81; i++) board.puzzleSolved[i] = gridSeed[i];
+
+	const puzzleSolved = new Uint8Array(81);
+	const startCells = new Uint8Array(81);
+	const cellSymbols = new Uint8Array(81);
+	const cellMasks = new Uint16Array(81);
+
+	for (let i = 0; i < 81; i++) puzzleSolved[i] = gridSeed[i];
 
 	let bitIndex = 0;
 	for (let i = 0; i < 81; i++) {
@@ -344,13 +348,13 @@ const puzzleBase64Grid = (board, puzzleDataBase64) => {
 		const bit1 = bits[bitIndex++];
 		const bit2 = bits[bitIndex++];
 		if (bit1 === 0 && bit2 === 0) {
-			board.startCells[i].symbol = board.puzzleSolved[i];
-			board.cells[i].symbol = board.puzzleSolved[i];
-			board.cells[i].mask = 0x0000;
+			startCells[i] = puzzleSolved[i];
+			cellSymbols[i] = puzzleSolved[i];
+			cellMasks[i] = 0x0000;
 			continue;
 		}
 
-		board.startCells[i].symbol = 0;
+		startCells[i] = 0;
 		if (bit1 === 0 && bit2 === 1) {
 			if (bitIndex > bits.length - 4) throw new Error(throwError);
 			let symbol = 0;
@@ -359,14 +363,14 @@ const puzzleBase64Grid = (board, puzzleDataBase64) => {
 				symbol |= bit << i;
 			}
 			symbol++;
-			board.cells[i].symbol = symbol;
-			board.cells[i].mask = 0x0000;
+			cellSymbols[i] = symbol;
+			cellMasks[i] = 0x0000;
 			continue;
 		}
 
-		board.cells[i].symbol = 0;
+		cellSymbols[i] = 0;
 		if (bit1 === 1 && bit2 === 0) {
-			board.cells[i].mask = 0x0000;
+			cellMasks[i] = 0x0000;
 			continue;
 		}
 
@@ -379,8 +383,14 @@ const puzzleBase64Grid = (board, puzzleDataBase64) => {
 			mask |= bit << i;
 		}
 		mask <<= 1;
+		cellMasks[i] = mask;
+	}
 
-		board.cells[i].mask = mask;
+	for (let i = 0; i < 81; i++) {
+		board.puzzleSolved[i] = puzzleSolved[i];
+		board.startCells[i].symbol = startCells[i];
+		board.cells[i].symbol = cellSymbols[i];
+		board.cells[i].mask = cellMasks[i];
 	}
 }
 
