@@ -194,6 +194,10 @@ const saveGrid = (metadata) => {
 	sessionStorage.setItem("saveData", data);
 };
 const loadGrid = (hash, fresh = false) => {
+	if(!hash) {
+		sessionStorage.removeItem("saveData");
+		return { coded: false, metadata: null };
+	}
 	try {
 		SudokuProcess.puzzleBase64Grid(board, hash);
 	} catch (error) {
