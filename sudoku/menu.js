@@ -224,6 +224,9 @@ if (document.fullscreenEnabled) {
 menu.style.display = "none";
 markerButton.style.display = "none";
 autoBar.style.display = "none";
+infoButton.style.display = "none";
+checkButton.style.display = "none";
+newPuzzle.style.display = "none";
 
 export { backing, mainBar, toolBar, pickerBar, autoBar, headerHeight, buttonSize };
 export { newPuzzle, reset, menu, markerButton, deleteButton, infoButton, checkButton };
