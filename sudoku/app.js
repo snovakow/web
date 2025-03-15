@@ -34,7 +34,6 @@ let strategy = "level";
 		"xWing",
 		"swordfish",
 		"jellyfish",
-		"custom",
 		"hardcoded",
 	];
 	for (const tableName of strategyNames) {
@@ -382,7 +381,7 @@ setMarkerMode();
 const title = document.createElement('SPAN');
 
 let customSelector = null;
-if (strategy === 'custom' || strategy === 'hardcoded') {
+if (strategy === 'hardcoded') {
 	const createSelect = (options, onChange) => {
 		const select = document.createElement('select');
 
@@ -407,14 +406,7 @@ if (strategy === 'custom' || strategy === 'hardcoded') {
 				const title = result.title;
 				let puzzleData = result.puzzleData;
 
-				if (strategy === 'custom') {
-					if (puzzleData.length !== 64) return;
-					const [puzzle, grid] = SudokuProcess.puzzleHexGrid(puzzleData);
-					puzzleData = puzzle;
-				}
-				if (strategy === 'hardcoded') {
-					if (puzzleData.length !== 81) return;
-				}
+				if (puzzleData.length !== 81) return;
 				entries.push({ id, title, puzzleData });
 
 				names.push(title);
@@ -550,7 +542,7 @@ const loadSudoku = () => {
 		loadLevel();
 		return;
 	} else {
-		if (strategy === 'custom' || strategy === 'hardcoded') return;
+		if (strategy === 'hardcoded') return;
 	}
 
 	fetch("../sudokulib/sudoku.php?version=2&strategy=candidate_" + strategy).then(response => {
@@ -905,7 +897,7 @@ const resize = () => {
 resize();
 window.addEventListener('resize', resize);
 
-if (strategy === 'custom') {
+/* if (strategy === 'custom') {
 	superimposeCandidates = (reset = false) => {
 		if (timer) {
 			window.clearInterval(timer);
@@ -1139,3 +1131,4 @@ if (strategy === 'custom') {
 	});
 	header.appendChild(superpositionAllFullSolveButton);
 }
+*/
