@@ -339,7 +339,8 @@ loadGridData(window.location.hash.substring(1));
 
 window.addEventListener("hashchange", (event) => {
 	const url = new URL(event.newURL);
-	loadGridData(url.hash.substring(1), true);
+	clearData();
+	loadGridData(url.hash.substring(1));
 	saveData();
 
 	if (foundPanel) {
