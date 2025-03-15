@@ -190,7 +190,7 @@ const saveGrid = (metadata) => {
 	const data = JSON.stringify(metadata);
 	const encoded = SudokuProcess.puzzleGridBase64(board);
 	// window.location.hash = encoded;
-	history.replaceState(undefined, undefined, "#" + encoded)
+	history.replaceState(null, "", "#" + encoded);
 	sessionStorage.setItem("saveData", data);
 };
 const loadGrid = (hash) => {
