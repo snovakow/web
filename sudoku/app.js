@@ -398,7 +398,7 @@ if (strategy === 'custom' || strategy === 'hardcoded') {
 		return select;
 	};
 
-	fetch("../sudokulib/sudoku.php?version=2&strategy=" + strategy).then(response => {
+	fetch("../sudokulib/sudoku.php?version=2&strategy=candidate_" + strategy).then(response => {
 		response.json().then((json) => {
 			const entries = [];
 			const names = [];
