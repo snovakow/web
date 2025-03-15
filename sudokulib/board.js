@@ -1,4 +1,6 @@
 import { Cell, CellCandidate, Grid } from "../sudokulib/Grid.js";
+import * as SudokuProcess from "../sudokulib/process.js";
+
 const pixAlign = (val) => {
 	return Math.round(val) + 0.5;
 };
