@@ -193,8 +193,8 @@ const saveGrid = (metadata) => {
 	history.replaceState(undefined, undefined, "#" + encoded)
 	sessionStorage.setItem("saveData", data);
 };
-const loadGrid = (hash, fresh = false) => {
-	if(!hash) {
+const loadGrid = (hash) => {
+	if (!hash) {
 		sessionStorage.removeItem("saveData");
 		return { coded: false, metadata: null };
 	}
@@ -205,10 +205,6 @@ const loadGrid = (hash, fresh = false) => {
 		sessionStorage.removeItem("saveData");
 		return { coded: false, metadata: null };
 	}
-	if (fresh) {
-		sessionStorage.removeItem("saveData");
-		return { coded: true, metadata: null };
-	}
 	try {
 		const data = sessionStorage.getItem("saveData");
 		return { coded: true, metadata: JSON.parse(data) };
@@ -217,4 +213,8 @@ const loadGrid = (hash, fresh = false) => {
 	}
 };
 
-export { board, FONT, loadGrid, saveGrid };
+const clearGrid = () => {
+	sessionStorage.removeItem("saveData");
+};
+
+export { board, FONT, loadGrid, saveGrid, clearGrid };
