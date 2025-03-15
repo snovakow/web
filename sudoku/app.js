@@ -782,27 +782,23 @@ document.body.addEventListener('click', (event) => {
 	Menu.backing.parentElement.removeChild(Menu.backing);
 });
 
-if (strategy === 'custom') {
-	Menu.newPuzzle.style.display = 'none';
-} else {
-	Menu.newPuzzle.addEventListener('click', () => {
-		if (findAnimating) return;
+Menu.newPuzzle.addEventListener('click', () => {
+	if (findAnimating) return;
 
-		const name = levelMode ? titleString : Menu.menuTitle(strategy);
-		const message = "Do you want to find a new " + name + " puzzle?";
-		AlertPanel.confirm(message, confirmed => {
-			if (!confirmed) return;
+	const name = levelMode ? titleString : Menu.menuTitle(strategy);
+	const message = "Do you want to find a new " + name + " puzzle?";
+	AlertPanel.confirm(message, confirmed => {
+		if (!confirmed) return;
 
-			if (foundPanel) {
-				foundPanel.hide();
-				foundPanel = null;
-			}
+		if (foundPanel) {
+			foundPanel.hide();
+			foundPanel = null;
+		}
 
-			selected = false;
-			loadSudoku();
-		});
+		selected = false;
+		loadSudoku();
 	});
-}
+});
 
 Menu.reset.addEventListener('click', () => {
 	if (findAnimating) return;
