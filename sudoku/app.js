@@ -361,7 +361,8 @@ Menu.setMenuReponse((responseStrategy) => {
 	Menu.setMenuItem(responseStrategy);
 	AlertPanel.confirm(message, confirmed => {
 		if (confirmed) {
-			window.location.search = "?strategy=" + responseStrategy;
+			history.replaceState(null, "", "?strategy=" + responseStrategy);
+			window.location.reload();
 		} else {
 			Menu.setMenuItem(strategy);
 		}
@@ -398,7 +399,7 @@ if (strategy === 'hardcoded') {
 		return select;
 	};
 
-	fetch("../sudokulib/sudoku.php?version=2&strategy=candidate_" + strategy).then(response => {
+	fetch("../sudokulib/sudoku.php?version=2&strategy=" + strategy).then(response => {
 		response.json().then((json) => {
 			const entries = [];
 			const names = [];
