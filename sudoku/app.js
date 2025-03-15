@@ -302,8 +302,8 @@ const clearData = () => {
 	clearGrid();
 };
 const loadGridData = (hash) => {
-	if (!levelMode) Menu.setMenuItem(strategy);
 	const loadGridData = loadGrid(hash);
+	if (!levelMode && strategy !== 'hardcoded') Menu.setMenuItem(strategy);
 	if (!loadGridData) return;
 
 	if (loadGridData.metadata) {
