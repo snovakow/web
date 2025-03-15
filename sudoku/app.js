@@ -580,10 +580,9 @@ const loadSudoku = () => {
 
 if (!loaded) loadSudoku();
 
-title.style.fontSize = (headerHeight * 0.75) + 'px';
 title.style.fontFamily = 'sans-serif';
 title.style.fontWeight = 'bold';
-title.style.lineHeight = headerHeight + 'px';
+title.style.whiteSpace = 'nowrap';
 title.style.textAlign = 'center';
 title.style.position = 'absolute';
 title.style.top = headerHeight / 2 + 'px';
@@ -605,7 +604,16 @@ if (strategy === 'xWing') titleString = "X Wing";
 if (strategy === 'swordfish') titleString = "Swordfish";
 if (strategy === 'jellyfish') titleString = "Jellyfish";
 if (titleString === null) titleString = "Singles";
-title.appendChild(document.createTextNode(titleString));
+if (strategy === 'level') {
+	title.style.fontSize = (headerHeight * 0.75) + 'px';
+	title.style.lineHeight = headerHeight + 'px';
+	title.appendChild(document.createTextNode(titleString));
+} else if (strategy !== 'hardcoded') {
+	const scale = 0.6;
+	title.style.fontSize = (headerHeight * 0.75 * scale) + 'px';
+	title.style.lineHeight = (headerHeight * scale) + 'px';
+	title.appendChild(document.createTextNode(titleString));
+}
 
 const applyUndo = (reverse) => {
 	const selectedIndex = reverse ? Undo.redo(board) : Undo.undo(board);
