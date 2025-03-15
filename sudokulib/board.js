@@ -143,7 +143,7 @@ class Board {
 				const index = r * 9 + c;
 				const cell = this.cells[index];
 
-				if (cell.symbol > 0 && board.errorCells.has(index)) ctx.fillStyle = 'HSL(9 100% 50%)';
+				if (cell.symbol > 0 && this.errorCells.has(index)) ctx.fillStyle = 'HSL(9 100% 50%)';
 				else ctx.fillStyle = 'Black';
 
 				if (cell.symbol === 0) {
@@ -163,7 +163,7 @@ class Board {
 						}
 					}
 				} else {
-					const startCell = board.startCells[index];
+					const startCell = this.startCells[index];
 					const fontSize = pixAlign(unitSize * 0.7);
 					ctx.font = fontSize + "px " + FONT;
 
@@ -186,64 +186,24 @@ class Board {
 }
 const board = new Board();
 
-const storageToCells = (data) => {
-	const dataCells = data.boardCells;
-	if (!dataCells) return null;
-	for (let i = 0; i < 81; i++) {
-		const dataCell = dataCells[i];
-		const startCell = board.startCells[i];
-		const cell = board.cells[i];
-		cell.mask = 0x0000;
-		if (dataCell.clue) {
-			startCell.symbol = dataCell.symbol;
-			cell.symbol = dataCell.symbol;
-		} else {
-			startCell.symbol = 0;
-			cell.setSymbol(dataCell.symbol);
-			if (dataCell.symbol === 0) cell.mask = dataCell.mask;
-		}
-		board.puzzleSolved[i] = dataCell.fill;
-	}
-	board.errorCells.clear();
-	for (const error of data.errorCells) board.errorCells.add(error);
-	return data.metadata;
-}
-const cellsToStorage = (metadata) => {
-	const dataCells = [];
-	for (let i = 0; i < 81; i++) {
-		const startCell = board.startCells[i];
-		const data = {};
-		if (startCell.symbol === 0) {
-			const cell = board.cells[i];
-			data.clue = false;
-			data.symbol = cell.symbol;
-			data.mask = cell.mask;
-		} else {
-			data.clue = true;
-			data.symbol = startCell.symbol;
-			data.mask = 0x0000;
-		}
-		data.fill = board.puzzleSolved[i];
-		dataCells.push(data);
-	}
-	return {
-		boardCells: dataCells,
-		errorCells: [...board.errorCells],
-		metadata
-	}
-}
-
 const saveGrid = (metadata) => {
-	const data = JSON.stringify(cellsToStorage(metadata));
+	const data = JSON.stringify(metadata);
+	const encoded = SudokuProcess.puzzleGridBase64(board);
+	window.location.hash = encoded;
 	sessionStorage.setItem("saveData", data);
 };
 const loadGrid = () => {
-	const data = sessionStorage.getItem("saveData");
 	try {
-		const json = JSON.parse(data);
-		return storageToCells(json);
+		SudokuProcess.puzzleBase64Grid(board, window.location.hash.substring(1));
 	} catch (error) {
-		return null;
+		console.log(error);
+	} finally {
+		try {
+			const data = sessionStorage.getItem("saveData");
+			return JSON.parse(data);
+		} catch (error) {
+			return null;
+		}
 	}
 };
 
