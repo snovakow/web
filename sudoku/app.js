@@ -77,6 +77,7 @@ const saveData = () => {
 		selected,
 		selectedRow,
 		selectedCol,
+		errorCells: [...board.errorCells],
 		undo: Undo.saveData()
 	});
 };
@@ -307,6 +308,9 @@ if (loadGridMetadata) {
 
 		loaded = true;
 	}
+
+	board.errorCells.clear();
+	for (const error of metadata.errorCells) board.errorCells.add(error);
 
 	if (metadata.pickerMarkerMode !== undefined) pickerMarkerMode = metadata.pickerMarkerMode;
 
