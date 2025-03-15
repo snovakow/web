@@ -651,40 +651,46 @@ Menu.deleteButton.addEventListener('click', () => {
 	draw();
 });
 
-Menu.checkButton.addEventListener('click', () => {
-	if (findAnimating) return;
+if (strategy !== 'hardcoded') {
+	Menu.checkButton.style.display = "block";
+	Menu.checkButton.addEventListener('click', () => {
+		if (findAnimating) return;
 
-	let errorCount = 0;
-	let solved = true;
-	board.errorCells.clear();
-	for (let i = 0; i < 81; i++) {
-		const cell = board.cells[i];
-		if (cell.symbol === 0) {
-			solved = false;
-			continue;
+		let errorCount = 0;
+		let solved = true;
+		board.errorCells.clear();
+		for (let i = 0; i < 81; i++) {
+			const cell = board.cells[i];
+			if (cell.symbol === 0) {
+				solved = false;
+				continue;
+			}
+			if (cell.symbol !== board.puzzleSolved[i]) {
+				board.errorCells.add(i);
+				errorCount++;
+				solved = false;
+			}
 		}
-		if (cell.symbol !== board.puzzleSolved[i]) {
-			board.errorCells.add(i);
-			errorCount++;
-			solved = false;
+		saveData();
+		draw();
+		if (solved) {
+			AlertPanel.alert("Puzzle Complete!!!");
+		} else if (errorCount > 0) {
+			if (errorCount === 1) AlertPanel.alert(errorCount + " Error!");
+			else AlertPanel.alert(errorCount + " Errors!");
+		} else {
+			AlertPanel.alert("No Errors!");
 		}
-	}
-	saveData();
-	draw();
-	if (solved) {
-		AlertPanel.alert("Puzzle Complete!!!");
-	} else if (errorCount > 0) {
-		if (errorCount === 1) AlertPanel.alert(errorCount + " Error!");
-		else AlertPanel.alert(errorCount + " Errors!");
-	} else {
-		AlertPanel.alert("No Errors!");
-	}
-});
+	});
+}
 
-Menu.infoButton.addEventListener('click', () => {
-	if (!infoPanel) infoPanel = new FramePanel("./info.html");
-	infoPanel.show();
-});
+if (levelMode) {
+	Menu.infoButton.style.display = "block";
+	Menu.infoButton.addEventListener('click', () => {
+		if (!infoPanel) infoPanel = new FramePanel("./info.html");
+		infoPanel.show();
+	});
+}
 
 const fillButton = document.createElement('button');
 fillButton.appendChild(document.createTextNode("Candidates"));
