@@ -1,4 +1,4 @@
-import { FONT, board, loadGrid, saveGrid } from "../sudokulib/board.js";
+import { FONT, board, clearGrid, loadGrid, saveGrid } from "../sudokulib/board.js";
 import { generateFromSeed, generateTransform, fillSolve, consoleOut } from "../sudokulib/generator.js";
 import { CellCandidate, Grid } from "../sudokulib/Grid.js";
 import * as PICKER from "../sudokulib/picker.js";
@@ -293,6 +293,14 @@ const header = document.createElement('DIV');
 const mainBody = document.createElement('DIV');
 
 let loaded = false;
+const clearData = () => {
+	pickerMarkerMode = false;
+	selected = false;
+	selectedRow = 0;
+	selectedCol = 0;
+	board.errorCells.clear();
+	clearGrid();
+};
 const loadGridData = (hash) => {
 	if (!levelMode) Menu.setMenuItem(strategy);
 	const loadGridData = loadGrid(hash);
