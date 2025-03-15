@@ -293,44 +293,36 @@ const header = document.createElement('DIV');
 const mainBody = document.createElement('DIV');
 
 let loaded = false;
-const loadGridData = (hash, fresh) => {
-	if (fresh) {
-		pickerMarkerMode = false;
-		selected = false;
-		selectedRow = 0;
-		selectedCol = 0;
-		board.errorCells.clear();
-	}
-	const loadGridData = loadGrid(hash, fresh);
+const loadGridData = (hash) => {
+	if (!levelMode) Menu.setMenuItem(strategy);
+	const loadGridData = loadGrid(hash);
 	if (!loadGridData) return;
 
-	loaded = loadGridData.coded;
 	if (loadGridData.metadata) {
 		const metadata = loadGridData.metadata;
-		if (metadata.strategy === strategy) {
-			if (metadata.selected !== undefined) selected = metadata.selected;
-			if (metadata.selectedRow !== undefined) selectedRow = metadata.selectedRow;
-			if (metadata.selectedCol !== undefined) selectedCol = metadata.selectedCol;
+		if (metadata.strategy !== strategy) return;
 
-			if (metadata.id !== undefined) puzzleData.id = metadata.id;
-			if (metadata.transform !== undefined) puzzleData.transform = metadata.transform;
+		if (metadata.selected !== undefined) selected = metadata.selected;
+		if (metadata.selectedRow !== undefined) selectedRow = metadata.selectedRow;
+		if (metadata.selectedCol !== undefined) selectedCol = metadata.selectedCol;
 
-			loaded = true;
-		}
+		if (metadata.id !== undefined) puzzleData.id = metadata.id;
+		if (metadata.transform !== undefined) puzzleData.transform = metadata.transform;
 
 		if (metadata.pickerMarkerMode !== undefined) pickerMarkerMode = metadata.pickerMarkerMode;
 
 		board.errorCells.clear();
 		for (const error of metadata.errorCells) board.errorCells.add(error);
 
-		if (metadata.strategy !== strategy) {
-			metadata.strategy = strategy;
-			saveData();
-		}
-		if (!levelMode) Menu.setMenuItem(strategy);
+		metadata.strategy = strategy;
+
+		saveData();
 
 		Undo.loadData(metadata.undo);
+
+		loaded = true;
 	} else {
+		loaded = loadGridData.coded;
 		if (loaded) Undo.set(board);
 	}
 	draw();
