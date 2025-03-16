@@ -1,6 +1,6 @@
 import { undoIcons } from "./menu.js";
 
-const undoStackMax = 1000;
+const undoStackMax = 100;
 const undoStack = [];
 let leadIndex = -1;
 
@@ -68,8 +68,24 @@ class Undo {
 }
 
 function set(board) {
-    leadIndex = 0;
-    undoStack.splice(0, Infinity, new Undo(-1, board));
+    let needsUndo = false;
+    for (let i = 0; i < 81; i++) {
+        const cell = board.cells[i];
+        if (cell.symbol !== board.startCells[i].symbol) {
+            needsUndo = true;
+            break;
+        }
+    }
+    if (needsUndo) {
+        const undo = new Undo(-1);
+        for (let i = 0; i < 81; i++) {
+            undo.cells[i].symbol = board.startCells[i].symbol;
+        }
+        undoStack.splice(0, Infinity, undo, new Undo(-1, board));
+    } else {
+        undoStack.splice(0, Infinity, new Undo(-1, board));
+    }
+    leadIndex = undoStack.length - 1;
     setIconState();
 }
 
