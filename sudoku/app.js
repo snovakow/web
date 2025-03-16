@@ -77,7 +77,7 @@ const saveData = () => {
 		selectedCol,
 		errorCells: [...board.errorCells],
 		undo: Undo.saveData()
-	});
+	}, strategy === 'hardcoded');
 };
 
 const draw = () => {
@@ -301,9 +301,11 @@ const clearData = () => {
 	board.errorCells.clear();
 	clearGrid();
 };
+
 const loadGridData = (hash) => {
-	const loadGridData = loadGrid(hash);
 	if (!levelMode && strategy !== 'hardcoded') Menu.setMenuItem(strategy);
+
+	const loadGridData = loadGrid(hash, strategy === 'hardcoded');
 	if (!loadGridData) return;
 
 	if (loadGridData.metadata) {
@@ -411,30 +413,39 @@ if (strategy === 'hardcoded') {
 			}
 
 			customSelector = createSelect(["-", ...names], (select) => {
-				selected = false;
-
-				if (select.selectedIndex === 0) {
-					for (const cell of board.cells) {
-						cell.symbol = 0;
-						cell.mask = 0x0000;
+				let message = "Do you want to clear the puzzle?";
+				if (select.selectedIndex > 0) message = `Do you want to load "${names[select.selectedIndex - 1]}"?`;
+				AlertPanel.confirm(message, confirmed => {
+					if (!confirmed) {
+						select.selectedIndex = puzzleData.id ?? 0;
+						return;
 					}
-					for (const cell of board.startCells) cell.symbol = 0;
 
-					puzzleData.id = "";
-				} else {
-					const index = select.selectedIndex - 1;
-					const entry = entries[index];
-					board.setGrid(entry.puzzleData);
+					selected = false;
 
-					puzzleData.id = entry.id;
-				}
-				puzzleData.transform = null;
-				board.puzzleSolved.fill(0);
-				board.errorCells.clear();
+					if (select.selectedIndex === 0) {
+						for (const cell of board.cells) {
+							cell.symbol = 0;
+							cell.mask = 0x0000;
+						}
+						for (const cell of board.startCells) cell.symbol = 0;
 
-				Undo.set(board);
-				saveData();
-				draw();
+						puzzleData.id = "";
+					} else {
+						const index = select.selectedIndex - 1;
+						const entry = entries[index];
+						board.setGrid(entry.puzzleData);
+
+						puzzleData.id = entry.id;
+					}
+					puzzleData.transform = null;
+					board.puzzleSolved.fill(0);
+					board.errorCells.clear();
+
+					Undo.set(board);
+					saveData();
+					draw();
+				});
 			});
 
 			customSelector.style.transform = 'translate(-50%, -50%)';
@@ -908,7 +919,7 @@ const resize = () => {
 resize();
 window.addEventListener('resize', resize);
 
-/* if (strategy === 'custom') {
+/* if (strategy === 'hardcoded') {
 	superimposeCandidates = (reset = false) => {
 		if (timer) {
 			window.clearInterval(timer);

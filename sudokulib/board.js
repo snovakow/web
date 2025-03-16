@@ -186,20 +186,20 @@ class Board {
 }
 const board = new Board();
 
-const saveGrid = (metadata) => {
+const saveGrid = (metadata, clues) => {
 	const data = JSON.stringify(metadata);
-	const encoded = SudokuProcess.puzzleGridBase64(board);
+	const encoded = SudokuProcess.puzzleGridBase64(board, clues);
 	// window.location.hash = encoded;
 	history.replaceState(null, "", "#" + encoded);
 	sessionStorage.setItem("saveData", data);
 };
-const loadGrid = (hash) => {
+const loadGrid = (hash, clues) => {
 	if (!hash) {
 		sessionStorage.removeItem("saveData");
 		return { coded: false, metadata: null };
 	}
 	try {
-		SudokuProcess.puzzleBase64Grid(board, hash);
+		SudokuProcess.puzzleBase64Grid(board, hash, clues);
 	} catch (error) {
 		console.log(error);
 		sessionStorage.removeItem("saveData");

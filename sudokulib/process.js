@@ -284,12 +284,19 @@ const binaryToBase64 = (binaryArray) => {
 // 01 4 bit symbol: 6 bit
 // 10 empty mask: 2 bit
 // 11 9 bit mask: 11 bit
-const puzzleGridBase64 = (board) => {
-	const binaryData = compressGrid(board.puzzleSolved);
+const puzzleGridBase64 = (board, clues = false) => {
+	const binaryData = clues ? [] : compressGrid(board.puzzleSolved);
 
 	for (let i = 0; i < 81; i++) {
-		if (board.startCells[i].symbol > 0) {
+		const startCell = board.startCells[i];
+		if (startCell.symbol > 0) {
 			binaryData.push(0, 0);
+			if (clues) {
+				const symbolBase = startCell.symbol - 1;
+				for (let offset = 3; offset >= 0; offset--) {
+					binaryData.push((symbolBase >>> offset) & 0x1);
+				}
+			}
 			continue;
 		}
 
@@ -318,9 +325,9 @@ const puzzleGridBase64 = (board) => {
 	return binaryToBase64(binaryData);
 }
 
-const puzzleBase64Grid = (board, puzzleDataBase64) => {
+const puzzleBase64Grid = (board, puzzleDataBase64, clues = false) => {
 	// min = 81*2/6 = 27
-	if (!puzzleDataBase64 || puzzleDataBase64.length <= 27) throw new Error(throwError);
+	if (!puzzleDataBase64 || puzzleDataBase64.length < 27) throw new Error(throwError);
 
 	const bits = [];
 	for (let i = 0; i < puzzleDataBase64.length; i++) {
@@ -331,14 +338,16 @@ const puzzleBase64Grid = (board, puzzleDataBase64) => {
 			bits.push((base64 >>> offset) & 0x1);
 		}
 	}
-	const gridSeed = decompressGrid(bits);
 
 	const puzzleSolved = new Uint8Array(81);
+	if (!clues) {
+		const gridSeed = decompressGrid(bits);
+		for (let i = 0; i < 81; i++) puzzleSolved[i] = gridSeed[i];
+	}
+
 	const startCells = new Uint8Array(81);
 	const cellSymbols = new Uint8Array(81);
 	const cellMasks = new Uint16Array(81);
-
-	for (let i = 0; i < 81; i++) puzzleSolved[i] = gridSeed[i];
 
 	let bitIndex = 0;
 	for (let i = 0; i < 81; i++) {
@@ -348,6 +357,16 @@ const puzzleBase64Grid = (board, puzzleDataBase64) => {
 		const bit1 = bits[bitIndex++];
 		const bit2 = bits[bitIndex++];
 		if (bit1 === 0 && bit2 === 0) {
+			if (clues) {
+				if (bitIndex > bits.length - 4) throw new Error(throwError);
+				let symbol = 0;
+				for (let i = 3; i >= 0; i--) {
+					const bit = bits[bitIndex++];
+					symbol |= bit << i;
+				}
+				symbol++;
+				puzzleSolved[i] = symbol;
+			}
 			startCells[i] = puzzleSolved[i];
 			cellSymbols[i] = puzzleSolved[i];
 			cellMasks[i] = 0x0000;
