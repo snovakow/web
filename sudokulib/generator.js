@@ -94,8 +94,8 @@ const fillSolve = (cells, simples, strategies) => {
 	];
 
 	let hiddenSimple = 0;
-	let omissionSimple = 0;
 	let nakedSimple = 0;
+	let omissionSimple = 0;
 
 	const solveSimple = () => {
 		let remaining = emptyCount(cells);
