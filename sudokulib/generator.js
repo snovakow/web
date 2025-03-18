@@ -11,8 +11,8 @@ const consoleOut = (result) => {
 	lines.push("Solved: " + (result.solved ? "Yes" : "No"));
 	lines.push("Simple: " + (result.simple ? "Yes" : "No"));
 	lines.push("Simple Hidden: " + result.hiddenSimple);
-	lines.push("Simple Omission: " + result.omissionSimple);
 	lines.push("Simple Naked: " + result.nakedSimple);
+	lines.push("Simple Omission: " + result.omissionSimple);
 
 	lines.push("Visual Omission: " + result.omissionVisible);
 	lines.push("Visual Naked: " + result.nakedVisible);
