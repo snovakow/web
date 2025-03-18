@@ -207,8 +207,8 @@ try {
   `clueCount` tinyint(2) unsigned NOT NULL DEFAULT '0',
   `solveType` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `hiddenSimple` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `omissionSimple` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `nakedSimple` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `omissionSimple` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `omissionVisible` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `nakedVisible` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `naked2` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -333,8 +333,8 @@ try {
 
 		$results = [
 			'hiddenSimple' => $hiddenSimple,
-			'omissionSimple' => $omissionSimple,
 			'nakedSimple' => $nakedSimple,
+			'omissionSimple' => $omissionSimple,
 			'omissionVisible' => $omissionVisible,
 			'candidate' => $candidate,
 			'candidateMin' => $candidateMin,
