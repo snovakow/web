@@ -324,8 +324,8 @@ try {
 		}
 
 		$hiddenSimple = $counts[0];
-		$omissionSimple = $counts[1];
-		$nakedSimple = $counts[2];
+		$nakedSimple = $counts[1];
+		$omissionSimple = $counts[2];
 		$omissionVisible = $counts[3];
 		$candidate = $counts[4];
 		$candidateMin = $counts[5];
