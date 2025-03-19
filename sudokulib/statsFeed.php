@@ -367,7 +367,7 @@ try {
 
 			foreach ($strategies as $strategy) {
 				if ($strategy == 'hiddenSimple') {
-					$sql = "SELECT COUNT(*) AS count, MIN(`$strategy`) AS min, MAX(`$strategy`) AS max FROM `$table` ";
+					$sql = "SELECT COUNT(*) AS count, MIN(`clueCount`) AS min, MAX(`clueCount`) AS max FROM `$table` ";
 					$sql .= "WHERE `solveType`=0";
 
 					$stmt = $db->prepare($sql);
@@ -455,14 +455,14 @@ try {
 				echo "\n";
 			}
 			if ($strategy == 'omissionSimple') {
-				$max = number_format($result['maxNaked']);
+				$max = number_format($result['maxPointer']);
 
 				echo str_pad("$max", $len_3 + 1, " ", STR_PAD_LEFT);
 				echo str_pad("$number", $len_4 + 1, " ", STR_PAD_LEFT);
 				echo "\n";
 
-				$title = "Pointer Naked";
-				$max = number_format($result['maxPointer']);
+				$title = "Naked Pointer";
+				$max = number_format($result['maxNaked']);
 
 				echo str_pad("$title", $len_1, " ", STR_PAD_RIGHT);
 				echo str_pad("$percent", $len_2 + 1, " ", STR_PAD_LEFT);
