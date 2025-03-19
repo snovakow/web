@@ -47,8 +47,8 @@ const emptyCount = (cells) => {
 let VAL = 0;
 const STRATEGY = {
 	SIMPLE_HIDDEN: VAL++,
-	SIMPLE_INTERSECTION: VAL++,
 	SIMPLE_NAKED: VAL++,
+	SIMPLE_INTERSECTION: VAL++,
 
 	VISIBLE_INTERSECTION: VAL++,
 	VISIBLE_NAKED: VAL++,
@@ -73,8 +73,8 @@ Object.freeze(STRATEGY);
 const fillSolve = (cells, simples, strategies) => {
 	simples = simples ?? [
 		STRATEGY.SIMPLE_HIDDEN,
-		STRATEGY.SIMPLE_INTERSECTION,
 		STRATEGY.SIMPLE_NAKED,
+		STRATEGY.SIMPLE_INTERSECTION,
 	];
 	strategies = strategies ?? [
 		STRATEGY.NAKED_2,
@@ -107,13 +107,13 @@ const fillSolve = (cells, simples, strategies) => {
 					found = true;
 					break;
 				}
-				if (simple === STRATEGY.SIMPLE_INTERSECTION && simpleOmissions(cells)) {
-					omissionSimple++;
+				if (simple === STRATEGY.SIMPLE_NAKED && simpleNaked(cells)) {
+					nakedSimple++;
 					found = true;
 					break;
 				}
-				if (simple === STRATEGY.SIMPLE_NAKED && simpleNaked(cells)) {
-					nakedSimple++;
+				if (simple === STRATEGY.SIMPLE_INTERSECTION && simpleOmissions(cells)) {
+					omissionSimple++;
 					found = true;
 					break;
 				}
