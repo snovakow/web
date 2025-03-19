@@ -168,13 +168,8 @@
 						makeBold(body, "10M ETA", formatTime(chunk7ETA));
 						body.appendChild(document.createElement("br"));
 
-						const chunk8Size = MAX_SIZE * 10;
-						const chunk8ETA = (chunk8Size - currentCount % chunk8Size) * passed / updateDataSent;
-						makeBold(body, "100M ETA", formatTime(chunk8ETA));
-						body.appendChild(document.createElement("br"));
-
 						const eta = (totalCount - currentCount) * passed / updateDataSent;
-						makeBold(body, "ETA", formatTime(eta));
+						makeBold(body, "1 Billion ETA", formatTime(eta));
 					}
 				}
 			}
