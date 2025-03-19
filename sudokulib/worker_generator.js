@@ -25,8 +25,8 @@ class StrategyData {
 
 const simples = [];
 new StrategyData(simples, STRATEGY.SIMPLE_HIDDEN, 'hiddenSimple');
-new StrategyData(simples, STRATEGY.SIMPLE_INTERSECTION, 'omissionSimple');
 new StrategyData(simples, STRATEGY.SIMPLE_NAKED, 'nakedSimple');
+new StrategyData(simples, STRATEGY.SIMPLE_INTERSECTION, 'omissionSimple');
 
 new StrategyData(null, STRATEGY.VISIBLE_INTERSECTION, 'omissionVisible');
 new StrategyData(null, STRATEGY.VISIBLE_NAKED, 'nakedVisible');
@@ -88,8 +88,8 @@ const step = () => {
 
 	// solveType
 	// 0 hiddenSimple
-	// 1 omissionSimple
-	// 2 nakedSimple
+	// 1 nakedSimple
+	// 2 omissionSimple
 	// 3 omissionVisible
 	// 4 Candidate
 	// 5 Candidate Minimal
@@ -97,10 +97,10 @@ const step = () => {
 	data.solveType = 0;
 
 	if (result.simple) {
-		if (result.omissionSimple > 0 && result.nakedSimple === 0) {
+		if (result.nakedSimple > 0 && result.omissionSimple === 0) {
 			data.solveType = 1;
 		}
-		if (result.nakedSimple > 0) {
+		if (result.omissionSimple > 0) {
 			data.solveType = 2;
 		}
 	}
