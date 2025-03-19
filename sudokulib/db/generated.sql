@@ -5,9 +5,9 @@
 # http://www.sequelpro.com/
 # https://github.com/sequelpro/sequelpro
 #
-# Host: localhost (MySQL 5.7.32)
+# Host: localhost (MySQL 5.7.39)
 # Database: sudoku
-# Generation Time: 2025-01-18 03:38:38 +0000
+# Generation Time: 2025-03-19 16:51:17 +0000
 # ************************************************************
 
 
@@ -196,22 +196,6 @@ CREATE TABLE `candidate_uniqueRectangle` (
 
 
 
-# Dump of table candidate_visible
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `candidate_visible`;
-
-CREATE TABLE `candidate_visible` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `count` tinyint(2) unsigned NOT NULL,
-  `clueCount` tinyint(2) unsigned NOT NULL,
-  `puzzle_id` int(10) unsigned NOT NULL,
-  `table_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=ascii;
-
-
-
 # Dump of table candidate_xWing
 # ------------------------------------------------------------
 
@@ -253,92 +237,6 @@ CREATE TABLE `candidate_yWing` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `count` tinyint(2) unsigned NOT NULL,
   `clueCount` tinyint(2) unsigned NOT NULL,
-  `puzzle_id` int(10) unsigned NOT NULL,
-  `table_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=ascii;
-
-
-
-# Dump of table simple_hidden
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `simple_hidden`;
-
-CREATE TABLE `simple_hidden` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `count` tinyint(2) unsigned NOT NULL,
-  `clueCount` tinyint(2) unsigned NOT NULL,
-  `puzzle_id` int(10) unsigned NOT NULL,
-  `table_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=ascii;
-
-
-
-# Dump of table simple_naked
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `simple_naked`;
-
-CREATE TABLE `simple_naked` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `count` tinyint(2) unsigned NOT NULL,
-  `clueCount` tinyint(2) unsigned NOT NULL,
-  `puzzle_id` int(10) unsigned NOT NULL,
-  `table_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=ascii;
-
-
-
-# Dump of table simple_omission
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `simple_omission`;
-
-CREATE TABLE `simple_omission` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `count` tinyint(2) unsigned NOT NULL,
-  `clueCount` tinyint(2) unsigned NOT NULL,
-  `puzzle_id` int(10) unsigned NOT NULL,
-  `table_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=ascii;
-
-
-
-# Dump of table super_max
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `super_max`;
-
-CREATE TABLE `super_max` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `superSize` tinyint(2) unsigned NOT NULL,
-  `superCount` tinyint(2) unsigned NOT NULL,
-  `superDepth` tinyint(2) unsigned NOT NULL,
-  `superRank` tinyint(2) unsigned NOT NULL,
-  `superType` tinyint(2) unsigned NOT NULL,
-  `puzzle_id` int(10) unsigned NOT NULL,
-  `table_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=ascii;
-
-
-
-# Dump of table super_min
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `super_min`;
-
-CREATE TABLE `super_min` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `superSize` tinyint(2) unsigned NOT NULL,
-  `superDepth` tinyint(2) unsigned NOT NULL,
-  `superCount` tinyint(2) unsigned NOT NULL,
-  `superRank` tinyint(2) unsigned NOT NULL,
-  `superType` tinyint(2) unsigned NOT NULL,
   `puzzle_id` int(10) unsigned NOT NULL,
   `table_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
