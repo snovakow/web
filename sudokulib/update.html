@@ -124,7 +124,8 @@
 				makeBold(sentNode, "Sent", updateDataSent.toLocaleString());
 				if (totalCount > 0) {
 					sentNode.appendChild(document.createElement("br"));
-					makeBold(sentNode, "Progress", (100 * currentCount / totalCount).toFixed(2) + "%");
+					const percent = Math.floor((100 * currentCount / totalCount) * 100) / 100;
+					makeBold(sentNode, "Progress", percent.toFixed(2) + "%");
 				}
 				sentNodeOverride = false;
 			}
