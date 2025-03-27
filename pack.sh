@@ -31,14 +31,15 @@ do
 	if [ "$build" = "all" ] || [ "$build" = "sudoku" ] ; then webpack "sudoku" ; fi
 	if [ "$build" = "all" ] || [ "$build" = "birthday" ] ; then webpack "birthday" ; fi
 	if [ "$build" = "all" ] || [ "$build" = "bounder" ] ; then webpack "bounder" ; fi
+	if [ "$build" = "all" ] ; then
+		echo "Replace live with live_offline"
+		echo "******"
+		echo "rm -rf ../live"
+		rm -rf ../live
+		echo "mv ../live_offline ../live"
+		mv ../live_offline ../live
+
+		echo
+	fi
 	shift 1;
 done
-
-echo "Replace live with live_offline"
-echo "******"
-echo "rm -rf ../live"
-rm -rf ../live
-echo "mv ../live_offline ../live"
-mv ../live_offline ../live
-
-echo
