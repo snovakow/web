@@ -1,6 +1,6 @@
 Web root and parent repo for various personal projects implemented as submodules
 
-Submodule command line:
+Submodule Creation command line:
 git submodule add https://username@github.com/username/reponame.git /localpath/reponame
 
 They will run directly off the source, but are designed to run through the webpack system for a live release.
