@@ -4,3 +4,6 @@
 [submodule "bounder"]
 	path = bounder
 	url = https://snovakow@github.com/snovakow/bounder.git
+[submodule "resume"]
+	path = resume
+	url = https://snovakow@github.com/snovakow/resume.git
