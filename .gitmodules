@@ -7,3 +7,9 @@
 [submodule "resume"]
 	path = resume
 	url = https://snovakow@github.com/snovakow/resume.git
+[submodule "sudoku"]
+	path = sudoku
+	url = https://snovakow@github.com/snovakow/sudoku.git
+[submodule "sudokulib"]
+	path = sudokulib
+	url = https://snovakow@github.com/snovakow/sudokulib.git
