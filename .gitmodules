@@ -1,3 +1,6 @@
 [submodule "birthday"]
 	path = birthday
 	url = https://snovakow@github.com/snovakow/birthday.git
+[submodule "bounder"]
+	path = bounder
+	url = https://snovakow@github.com/snovakow/bounder.git
