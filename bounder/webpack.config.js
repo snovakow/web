@@ -14,7 +14,7 @@ module.exports = {
 	plugins: [
 		new CopyPlugin({
 			patterns: [
-				// { from: '../three.js/examples/models/gltf/collision-world.glb', to: 'models/gltf/collision-world.glb' },
+				{ from: 'include', to: 'include' },
 				{ from: 'index.html', to: 'index.html' }
 			]
 		})
