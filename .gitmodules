@@ -1,0 +1,3 @@
+[submodule "birthday"]
+	path = birthday
+	url = https://snovakow@github.com/snovakow/birthday.git
