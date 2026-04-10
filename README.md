@@ -1,4 +1,4 @@
-This repo is depricated. The project has been re-incarnated as a Vite + TypeScript project in the "homepage" repo
+# This repo is depricated. The project has been re-incarnated as a Vite + TypeScript project in the "homepage" repo
 
 Web root and parent repo for various personal projects implemented as submodules
 
